@@ -34,14 +34,16 @@ parent(prince_william,prince_george).
 prim(parent/2).
 
 %% METARULES
-metarule([P,Q,R],([P,A,B]:-[Q,A,C],[R,C,B])).
+metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
 %% LEARNING
 x :-
   Pos = [
     great_grandparent(elizabeth_second,prince_george)
     great_grandparent(prince_philip,prince_george)],
-  Neg = [great_grandparent(prince_charles,prince_william)],
+  Neg = [
+    great_grandparent(prince_charles,prince_william)
+  ],
   learn(great_grandparent,Pos,Neg,H),
   pprint(H).
 ```
@@ -62,16 +64,24 @@ In this solution, the predicate `great_grandparent_1/2` is invented. See the afo
 Metagol requires that the user provides a set of second-order metarules, a form of language bias which defines the form of clauses permitted in a hypothesis, similar to mode declarations used in Progol, Aleph, etc. An example metarule is as follows:
 
 ```prolog
-metarule([P,Q,R],([P,A,B]:-[Q,A,C],[R,C,B])). % P(A,B)<- Q(A,C), R(C,B).
+metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])). % P(A,B)<- Q(A,C), R(C,B).
 ```
 
 In this metarule, called the chain metarule, the symbols P, Q, and R denote existentially quantified second-order variables, and the symbols A, B, and C denote universally quantified first-order variables. All metarules follow the following pattern:
 
 ```prolog
-metarule(Metasubs,(Body :- Head)).
+metarule(Metasubs,(Head :- Body)).
 ```
 
-The `Metasubs` list denotes the existential variables in a metarule. All other variables are assumed to be universally quantified.
+The `Metasubs` list denotes the existential variables in a metarule, and Metagol will attempt to find substitutions for them during the proof of a goal. All other variables are assumed to be universally quantified. Alternatively, we can define metarules as follows:
+
+```prolog
+metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):- % P(A,B)<- Q(A,C), R(C,B).
+  member(Q/2,PS),
+  member(R/2,PS).
+```
+
+In this definition, the additional argument `PS` represents the predicate signature of the learning problem.
 
 Currently, the metarules are supplied by the user. We are working on automatically identifying the necessary metarules, and preliminary work is detailed in the following paper:
 
@@ -80,21 +90,21 @@ Currently, the metarules are supplied by the user. We are working on automatical
 Here are more metarules:
 
 ```prolog
-metarule([P,Q],([P,A,B]:-[Q,A,B])). % identity
-metarule([P,Q],([P,A,B]:-[Q,B,A])). % inverse
-metarule([P,Q,X],([P,A,B]:-[Q,A,B,X])). % curry
-metarule([P,Q,R],([P,A,B]:-[Q,A],[R,A,B])). % precon
-metarule([P,Q,R],([P,A,B]:-[Q,A,B],[R,B])). % postcon
+metarule(identity,[P,Q],([P,A,B]:-[[Q,A,B]])).
+metarule(inverse,[P,Q],([P,A,B]:-[[Q,B,A]])).
+metarule(curry,[P,Q,X],([P,A,B]:-[[Q,A,B,X]])).
+metarule(precon,[P,Q,R],([P,A,B]:-[[Q,A],[R,A,B]])).
+metarule(postcon,[P,Q,R],([P,A,B]:-[[Q,A,B],[R,B]])).
 ```
 
 The above metarules are all non-recursive.  By contrast, the following metarule is recursive.
 
 ```prolog
 % P(A,B) <- Q(A,C), A>C, P(C,B),C>B.
-metarule([P,Q],([P,A,B]:-[Q,A,C],obj_gt(A,C),[P,C,B],obj_gt(C,B))).
+metarule(tailrec,[P,Q],([P,A,B]:-[[Q,A,C],@obj_gt(A,C),[P,C,B],@obj_gt(C,B)])).
 ```
 
-Here, the atoms `obj_gt(A,C)` and `obj_gt(C,B)` are used to define a total order over the terms. This is necessary to guarantee termination of the meta-interpreter. For example, suppose you are learning robot strategies for a robot in a one-dimensional space and each term is a state (a list of Prolog facts). The following ordering ensures that the robot always moves at least one place to the right. Because the space is finite, termination is guaranteed.
+Here, the atoms `@obj_gt(A,C)` and `@obj_gt(C,B)` define a total ordering over the terms. The user must define the ordering `@obj_gt(A,B)'. An total order is necessary to guarantee termination of the meta-interpreter. For example, suppose you are learning robot strategies for a robot in a one-dimensional space and each term is a state (a list of Prolog facts). The following ordering ensures that the robot always moves at least one place to the right. Because the space is finite, termination is guaranteed.
 
 ```prolog
 obj_gt(A,B):-
