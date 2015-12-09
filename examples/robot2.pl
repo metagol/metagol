@@ -28,7 +28,7 @@ a :-
     Pos = [
             f(
             world((1/1),(1/1),false,0),
-            world((5/5),(5/5),false,_)
+            world((6/6),(6/6),false,_)
             )
           ],
     learn(f,Pos,[],H),
