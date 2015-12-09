@@ -5,8 +5,6 @@
 
 :- use_module('../metagol').
 
-:- use_module(library(lists)).
-
 :- op(950,fx,'@').
 
 %% PREDICATES TO BE USED IN THE LEARNING

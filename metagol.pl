@@ -1,4 +1,4 @@
-:- module(metagol,[learn/4,pprint/1]).
+:- module(metagol,[learn/4,pprint/1,member/2]).
 
 :- use_module(library(lists)).
 

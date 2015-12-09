@@ -6,7 +6,6 @@
 
 :- dynamic(energy_bound/1).
 
-:- use_module(library(lists)).
 :- use_module(library(random)).
 :- use_module(library(system)).
 
@@ -76,7 +75,7 @@ t:-
     examples(100,Xs),
     foreach(member(G,Xs),call(G)).
 
-x:-
+a:-
   %% set_rand,!,
   examples(10,TrainExamples),!,
 
