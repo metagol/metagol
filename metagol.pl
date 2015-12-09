@@ -28,20 +28,21 @@ proveall(Name,Atoms,PS,G):-
 prove([],_,_,G,G).
 
 prove(['@'(OrderTest)|Atoms],PS,MaxN,G1,G2):-!,
-  OrderTest,
+  user:OrderTest,
   prove(Atoms,PS,MaxN,G1,G2).
 
 %% prim
 prove([Atom|Atoms],PS,MaxN,G1,G2):-
   prim_atom(Atom),
   Goal =..Atom,!,
-  Goal,
+  user:Goal,
   prove(Atoms,PS,MaxN,G1,G2).
 
 %% use existing
 prove([Atom|Atoms],PS1,MaxN,G1,G2):-
   member(sub(Name,MetaSub),G1),
-  metarule(Name,MetaSub,(Atom :- Body),PS1),
+  once(user:metarule(Name,MetaSub,(Atom :- Body),_)), % is this really better?
+  %% user:metarule(Name,MetaSub,(Atom :- Body),PS1),
   prove(Body,PS1,MaxN,G1,G3),
   prove(Atoms,PS1,MaxN,G3,G2).
 
@@ -50,7 +51,7 @@ prove([Atom|Atoms],PS1,MaxN,G1,G2):-
   length(G1,L),
   L < MaxN,
   slice_ps(PS1,Atom,PS2),!,
-  metarule(Name,MetaSub,(Atom :- Body),PS2),
+  user:metarule(Name,MetaSub,(Atom :- Body),PS2),
   not(memberchk(sub(Name,MetaSub),G1)),
   prove(Body,PS1,MaxN,[sub(Name,MetaSub)|G1],G3),
   prove(Atoms,PS1,MaxN,G3,G2).
@@ -58,7 +59,7 @@ prove([Atom|Atoms],PS1,MaxN,G1,G2):-
 prim_atom(Atom):-
   Atom=[P|_],
   arity(Atom,A),
-  prim(P/A).
+  user:prim(P/A).
 
 arity([_|Body],N) :-
   length(Body,N).
@@ -71,7 +72,7 @@ inv_preds(M,Name,[Sk/_|PS]) :-
 
 pred_sig(Name,M,PS):-
   inv_preds(M,Name,InvPreds),
-  findall(X, prim(X), Prims),
+  findall(X, user:prim(X), Prims),
   append(InvPreds,Prims,PS).
 
 slice_ps(PS1,Atom,PS2):-
@@ -101,7 +102,7 @@ func_test([Atom|Atoms],PS,G) :-
 
 pprint([]).
 pprint([sub(Name,MetaSub)|T]):-
-  metarule(Name,MetaSub,Clause,_),
+  user:metarule(Name,MetaSub,Clause,_),
   copy_term(Clause,X),
   numbervars(X,0,_),
   format('~q.~n', [X]),
