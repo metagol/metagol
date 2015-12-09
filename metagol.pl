@@ -57,12 +57,9 @@ prove([Atom|Atoms],PS1,MaxN,G1,G2):-
   prove(Atoms,PS1,MaxN,G3,G2).
 
 prim_atom(Atom):-
-  Atom=[P|_],
-  arity(Atom,A),
+  Atom=[P|Args],
+  length(Args,A),
   user:prim(P/A).
-
-arity([_|Body],N) :-
-  length(Body,N).
 
 inv_preds(0,_Name,[]) :- !.
 inv_preds(M,Name,[Sk/_|PS]) :-
@@ -76,8 +73,8 @@ pred_sig(Name,M,PS):-
   append(InvPreds,Prims,PS).
 
 slice_ps(PS1,Atom,PS2):-
-  Atom = [P|_],
-  arity(Atom,A),
+  Atom = [P|Args],
+  length(Args,A),
   append(_,[P/A|PS2],PS1),!.
 
 slice_ps(PS,_,PS).
@@ -113,12 +110,21 @@ atom_to_list([Atom|T],[AtomAsList|Out]):-
   Atom =..AtomAsList,
   atom_to_list(T,Out).
 
+%% expand metarules?
+%% user:term_expansion(metarule(Name,Subs,(Head:-Body)),
+%%   (
+%%     metarule(Name,Subs,(Head:-Body),PS) :-
+%%       Head = [P|_],
+%%       selectchk(P,Subs,ToBind),
+%%       metagol:bind_metasubs(ToBind,PS)
+%%   )).
 
-%% compound_to_list([E],E):-!.
-%% compound_to_list([H|Tlist],(H,Tcomma)):-
-%%   compound_to_list(Tlist,Tcomma).
+%% bind_metasubs([],_).
+%% bind_metasubs([P|T],PS):-
+%%   member(P/_,PS),
+%%   bind_metasubs(T,PS).
 
-%% isfunctions([]).
+
 
 %% isfunctions([Atom|Atoms]) :-
 %%   isfunction(Atom),
