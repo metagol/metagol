@@ -25,8 +25,8 @@ learn(Name,Pos1,Neg1,G):-
   atom_to_list(Pos1,Pos2),
   atom_to_list(Neg1,Neg2),
   proveall(Name,Pos2,PS,G),
-  nproveall(Neg2,PS,G).
-  %% (functional -> functional(Pos,PS,G); true).
+  nproveall(Name,Neg2,PS,G).
+  %(functional -> isfunctions(Pos2,PS,G); true).
 
 proveall(Name,Atoms,PS,G):-
   iterator(N,M),
@@ -36,7 +36,8 @@ proveall(Name,Atoms,PS,G):-
 
 prove([],_,_,G,G).
 
-prove(['@'(Atom)|Atoms],PS,MaxN,G1,G2):-!,
+prove(['@'(Atom)|Atoms],PS,MaxN,G1,G2):-
+  !,
   user:call(Atom),
   prove(Atoms,PS,MaxN,G1,G2).
 
@@ -48,7 +49,8 @@ prove([Atom|Atoms],PS,MaxN,G1,G2):-
 
 %% use existing
 prove([Atom|Atoms],PS1,MaxN,G1,G2):-
-  member(sub(Name,MetaSub),G1),
+  Atom=[P|_],
+  member(sub(Name,P,MetaSub),G1),
   once(user:metarule(Name,MetaSub,(Atom :- Body),_)),
   prove(Body,PS1,MaxN,G1,G3),
   prove(Atoms,PS1,MaxN,G3,G2).
@@ -57,10 +59,12 @@ prove([Atom|Atoms],PS1,MaxN,G1,G2):-
 prove([Atom|Atoms],PS1,MaxN,G1,G2):-
   length(G1,L),
   L < MaxN,
-  slice_sig(Atom,PS1,PS2),!,
+  Atom=[P|Args],
+  length(Args,A),
+  append(_,[P/A|PS2],PS1),!, % slicing of signature
   user:metarule(Name,MetaSub,(Atom :- Body),PS2),
-  not(memberchk(sub(Name,MetaSub),G1)),
-  prove(Body,PS1,MaxN,[sub(Name,MetaSub)|G1],G3),
+  not(memberchk(sub(Name,P,MetaSub),G1)),
+  prove(Body,PS1,MaxN,[sub(Name,P,MetaSub)|G1],G3),
   prove(Atoms,PS1,MaxN,G3,G2).
 
 inv_preds(0,_Name,[]) :- !.
@@ -74,15 +78,11 @@ init_sig(Name,M,[Name/_|PS]):-
   findall(Prim, user:prim(Prim), Prims),
   append(InvPreds,Prims,PS).
 
-slice_sig([P|Args],PS1,PS2):-
-  length(Args,A),
-  append(_,[P/A|PS2],PS1),!.
-
-nproveall([],_PS,_G).
-nproveall([Atom|T],PS,G):-
+nproveall(_Name,[],_PS,_G).
+nproveall(Name,[Atom|T],PS,G):-
   length(G,N),
   not(prove([Atom],PS,N,G,G)),
-  nproveall(T,PS,G).
+  nproveall(Name,T,PS,G).
 
 iterator(N,M):-
   get_option(min_clauses(MIN)),
@@ -97,7 +97,7 @@ func_test([Atom|Atoms],PS,G) :-
   func_test(Atoms,PS,G).
 
 pprint([]).
-pprint([sub(Name,MetaSub)|T]):-
+pprint([sub(Name,_P,MetaSub)|T]):-
   user:metarule(Name,MetaSub,Clause,_),
   copy_term(Clause,X),
   numbervars(X,0,_),
