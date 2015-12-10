@@ -41,8 +41,7 @@ prove([Atom|Atoms],PS,MaxN,G1,G2):-
 %% use existing
 prove([Atom|Atoms],PS1,MaxN,G1,G2):-
   member(sub(Name,MetaSub),G1),
-  once(user:metarule(Name,MetaSub,(Atom :- Body),_)), % is this really better?
-  %% user:metarule(Name,MetaSub,(Atom :- Body),PS1),
+  once(user:metarule(Name,MetaSub,(Atom :- Body),_)),
   prove(Body,PS1,MaxN,G1,G3),
   prove(Atoms,PS1,MaxN,G3,G2).
 
