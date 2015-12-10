@@ -42,7 +42,7 @@ prove([[P|Args]|Atoms],PS,MaxN,G1,G2):-
 prove([Atom|Atoms],PS1,MaxN,G1,G2):-
   Atom=[P|_],
   member(sub(Name,P,MetaSub),G1),
-  user:metarule_init(Name,MetaSub,Atom,Body),
+  user:metarule_init(Name,MetaSub,(Atom:-Body)),
   prove(Body,PS1,MaxN,G1,G3),
   prove(Atoms,PS1,MaxN,G3,G2).
 
@@ -56,7 +56,8 @@ prove([Atom|Atoms],PS1,MaxN,G1,G2):-
   prove(Body,PS1,MaxN,[sub(Name,P,MetaSub)|G1],G3),
   prove(Atoms,PS1,MaxN,G3,G2).
 
-inv_preds(0,_Name,[]) :- !.
+inv_preds(0,_Name,[]):-!.
+
 inv_preds(M,Name,[Sk/_|PS]) :-
   atomic_list_concat([Name,'_',M],Sk),
   succ(Prev,M),
@@ -72,27 +73,30 @@ lower_sig([P|Args],P,PS1,PS2):-
   append(_,[P/A|PS2],PS1),!.
 
 nproveall(_Name,[],_PS,_G).
+
 nproveall(Name,[Atom|T],PS,G):-
   length(G,N),
   not(prove([Atom],PS,N,G,G)),
   nproveall(Name,T,PS,G).
 
 iterator(N,M):-
-  get_option(min_clauses(MIN)),
-  get_option(max_clauses(MAX)),!,
-  between(MIN,MAX,N),
+  get_option(min_clauses(MinN)),
+  get_option(max_clauses(MaxN)),!,
+  between(MinN,MaxN,N),
   succ(MaxM,N),
   between(0,MaxM,M).
 
 pprint([]).
+
 pprint([sub(Name,_P,MetaSub)|T]):-
-  user:metarule(Name,MetaSub,Clause,_),
+  user:metarule_init(Name,MetaSub,Clause),
   copy_term(Clause,X),
   numbervars(X,0,_),
   format('~q.~n', [X]),
   pprint(T).
 
 atom_to_list([],[]).
+
 atom_to_list([Atom|T],[AtomAsList|Out]):-
   Atom =..AtomAsList,
   atom_to_list(T,Out).
@@ -118,10 +122,10 @@ user:term_expansion(prim(P/A),[prim(P/A),primtest(P,Args),(primcall(P,Args):-Cal
     Call=..[P|Args].
 
 :- user:discontiguous(metarule/4).
-:- user:discontiguous(metarule_init/4).
+:- user:discontiguous(metarule_init/3).
 
-user:term_expansion((metarule(Name,MetaSub,(ClauseHead:-ClauseBody),PS):-Body),Asserts):-
+user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
   Asserts = [
-             (metarule(Name,MetaSub,(ClauseHead:-ClauseBody),PS):-Body),
-             (metarule_init(Name,MetaSub,ClauseHead,ClauseBody))
+             (metarule(Name,MetaSub,Clause,PS):-Body),
+             (metarule_init(Name,MetaSub,Clause))
             ].
