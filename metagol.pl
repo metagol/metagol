@@ -2,6 +2,15 @@
 
 :- use_module(library(lists)).
 
+
+:- user:discontiguous(prim/1).
+:- user:discontiguous(primcall/1).
+:- user:discontiguous(primtest/1).
+
+user:term_expansion(prim(P/A),[prim(P/A),primtest(List),(primcall(List):-Call)]):-
+    functor(Call,P,A),
+    Call=..List.
+
 :- dynamic(functional/0).
 :- dynamic(min_clauses/1).
 :- dynamic(max_clauses/1).
@@ -27,15 +36,14 @@ proveall(Name,Atoms,PS,G):-
 
 prove([],_,_,G,G).
 
-prove(['@'(OrderTest)|Atoms],PS,MaxN,G1,G2):-!,
-  user:OrderTest,
+prove(['@'(Atom)|Atoms],PS,MaxN,G1,G2):-!,
+  user:call(Atom),
   prove(Atoms,PS,MaxN,G1,G2).
 
 %% prim
 prove([Atom|Atoms],PS,MaxN,G1,G2):-
-  prim_atom(Atom),
-  Goal =..Atom,!,
-  user:Goal,
+  user:primtest(Atom),!,
+  user:primcall(Atom),
   prove(Atoms,PS,MaxN,G1,G2).
 
 %% use existing
@@ -54,11 +62,6 @@ prove([Atom|Atoms],PS1,MaxN,G1,G2):-
   not(memberchk(sub(Name,MetaSub),G1)),
   prove(Body,PS1,MaxN,[sub(Name,MetaSub)|G1],G3),
   prove(Atoms,PS1,MaxN,G3,G2).
-
-prim_atom(Atom):-
-  Atom=[P|Args],
-  length(Args,A),
-  user:prim(P/A).
 
 inv_preds(0,_Name,[]) :- !.
 inv_preds(M,Name,[Sk/_|PS]) :-
