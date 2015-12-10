@@ -3,6 +3,7 @@
 :- user:call(op(950,fx,'@')).
 
 :- use_module(library(lists)).
+:- use_module(library(charsio)).
 
 :- dynamic(functional/0).
 :- dynamic(min_clauses/1).
@@ -154,11 +155,15 @@ check_function([Head|Args],PS,G):-
 :- user:discontiguous(primtest/2).
 
 user:term_expansion(prim(P/A),[prim(P/A),primtest(P,Args),(primcall(P,Args):-Call)]):-
-    functor(Call,P,A),
-    Call=..[P|Args].
+  functor(Call,P,A),
+  Call=..[P|Args].
 
 :- user:discontiguous(metarule/4).
 :- user:discontiguous(metarule_init/3).
+
+user:term_expansion((metarule(MetaSub,Clause,PS):-Body),Asserts):-
+  copy_term(Clause,ClauseCopy),numbervars(ClauseCopy,0,_),write_to_chars(ClauseCopy,Codes),atom_codes(Name,Codes),
+  user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts).
 
 user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
   Asserts = [
