@@ -25,8 +25,8 @@ learn(Name,Pos1,Neg1,G):-
   atom_to_list(Pos1,Pos2),
   atom_to_list(Neg1,Neg2),
   proveall(Name,Pos2,PS,G),
-  nproveall(Name,Neg2,PS,G).
-  %(functional -> isfunctions(Pos2,PS,G); true).
+  nproveall(Name,Neg2,PS,G),
+  (get_option(functional) -> check_functions(Pos2,PS,G); true).
 
 proveall(Name,Atoms,PS,G):-
   iterator(N,M),
@@ -91,11 +91,6 @@ iterator(N,M):-
   succ(MaxM,N),
   between(0,MaxM,M).
 
-func_test([],_,_).
-func_test([Atom|Atoms],PS,G) :-
-  do_func_test(Atom,PS,G),
-  func_test(Atoms,PS,G).
-
 pprint([]).
 pprint([sub(Name,_P,MetaSub)|T]):-
   user:metarule(Name,MetaSub,Clause,_),
@@ -108,6 +103,18 @@ atom_to_list([],[]).
 atom_to_list([Atom|T],[AtomAsList|Out]):-
   Atom =..AtomAsList,
   atom_to_list(T,Out).
+
+check_functions([],_PS,_G).
+
+check_functions([Atom|Atoms],PS,G) :-
+  check_function(Atom,PS,G),
+  check_functions(Atoms,PS,G).
+
+check_function([Head|Args],PS,G):-
+  length(G,N),
+  append(FuncArgs,[OrigReturn],Args),
+  append(FuncArgs,[TestReturn],TestArgs),
+  not((prove([[Head|TestArgs]],PS,N,G,G),TestReturn \= OrigReturn)).
 
 %% expand metarules?
 %% user:term_expansion(metarule(Name,Subs,(Head:-Body)),
@@ -122,16 +129,3 @@ atom_to_list([Atom|T],[AtomAsList|Out]):-
 %% bind_metasubs([P|T],PS):-
 %%   member(P/_,PS),
 %%   bind_metasubs(T,PS).
-
-
-
-%% isfunctions([Atom|Atoms]) :-
-%%   isfunction(Atom),
-%%   isfunctions(Atoms).
-
-%% isfunction(Atom):-
-%%   Atom=..[Head|Args],
-%%   append(FuncArgs,[OrigReturn],Args),
-%%   append(FuncArgs,[TestReturn],TestArgs),
-%%   TestAtom=..[Head|TestArgs],!,
-%%   not((call(user:TestAtom),TestReturn \= OrigReturn)).
