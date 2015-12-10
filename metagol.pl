@@ -92,10 +92,29 @@ pprint([]).
 
 pprint([sub(Name,_P,MetaSub)|T]):-
   user:metarule_init(Name,MetaSub,Clause),
-  copy_term(Clause,X),
-  numbervars(X,0,_),
-  format('~q.~n', [X]),
+  copy_term(Clause,(ListHead:-ListBodyWithAts)),
+  Head=..ListHead,
+  convert_preds(ListBodyWithAts,AtomBodyList),
+  listtocomma(AtomBodyList,Body),
+  numbervars((Head:-Body),0,_),
+  format('~q.~n', [(Head:-Body)]),
   pprint(T).
+
+listtocomma([E],E):-!.
+
+listtocomma([H|T],(H,R)):-
+  listtocomma(T,R).
+
+convert_preds([],[]).
+
+convert_preds(['@'(Atom)|T],[Atom|R]):-
+  !,
+  convert_preds(T,R).
+
+convert_preds([List|T],[Atom|R]):-
+  !,
+  Atom=..List,
+  convert_preds(T,R).
 
 atom_to_list([],[]).
 
