@@ -2,15 +2,6 @@
 
 :- use_module(library(lists)).
 
-
-:- user:discontiguous(prim/1).
-:- user:discontiguous(primcall/1).
-:- user:discontiguous(primtest/1).
-
-user:term_expansion(prim(P/A),[prim(P/A),primtest(List),(primcall(List):-Call)]):-
-    functor(Call,P,A),
-    Call=..List.
-
 :- dynamic(functional/0).
 :- dynamic(min_clauses/1).
 :- dynamic(max_clauses/1).
@@ -51,7 +42,7 @@ prove([Atom|Atoms],PS,MaxN,G1,G2):-
 prove([Atom|Atoms],PS1,MaxN,G1,G2):-
   Atom=[P|_],
   member(sub(Name,P,MetaSub),G1),
-  once(user:metarule(Name,MetaSub,(Atom :- Body),_)),
+  user:metarule_init(Name,MetaSub,Atom,Body),
   prove(Body,PS1,MaxN,G1,G3),
   prove(Atoms,PS1,MaxN,G3,G2).
 
@@ -115,6 +106,23 @@ check_function([Head|Args],PS,G):-
   append(FuncArgs,[OrigReturn],Args),
   append(FuncArgs,[TestReturn],TestArgs),
   not((prove([[Head|TestArgs]],PS,N,G,G),TestReturn \= OrigReturn)).
+
+:- user:discontiguous(prim/1).
+:- user:discontiguous(primcall/1).
+:- user:discontiguous(primtest/1).
+
+user:term_expansion(prim(P/A),[prim(P/A),primtest(List),(primcall(List):-Call)]):-
+    functor(Call,P,A),
+    Call=..List.
+
+:- user:discontiguous(metarule/4).
+:- user:discontiguous(metarule_init/4).
+
+user:term_expansion((metarule(Name,MetaSub,(ClauseHead:-ClauseBody),PS):-Body),Asserts):-
+  Asserts = [
+             (metarule(Name,MetaSub,(ClauseHead:-ClauseBody),PS):-Body),
+             (metarule_init(Name,MetaSub,ClauseHead,ClauseBody))
+            ].
 
 %% expand metarules?
 %% user:term_expansion(metarule(Name,Subs,(Head:-Body)),
