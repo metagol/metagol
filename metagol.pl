@@ -50,9 +50,7 @@ prove([Atom|Atoms],PS1,MaxN,G1,G2):-
 prove([Atom|Atoms],PS1,MaxN,G1,G2):-
   length(G1,L),
   L < MaxN,
-  Atom=[P|Args],
-  length(Args,A),
-  append(_,[P/A|PS2],PS1),!, % slicing of signature
+  lower_sig(Atom,P,PS1,PS2),
   user:metarule(Name,MetaSub,(Atom :- Body),PS2),
   not(memberchk(sub(Name,P,MetaSub),G1)),
   prove(Body,PS1,MaxN,[sub(Name,P,MetaSub)|G1],G3),
@@ -68,6 +66,10 @@ init_sig(Name,M,[Name/_|PS]):-
   inv_preds(M,Name,InvPreds),
   findall(Prim, user:prim(Prim), Prims),
   append(InvPreds,Prims,PS).
+
+lower_sig([P|Args],P,PS1,PS2):-
+  length(Args,A),
+  append(_,[P/A|PS2],PS1),!.
 
 nproveall(_Name,[],_PS,_G).
 nproveall(Name,[Atom|T],PS,G):-
@@ -123,17 +125,3 @@ user:term_expansion((metarule(Name,MetaSub,(ClauseHead:-ClauseBody),PS):-Body),A
              (metarule(Name,MetaSub,(ClauseHead:-ClauseBody),PS):-Body),
              (metarule_init(Name,MetaSub,ClauseHead,ClauseBody))
             ].
-
-%% expand metarules?
-%% user:term_expansion(metarule(Name,Subs,(Head:-Body)),
-%%   (
-%%     metarule(Name,Subs,(Head:-Body),PS) :-
-%%       Head = [P|_],
-%%       selectchk(P,Subs,ToBind),
-%%       metagol:bind_metasubs(ToBind,PS)
-%%   )).
-
-%% bind_metasubs([],_).
-%% bind_metasubs([P|T],PS):-
-%%   member(P/_,PS),
-%%   bind_metasubs(T,PS).
