@@ -64,24 +64,20 @@ In this solution, the predicate `great_grandparent_1/2` is invented. See the afo
 Metagol requires that the user provides a set of second-order metarules, a form of language bias which defines the form of clauses permitted in a hypothesis, similar to mode declarations used in Progol, Aleph, etc. An example metarule is as follows:
 
 ```prolog
-metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])). % P(A,B)<- Q(A,C), R(C,B).
+metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 ```
 
-In this metarule, called the chain metarule, the symbols P, Q, and R denote existentially quantified second-order variables, and the symbols A, B, and C denote universally quantified first-order variables. All metarules follow the following pattern:
+In this metarule, named the chain metarule, the symbols P, Q, and R denote existentially quantified second-order variables, and the symbols A, B, and C denote universally quantified first-order variables. All other variables are assumed to be universally quantified. Metagol will attempt to find substitutions for the existentially quantified variables during the proof of a goal.
+
+Alternatively, we can write the aforementioned metatrule in the following equivalent form:
 
 ```prolog
-metarule(Metasubs,(Head :- Body)).
-```
-
-The `Metasubs` list denotes the existential variables in a metarule, and Metagol will attempt to find substitutions for them during the proof of a goal. All other variables are assumed to be universally quantified. Alternatively, we can define metarules as follows:
-
-```prolog
-metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):- % P(A,B)<- Q(A,C), R(C,B).
+metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
   member(Q/2,PS),
   member(R/2,PS).
 ```
 
-In this definition, the additional argument `PS` represents the predicate signature of the learning problem.
+In this example, where `PS` represents the predicate signature, the user can explicitly state how to bind the variables in the metarule,
 
 Currently, the metarules are supplied by the user. We are working on automatically identifying the necessary metarules, and preliminary work is detailed in the following paper:
 
@@ -115,7 +111,25 @@ obj_gt(A,B):-
 
 ## Dependent learning
 
-(todo)
+To learn a sequence of tasks, use the following command.
+
+```prolog
+Seq = [
+    (parent,
+      [
+        parent(ann,andy),
+        parent(steve,andy),
+        parent(ann,amy)
+      ],[]),
+    (grandparent,
+      [
+        grandparent(ann,amelia),
+        grandparent(steve,amelia)
+      ],[])
+  ],
+  learn_seq(Seq,H),
+  pprint(H).
+```
 
 ## Metagol settings
 
@@ -127,7 +141,7 @@ Metagol searches for a hypothesis using iterative deepening on the number of cla
 metagol:min_clauses(Integer). % default 1
 ```
 
-The user can also specify a max solution length, as follows.
+The user can also specify a maximum solution length as follows.
 
 ```prolog
 metagol:max_clauses(Integer). % default 6
@@ -139,6 +153,8 @@ The following flag denotes whether the learned theory should be functional.
 metagol:functional. % default false
 ```
 
+(todo explain: If the functional flag is enabled, then the must define functest predicate.)
+
 ```prolog
 metagol:limit_recursion. % default false
 ```
@@ -146,8 +162,6 @@ metagol:limit_recursion. % default false
 ```prolog
 metagol:fold_theory. % default false
 ```
-
-
 
 ## Further details
 
