@@ -33,9 +33,9 @@ prove(['@'(Atom)|Atoms],PS,MaxN,G1,G2):-
   prove(Atoms,PS,MaxN,G1,G2).
 
 %% prim
-prove([Atom|Atoms],PS,MaxN,G1,G2):-
-  user:primtest(Atom),!,
-  user:primcall(Atom),
+prove([[P|Args]|Atoms],PS,MaxN,G1,G2):-
+  user:primtest(P,Args),!,
+  user:primcall(P,Args),
   prove(Atoms,PS,MaxN,G1,G2).
 
 %% use existing
@@ -108,12 +108,12 @@ check_function([Head|Args],PS,G):-
   not((prove([[Head|TestArgs]],PS,N,G,G),TestReturn \= OrigReturn)).
 
 :- user:discontiguous(prim/1).
-:- user:discontiguous(primcall/1).
-:- user:discontiguous(primtest/1).
+:- user:discontiguous(primcall/2).
+:- user:discontiguous(primtest/2).
 
-user:term_expansion(prim(P/A),[prim(P/A),primtest(List),(primcall(List):-Call)]):-
+user:term_expansion(prim(P/A),[prim(P/A),primtest(P,Args),(primcall(P,Args):-Call)]):-
     functor(Call,P,A),
-    Call=..List.
+    Call=..[P|Args].
 
 :- user:discontiguous(metarule/4).
 :- user:discontiguous(metarule_init/4).
