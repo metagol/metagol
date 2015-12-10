@@ -22,7 +22,7 @@ learn(Name,Pos1,Neg1,G):-
 proveall(Name,Atoms,PS,G):-
   iterator(N,M),
   format('% clauses: ~d invented predicates: ~d\n',[N,M]),
-  pred_sig(Name,M,PS),
+  init_sig(Name,M,PS),
   prove(Atoms,PS,N,[],G).
 
 prove([],_,_,G,G).
@@ -50,7 +50,7 @@ prove([Atom|Atoms],PS1,MaxN,G1,G2):-
 prove([Atom|Atoms],PS1,MaxN,G1,G2):-
   length(G1,L),
   L < MaxN,
-  slice_ps(PS1,Atom,PS2),!,
+  slice_sig(Atom,PS1,PS2),!,
   user:metarule(Name,MetaSub,(Atom :- Body),PS2),
   not(memberchk(sub(Name,MetaSub),G1)),
   prove(Body,PS1,MaxN,[sub(Name,MetaSub)|G1],G3),
@@ -67,17 +67,14 @@ inv_preds(M,Name,[Sk/_|PS]) :-
   succ(Prev,M),
   inv_preds(Prev,Name,PS).
 
-pred_sig(Name,M,PS):-
+init_sig(Name,M,[Name/_|PS]):-
   inv_preds(M,Name,InvPreds),
-  findall(X, user:prim(X), Prims),
+  findall(Prim, user:prim(Prim), Prims),
   append(InvPreds,Prims,PS).
 
-slice_ps(PS1,Atom,PS2):-
-  Atom = [P|Args],
+slice_sig([P|Args],PS1,PS2):-
   length(Args,A),
   append(_,[P/A|PS2],PS1),!.
-
-slice_ps(PS,_,PS).
 
 nproveall([],_PS,_G).
 nproveall([Atom|T],PS,G):-
