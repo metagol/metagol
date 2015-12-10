@@ -8,6 +8,7 @@
 
 :- use_module(library(random)).
 :- use_module(library(system)).
+:- use_module(library(lists)).
 
 :- op(950,fx,'@').
 
