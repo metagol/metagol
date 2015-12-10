@@ -29,7 +29,7 @@ prim(father/2).
 metarule(a,[P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
   member(Q/2,PS).
 
-metarule(ab,[P,Q,R],([P,A,B]:-[[Q,A,B],[R,A,B]]),PS):-
+metarule(ab,[P,Q],([P,A,B]:-[[Q,A,B],[R,A,B]]),PS):-
   member(Q/2,PS),
   member(R/2,PS).
 
@@ -37,28 +37,19 @@ metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
   member(Q/2,PS),
   member(R/2,PS).
 
-%% THIS SHOULD WORK
 a :-
-  Pos = [
-    grandparent(ann,amelia),
-    grandparent(steve,amelia),
-    grandparent(ann,spongebob),
-    grandparent(steve,spongebob),
-    grandparent(linda,amelia)
+  Seq = [
+    (parent,
+      [
+        parent(ann,andy),
+        parent(steve,andy),
+        parent(ann,amy)
+      ],[]),
+    (grandparent,
+      [
+        grandparent(ann,amelia),
+        grandparent(steve,amelia)
+      ],[])
   ],
-  Neg = [
-    grandparent(amy,amelia)
-  ],
-  learn(grandparent,Pos,Neg,H),
+  learn_seq(Seq,H),
   pprint(H).
-
-%% THIS SHOULD FAIL
-b :-
-  Pos = [
-    grandparent(ann,amelia)
-  ],
-  Neg = [
-    grandparent(ann,amelia)
-  ],
-
-  (learn(grandparent,Pos,Neg,H) -> (pprint(H)); writeln('failed to learn a theory')).

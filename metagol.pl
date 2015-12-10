@@ -1,4 +1,4 @@
-:- module(metagol,[learn/4,pprint/1,member/2]).
+:- module(metagol,[learn/4,learn_seq/2,pprint/1,member/2]).
 
 :- user:call(op(950,fx,'@')).
 
@@ -14,18 +14,29 @@ default(max_clauses(6)).
 get_option(X):-call(X),!.
 get_option(X):-default(X).
 
-learn(Name,Pos1,Neg1,G):-
+learn(Name,Pos,Neg,G):-
+  learn(Name,Pos,Neg,[],_PS,[],G).
+
+learn(Name,Pos1,Neg1,PS1,PS2,G1,G2):-
   atom_to_list(Pos1,Pos2),
   atom_to_list(Neg1,Neg2),
-  proveall(Name,Pos2,PS,G),
-  nproveall(Name,Neg2,PS,G),
-  (get_option(functional) -> check_functions(Pos2,PS,G); true).
+  proveall(Name,Pos2,PS1,PS2,G1,G2),
+  nproveall(Name,Neg2,PS2,G2),
+  (functional -> check_functions(Pos2,PS2,G2); true).
 
-proveall(Name,Atoms,PS,G):-
+learn_seq(Seq,G):-
+  learn_seq_aux(Seq,[],_PS2,[],G).
+
+learn_seq_aux([],PS,PS,G,G).
+learn_seq_aux([(Name,Pos,Neg)|T],PS1,PS2,G1,G2):-
+  learn(Name,Pos,Neg,PS1,PS3,G1,G3),!, % purposely never backtrack
+  learn_seq_aux(T,PS3,PS2,G3,G2).
+
+proveall(Name,Atoms,PS1,PS2,G1,G2):-
   iterator(N,M),
   format('% clauses: ~d invented predicates: ~d\n',[N,M]),
-  init_sig(Name,M,PS),
-  prove(Atoms,PS,N,[],G).
+  init_sig(Name,M,PS1,PS2),
+  prove(Atoms,PS2,N,G1,G2).
 
 prove([],_,_,G,G).
 
@@ -65,10 +76,14 @@ inv_preds(M,Name,[Sk/_|PS]) :-
   succ(Prev,M),
   inv_preds(Prev,Name,PS).
 
-init_sig(Name,M,[Name/_|PS]):-
+init_sig(Name,M,[],[Name/_|PS]):-!,
   inv_preds(M,Name,InvPreds),
   findall(Prim, user:prim(Prim), Prims),
   append(InvPreds,Prims,PS).
+
+init_sig(Name,M,PS1,[Name/_|PS2]):-
+  inv_preds(M,Name,InvPreds),
+  append(InvPreds,PS1,PS2).
 
 lower_sig([P|Args],P,PS1,PS2):-
   length(Args,A),
