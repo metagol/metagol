@@ -67,7 +67,8 @@ Metagol requires that the user provides a set of second-order metarules, a form 
 metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 ```
 
-In this metarule, named the chain metarule, the symbols P, Q, and R denote existentially quantified second-order variables, and the symbols A, B, and C denote universally quantified first-order variables. All other variables are assumed to be universally quantified. Metagol will attempt to find substitutions for the existentially quantified variables during the proof of a goal.
+In this metarule, named the chain metarule, the symbols `P`, `Q`, and `R` are existentially quantified second-order variables,
+and the symbols `A`, `B,` and `C` are universally quantified first-order variables. The list in the second argument of the clause is used to denote existentially quantified variables, and Metagol will attempt to find substitutions for these variables during the proof of a goal.
 
 Alternatively, we can write the aforementioned metatrule in the following equivalent form:
 
@@ -77,7 +78,7 @@ metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
   member(R/2,PS).
 ```
 
-In this example, where `PS` represents the predicate signature, the user can explicitly state how to bind the variables in the metarule,
+In this example, where `PS` represents the predicate signature, the user can explicitly state how to bind the variables in the metarule.
 
 Currently, the metarules are supplied by the user. We are working on automatically identifying the necessary metarules, and preliminary work is detailed in the following paper:
 
