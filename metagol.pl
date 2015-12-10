@@ -1,5 +1,7 @@
 :- module(metagol,[learn/4,pprint/1,member/2]).
 
+:- user:call(op(950,fx,'@')).
+
 :- use_module(library(lists)).
 
 :- dynamic(functional/0).

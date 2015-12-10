@@ -5,8 +5,6 @@
 
 :- use_module('../metagol').
 
-:- op(950,fx,'@').
-
 metagol:functional.
 
 %% PREDICATES TO BE USED IN THE LEARNING

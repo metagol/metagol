@@ -5,8 +5,6 @@
 
 :- use_module('../metagol').
 
-:- op(950,fx,'@').
-
 %% PREDICATES TO BE USED IN THE LEARNING
 prim(move_left/2).
 prim(move_right/2).
