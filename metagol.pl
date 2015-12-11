@@ -22,7 +22,7 @@ learn(Name,Pos1,Neg1,PS1,PS2,G1,G2):-
   atom_to_list(Pos1,Pos2),
   atom_to_list(Neg1,Neg2),
   proveall(Name,Pos2,PS1,PS2,G1,G2),
-  nproveall(Name,Neg2,PS2,G2),
+  nproveall(Neg2,PS2,G2),
   (functional -> is_functional(Pos2,PS2,G2); true).
 
 learn_seq(Seq,G):-
@@ -93,10 +93,10 @@ prove_deduce(Atom,PS,G):-
   length(G,N),
   prove([Atom],PS,N,G,G).
 
-nproveall(_Name,[],_PS,_G).
-nproveall(Name,[Atom|T],PS,G):-
+nproveall([],_PS,_G).
+nproveall([Atom|T],PS,G):-
   not(prove_deduce(Atom,PS,G)),
-  nproveall(Name,T,PS,G).
+  nproveall(T,PS,G).
 
 iterator(N,M):-
   get_option(min_clauses(MinN)),
@@ -104,8 +104,6 @@ iterator(N,M):-
   between(MinN,MaxN,N),
   succ(MaxM,N),
   between(0,MaxM,M).
-
-
 
 pprint(G1):-
   reverse(G1,G2),
