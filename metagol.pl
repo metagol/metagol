@@ -144,7 +144,6 @@ is_functional([Atom|Atoms],PS,G) :-
 :- user:discontiguous(metarule/4).
 :- user:discontiguous(metarule_init/3).
 
-
 gen_metarule_name(Clause,Name):-
   copy_term(Clause,Copy),
   numbervars(Copy,0,_),
@@ -179,4 +178,3 @@ user:term_expansion(metarule(Subs,Clause),Asserts) :-
   gen_metarule_name(Clause,Name),
   Clause = ([P|_] :- _),
   selectchk(P,Subs,ToBind).
-

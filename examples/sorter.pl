@@ -10,6 +10,8 @@
 :- use_module(library(system)).
 :- use_module(library(lists)).
 
+:- user:call(op(950,fx,'@')).
+
 %% METAGOL SETTINGS
 metagol:max_clauses(4).
 
@@ -20,10 +22,10 @@ prim(pick_up_left/2).
 prim(split/2).
 prim(combine/2).
 
-metarule(a,[P,Q],([P,A,B]:-[[Q,A,C],@obj_gt(A,C),[P,C,B],@obj_gt(C,B)]),PS):-
+metarule([P,Q],([P,A,B]:-[[Q,A,C],@obj_gt(A,C),[P,C,B],@obj_gt(C,B)]),PS):-
   member(Q/2,PS).
 
-metarule(b,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
+metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
   member(Q/2,PS),
   member(R/2,PS).
 

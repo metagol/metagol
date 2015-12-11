@@ -23,16 +23,9 @@ prim(mother/2).
 prim(father/2).
 
 %% METARULES
-metarule([P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
-  member(Q/2,PS).
-
-metarule([P,Q],([P,A,B]:-[[Q,A,B],[R,A,B]]),PS):-
-  member(Q/2,PS),
-  member(R/2,PS).
-
-metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
-  member(Q/2,PS),
-  member(R/2,PS).
+metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
+metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,A,B]])).
+metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
 %% SEQUENTIAL LEARNING
 a :-

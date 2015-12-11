@@ -14,12 +14,15 @@ prim(grab_ball/2).
 prim(drop_ball/2).
 
 %% METARULES
-metarule(identity,[P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
+metarule([P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
   member(Q/2,PS).
 
-metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
+metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
   member(Q/2,PS),
   member(R/2,PS).
+
+%% metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
+%% metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
 %% LEARNING
 a :-

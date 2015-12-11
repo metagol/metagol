@@ -18,11 +18,8 @@ parent(prince_william,prince_george).
 prim(parent/2).
 
 %% METARULES
-metarule([P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
-  member(Q/2,PS).
-
-metarule([P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]]),PS):-
-  member(Q/2,PS).
+metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
+metarule([P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]])).
 
 %% LEARNING RECURSIVE ANCESTOR
 a :-

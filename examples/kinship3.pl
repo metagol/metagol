@@ -26,18 +26,18 @@ prim(married/2).
 prim(mother/2).
 prim(father/2).
 
-%% METARULES - example with names provided
-metarule(indent,[P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
+%% METARULES - example with specific bindings
+metarule([P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
   member(Q/2,PS).
 
-metarule(inverse,[P,Q],([P,A,B]:-[[Q,B,A]]),PS):-
+metarule([P,Q],([P,A,B]:-[[Q,B,A]]),PS):-
   member(Q/2,PS).
 
-metarule(ab,[P,Q,R],([P,A,B]:-[[Q,A,B],[R,A,B]]),PS):-
+metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,A,B]]),PS):-
   member(Q/2,PS),
   member(R/2,PS).
 
-metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
+metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
   member(Q/2,PS),
   member(R/2,PS).
 
