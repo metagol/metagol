@@ -105,8 +105,8 @@ iterator(N,M):-
   succ(MaxM,N),
   between(0,MaxM,M).
 
+%% need to reverse the input
 pprint([]).
-
 pprint([sub(Name,_P,MetaSub)|T]):-
   user:metarule_init(Name,MetaSub,Clause),
   copy_term(Clause,(ListHead:-ListBodyWithAts)),
@@ -141,20 +141,42 @@ is_functional([Atom|Atoms],PS,G) :-
 :- user:discontiguous(prim/1).
 :- user:discontiguous(primcall/2).
 :- user:discontiguous(primtest/2).
+:- user:discontiguous(metarule/4).
+:- user:discontiguous(metarule_init/3).
+
+
+gen_metarule_name(Clause,Name):-
+  copy_term(Clause,Copy),
+  numbervars(Copy,0,_),
+  write_to_chars(Copy,Codes),
+  atom_codes(Name,Codes).
+
+bind_metasubs([],_).
+bind_metasubs([P|T],PS):-
+  member(P/_,PS),
+  bind_metasubs(T,PS).
 
 user:term_expansion(prim(P/A),[prim(P/A),primtest(P,Args),(primcall(P,Args):-Call)]):-
   functor(Call,P,A),
   Call=..[P|Args].
 
-:- user:discontiguous(metarule/4).
-:- user:discontiguous(metarule_init/3).
-
 user:term_expansion((metarule(MetaSub,Clause,PS):-Body),Asserts):-
-  copy_term(Clause,ClauseCopy),numbervars(ClauseCopy,0,_),write_to_chars(ClauseCopy,Codes),atom_codes(Name,Codes),
+  gen_metarule_name(Clause,Name),
   user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts).
 
 user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
   Asserts = [
-             (metarule(Name,MetaSub,Clause,PS):-Body),
-             (metarule_init(Name,MetaSub,Clause))
-            ].
+   (metarule(Name,MetaSub,Clause,PS):-Body),
+   (metarule_init(Name,MetaSub,Clause))
+  ].
+
+%% automatically adds the bindings for the metasubs
+user:term_expansion(metarule(Subs,Clause),Asserts) :-
+  Asserts = [
+    (metarule(Name,Subs,Clause,PS) :- metagol:bind_metasubs(ToBind,PS)),
+    (metarule_init(Name,Subs,Clause))
+  ],
+  gen_metarule_name(Clause,Name),
+  Clause = ([P|_] :- _),
+  selectchk(P,Subs,ToBind).
+
