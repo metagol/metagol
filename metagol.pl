@@ -155,31 +155,59 @@ gen_metarule_name(Clause,Name):-
   write_to_chars(Copy,Codes),
   atom_codes(Name,Codes).
 
-bind_metasubs([],_).
-bind_metasubs([P|T],PS):-
-  member(P/_,PS),
-  bind_metasubs(T,PS).
-
 user:term_expansion(prim(P/A),[prim(P/A),primtest(P,Args),(primcall(P,Args):-Call)]):-
   functor(Call,P,A),
   Call=..[P|Args].
 
+user:term_expansion(metarule(MetaSub,Clause),Asserts):-
+  gen_body(MetaSub,Clause,PS,Body),
+  user:term_expansion((metarule(MetaSub,Clause,PS):-Body),Asserts).
+
 user:term_expansion((metarule(MetaSub,Clause,PS):-Body),Asserts):-
+  is_list(MetaSub),
   gen_metarule_name(Clause,Name),
   user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts).
 
+user:term_expansion(metarule(Name,MetaSub,Clause),Asserts):-
+  atom(Name),
+  gen_body(MetaSub,Clause,PS,Body),
+  user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts).
+
 user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
+  add_metaruleinit((metarule(Name,MetaSub,Clause,PS):-Body),Asserts).
+
+add_metaruleinit((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
   Asserts = [
    (metarule(Name,MetaSub,Clause,PS):-Body),
    (metarule_init(Name,MetaSub,Clause))
   ].
 
 %% automatically adds the bindings for the metasubs
-user:term_expansion(metarule(Subs,Clause),Asserts) :-
-  Asserts = [
-    (metarule(Name,Subs,Clause,PS) :- metagol:bind_metasubs(ToBind,PS)),
-    (metarule_init(Name,Subs,Clause))
-  ],
-  gen_metarule_name(Clause,Name),
-  Clause = ([P|_] :- _),
-  selectchk(P,Subs,ToBind).
+gen_body(MetaSub,([P|_]:-Goals),PS,Body):-
+  remove_var(P,MetaSub,MetaSubNew),
+  gen_body_aux(MetaSubNew,Goals,PS,Body).
+
+gen_body_aux([],_Goals,_PS,true):-!.
+
+gen_body_aux(Vars,[[Var|Args]|Goals],PS,(member(Var/A,PS),Body)):-
+  select_var(Var,Vars,NewVars),!,
+  length(Args,A),
+  gen_body_aux(NewVars,Goals,PS,Body).
+
+gen_body_aux(Vars,[_|Goals],PS,Body):-
+  gen_body_aux(Vars,Goals,PS,Body).
+
+remove_var(_Var,[],[]).
+
+remove_var(Var,[V|Vars],R):-
+  Var==V,!,
+  remove_var(Var,Vars,R).
+
+remove_var(Var,[V|Vars],[V|R]):-
+  remove_var(Var,Vars,R).
+
+select_var(Var,[V|Vars],Vars):-
+  Var==V,!.
+
+select_var(Var,[V|Vars],[V|R]):-
+  select_var(Var,Vars,R).
