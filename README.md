@@ -67,11 +67,11 @@ Metagol requires that the user provides a set of second-order metarules, a form 
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 ```
 
-In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` are existentially quantified second-order variables, and the symbols `A`, `B,` and `C` are universally quantified first-order variables.
+In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` are existentially quantified second-order variables, and the symbols `A`, `B`, and `C` are universally quantified first-order variables.
 
 The list in the first argument is used to denote existentially quantified variables. Metagol will attempt to find substitutions for these variables during the proof of a goal.
 
-Alternatively, we can write the aforementioned metatrule in the following equivalent form:
+Alternatively, we can write the aforementioned metarule in the following equivalent form:
 
 ```prolog
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
@@ -158,10 +158,12 @@ metagol:functional. % default false
 
 If the functional flag is enabled, then the must define a func_test predicate. An example func test is as follows.
 
+```prolog
 func_test(Atom,PS,G):-
   Atom = [P,A,B],
   Actual = [P,A,Z],
   not((metagol:prove_deduce(Actual,PS,G),Z \= B)).
+```
 
 This func test is used in the robot-func example.  The `Atom` variable is formed of a predicate symbol `P` and two states `A` and `B`, which represent initial and final state pairs respectively.  The func_test checks whether the learned hypothesis can be applied to the initial state to reach any state `Z` other that the expected final state `B`. 
 
