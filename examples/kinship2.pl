@@ -14,20 +14,17 @@ parent(princess_diana,prince_william).
 parent(princess_diana,prince_harry).
 parent(prince_william,prince_george).
 
-%% METAGOL SETTINGS
-metagol:max_clauses(5).
-
 %% PREDICATES TO BE USED IN THE LEARNING
 prim(parent/2).
 
 %% METARULES
-metarule(a,[P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
+metarule([P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
   member(Q/2,PS).
 
-metarule(b,[P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]]),PS):-
+metarule([P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]]),PS):-
   member(Q/2,PS).
 
-%% LEARNING ANCESTOR
+%% LEARNING RECURSIVE ANCESTOR
 a :-
   Pos = [
     ancestor(elizabeth_second,prince_charles),
@@ -36,6 +33,3 @@ a :-
   ],
   learn(ancestor,Pos,[],H),
   pprint(H).
-
-t :-
-  a.

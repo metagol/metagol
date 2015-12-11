@@ -34,7 +34,7 @@ parent(prince_william,prince_george).
 prim(parent/2).
 
 %% METARULES
-metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
+metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
 %% LEARNING
 x :-

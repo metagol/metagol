@@ -32,16 +32,6 @@ a :-
     learn(f,Pos,[],H),
     pprint(H).
 
-b :-
-    Pos = [
-            f(
-            world((1/1),(1/1),false,0),
-            world((3/3),(3/3),false,_)
-            )
-          ],
-    metagolo_linear(f,Pos,[],H),
-    pprint(H).
-
 %% FIRST-ORDER BACKGROUND KNOWLEDGE
 max_right(6).
 max_forwards(6).

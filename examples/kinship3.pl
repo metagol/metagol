@@ -17,6 +17,7 @@ married(gavin,amy).
 offspring(A,B):- mother(B,A).
 offspring(A,B):- father(B,A).
 
+%% METAGOL SETTINGS
 metagol:max_clauses(3).
 
 %% PREDICATES TO BE USED IN THE LEARNING
@@ -25,7 +26,7 @@ prim(married/2).
 prim(mother/2).
 prim(father/2).
 
-%% METARULES
+%% METARULES - example with names provided
 metarule(indent,[P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
   member(Q/2,PS).
 
@@ -64,6 +65,3 @@ b :-
     grandparent(ann,amelia)
   ],
   (learn(grandparent,Pos,Neg,_) -> false; writeln('failed to learn a theory')).
-
-t :-
-  a,b.

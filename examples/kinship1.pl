@@ -13,11 +13,11 @@ married(ann,steve).
 married(steve,ann).
 married(amy,gavin).
 married(gavin,amy).
-
 offspring(A,B):- mother(B,A).
 offspring(A,B):- father(B,A).
 
-metagol:max_clauses(3).
+%% METAGOL SETTINGS
+metagol:max_clauses(3). % optional
 
 %% PREDICATES TO BE USED IN THE LEARNING
 prim(offspring/2).
@@ -26,18 +26,18 @@ prim(mother/2).
 prim(father/2).
 
 %% METARULES
-metarule(a,[P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
+metarule([P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
   member(Q/2,PS).
 
-metarule(ab,[P,Q,R],([P,A,B]:-[[Q,A,B],[R,A,B]]),PS):-
+metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,A,B]]),PS):-
   member(Q/2,PS),
   member(R/2,PS).
 
-metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
+metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
   member(Q/2,PS),
   member(R/2,PS).
 
-%% THIS SHOULD WORK
+%% LEARNING TASK
 a :-
   Pos = [
     grandparent(ann,amelia),
@@ -52,7 +52,7 @@ a :-
   learn(grandparent,Pos,Neg,H),
   pprint(H).
 
-%% THIS SHOULD FAIL
+%% EXAMPLE OF A FAILURE
 b :-
   Pos = [
     grandparent(ann,amelia)
@@ -60,5 +60,4 @@ b :-
   Neg = [
     grandparent(ann,amelia)
   ],
-
   (learn(grandparent,Pos,Neg,H) -> (pprint(H)); writeln('failed to learn a theory')).

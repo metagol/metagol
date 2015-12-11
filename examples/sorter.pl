@@ -10,6 +10,7 @@
 :- use_module(library(system)).
 :- use_module(library(lists)).
 
+%% METAGOL SETTINGS
 metagol:max_clauses(4).
 
 prim(comp_adjacent/2).

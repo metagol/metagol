@@ -5,9 +5,8 @@
 
 :- use_module('../metagol').
 
-
 %% METAGOL SETTINGS
-metagol:functional.
+metagol:functional. % force functional solution
 
 %% PREDICATES TO BE USED IN THE LEARNING
 prim(move_left/2).
@@ -18,13 +17,15 @@ prim(grab_ball/2).
 prim(drop_ball/2).
 
 %% METARULES
-metarule(identity,[P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
+metarule([P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
   member(Q/2,PS).
 
-metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
+metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
   member(Q/2,PS),
   member(R/2,PS).
 
+%% CUSTOM FUNCTIONAL CHECK
+%% this ensures a unique output state
 func_test(Atom,PS,G):-
   Atom = [P,A,B],
   Actual = [P,A,Z],
@@ -38,18 +39,7 @@ a :-
             world((3/3),(3/3),false,_)
             )
           ],
-    learn(f,Pos,[],H1),
-    reverse(H1,H2),
-    pprint(H2).
-
-b :-
-    Pos = [
-            f(
-            world((1/1),(1/1),false,0),
-            world((3/3),(3/3),false,_)
-            )
-          ],
-    metagolo_linear(f,Pos,[],H),
+    learn(f,Pos,[],H),
     pprint(H).
 
 %% FIRST-ORDER BACKGROUND KNOWLEDGE

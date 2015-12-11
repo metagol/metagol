@@ -5,8 +5,6 @@
 
 :- use_module('../metagol').
 
-metagol:functional.
-
 %% PREDICATES TO BE USED IN THE LEARNING
 prim(move_left/2).
 prim(move_right/2).
@@ -32,16 +30,6 @@ a :-
             )
           ],
     learn(f,Pos,[],H),
-    pprint(H).
-
-b :-
-    Pos = [
-            f(
-            world((1/1),(1/1),false,0),
-            world((3/3),(3/3),false,_)
-            )
-          ],
-    metagolo_linear(f,Pos,[],H),
     pprint(H).
 
 %% FIRST-ORDER BACKGROUND KNOWLEDGE
