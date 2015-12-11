@@ -105,9 +105,14 @@ iterator(N,M):-
   succ(MaxM,N),
   between(0,MaxM,M).
 
-%% need to reverse the input
-pprint([]).
-pprint([sub(Name,_P,MetaSub)|T]):-
+
+
+pprint(G1):-
+  reverse(G1,G2),
+  pprint_aux(G2).
+
+pprint_aux([]).
+pprint_aux([sub(Name,_P,MetaSub)|T]):-
   user:metarule_init(Name,MetaSub,Clause),
   copy_term(Clause,(ListHead:-ListBodyWithAts)),
   Head=..ListHead,
@@ -115,7 +120,7 @@ pprint([sub(Name,_P,MetaSub)|T]):-
   listtocomma(AtomBodyList,Body),
   numbervars((Head:-Body),0,_),
   format('~q.~n', [(Head:-Body)]),
-  pprint(T).
+  pprint_aux(T).
 
 listtocomma([E],E):-!.
 listtocomma([H|T],(H,R)):-
