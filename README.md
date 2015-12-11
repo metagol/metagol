@@ -39,8 +39,9 @@ metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 %% LEARNING
 x :-
   Pos = [
-    great_grandparent(elizabeth_second,prince_george)
-    great_grandparent(prince_philip,prince_george)],
+    great_grandparent(elizabeth_second,prince_george),
+    great_grandparent(prince_philip,prince_george)
+    ],
   Neg = [
     great_grandparent(prince_charles,prince_william)
   ],
