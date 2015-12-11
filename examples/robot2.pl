@@ -1,4 +1,4 @@
-%% Learning robot sorting algorithms
+%% Learning robot strategies
 %% Example taken from the following paper:
 %% * A. Cropper and S.H. Muggleton. Logical minimisation of meta-rules within meta-interpretive learning. In Proceedings of the 24th International Conference on Inductive Logic Programming, pages 65-78. Springer-Verlag, 2015. LNAI 9046.
 %% * A. Cropper and S.H. Muggleton. Can predicate invention compensate for incomplete background knowledge?. In Proceedings of the 13th Scandinavian Conference on Artificial Intelligence, pages 27-36. IOS Press, 2015.
@@ -28,8 +28,8 @@ metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
 a :-
     Pos = [
             f(
-            world((1/1),(1/1),false,0),
-            world((6/6),(6/6),false,_)
+            world((1/1),(1/1),false),
+            world((6/6),(6/6),false)
             )
           ],
     learn(f,Pos,[],H),
@@ -40,73 +40,42 @@ max_right(6).
 max_forwards(6).
 energy_bound(100).
 
-grab_ball(world(Pos,Pos,false,E   ),
-          world(Pos,Pos,true ,Enew)):-
-    increment_energy(E,Enew,1).
+grab_ball(world(Pos,Pos,false),world(Pos,Pos,true)).
 
-drop_ball(world(Pos,Pos,true ,E   ),
-          world(Pos,Pos,false,Enew)):-
-    increment_energy(E,Enew,1).
+drop_ball(world(Pos,Pos,true),world(Pos,Pos,false)).
 
-move_left(world(X1/Y1,Bpos,false,E   ),
-          world(X2/Y1,Bpos,false,Enew)):-
-    X1 > 0,
-    increment_energy(E,Enew,1),
-    X2 is X1-1.
+move_left(world(X1/Y1,Bpos,false),world(X2/Y1,Bpos,false)):-
+  X1 > 0,
+  X2 is X1-1.
 
-move_left(world(X1/Y1,_    ,true,E   ),
-          world(X2/Y1,X2/Y1,true,Enew)):-
-    X1 > 0,
-    increment_energy(E,Enew,1),
-    X2 is X1-1.
+move_left(world(X1/Y1,_,true),world(X2/Y1,X2/Y1,true)):-
+  X1 > 0,
+  X2 is X1-1.
 
+move_right(world(X1/Y1,Bpos,false),world(X2/Y1,Bpos,false)):-
+  max_right(MAXRIGHT),
+  X1 < MAXRIGHT,
+  X2 is X1+1.
 
-move_right(world(X1/Y1,Bpos,false,E   ),
-           world(X2/Y1,Bpos,false,Enew)):-
-    max_right(MAXRIGHT),
-    X1 < MAXRIGHT,
-    increment_energy(E,Enew,1),
-    X2 is X1+1.
+move_right(world(X1/Y1,_,true),world(X2/Y1,X2/Y1,true)):-
+  max_right(MAXRIGHT),
+  X1 < MAXRIGHT,
+  X2 is X1+1.
 
-move_right(world(X1/Y1,_    ,true,E   ),
-           world(X2/Y1,X2/Y1,true,Enew)):-
-    max_right(MAXRIGHT),
-    X1 < MAXRIGHT,
-    increment_energy(E,Enew,1),
-    X2 is X1+1.
+move_backwards(world(X1/Y1,Bpos,false),world(X1/Y2,Bpos,false)):-
+  Y1 > 0,
+  Y2 is Y1-1.
 
+move_backwards(world(X1/Y1,_,true),world(X1/Y2,X1/Y2,true)):-
+  Y1 > 0,
+  Y2 is Y1-1.
 
-move_backwards(world(X1/Y1,Bpos,false,E   ),
-               world(X1/Y2,Bpos,false,Enew)):-
-    Y1 > 0,
-    increment_energy(E,Enew,1),
-    Y2 is Y1-1.
+move_forwards(world(X1/Y1,Bpos,false),world(X1/Y2,Bpos,false)):-
+  max_forwards(MAXFORWARDS),
+  Y1 < MAXFORWARDS,
+  Y2 is Y1+1.
 
-move_backwards(world(X1/Y1,_    ,true,E   ),
-               world(X1/Y2,X1/Y2,true,Enew)):-
-    Y1 > 0,
-    increment_energy(E,Enew,1),
-    Y2 is Y1-1.
-
-
-move_forwards(world(X1/Y1,Bpos,false,E   ),
-              world(X1/Y2,Bpos,false,Enew)):-
-    max_forwards(MAXFORWARDS),
-    Y1 < MAXFORWARDS,
-    increment_energy(E,Enew,1),
-    Y2 is Y1+1.
-
-move_forwards(world(X1/Y1,_    ,true,E   ),
-              world(X1/Y2,X1/Y2,true,Enew)):-
-    max_forwards(MAXFORWARDS),
-    Y1 < MAXFORWARDS,
-    increment_energy(E,Enew,1),
-    Y2 is Y1+1.
-
-%% ENERGY COSTS
-increment_energy(E1,E2,Amount):-
-  energy_bound(Bound),
-  E2 is E1 + Amount,
-  E2 =< Bound.
-
-resource_complexity(world(_,_,_,E),E).
+move_forwards(world(X1/Y1,_,true),world(X1/Y2,X1/Y2,true)):-
+  max_forwards(MAXFORWARDS),
+  Y1 < MAXFORWARDS,
+  Y2 is Y1+1.
