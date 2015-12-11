@@ -23,7 +23,7 @@ learn(Name,Pos1,Neg1,PS1,PS2,G1,G2):-
   atom_to_list(Neg1,Neg2),
   proveall(Name,Pos2,PS1,PS2,G1,G2),
   nproveall(Name,Neg2,PS2,G2),
-  (functional -> check_functions(Pos2,PS2,G2); true).
+  (functional -> is_functional(Pos2,PS2,G2); true).
 
 learn_seq(Seq,G):-
   learn_seq_aux(Seq,[],_PS2,[],G).
@@ -41,18 +41,17 @@ proveall(Name,Atoms,PS1,PS2,G1,G2):-
 
 prove([],_,_,G,G).
 
-prove(['@'(Atom)|Atoms],PS,MaxN,G1,G2):-
-  !,
+prove(['@'(Atom)|Atoms],PS,MaxN,G1,G2):- !,
   user:call(Atom),
   prove(Atoms,PS,MaxN,G1,G2).
 
-%% prim
+%% prove primitive atom
 prove([[P|Args]|Atoms],PS,MaxN,G1,G2):-
   user:primtest(P,Args),!,
   user:primcall(P,Args),
   prove(Atoms,PS,MaxN,G1,G2).
 
-%% use existing
+%% use existing abduction
 prove([Atom|Atoms],PS1,MaxN,G1,G2):-
   Atom=[P|_],
   member(sub(Name,P,MetaSub),G1),
@@ -60,7 +59,7 @@ prove([Atom|Atoms],PS1,MaxN,G1,G2):-
   prove(Body,PS1,MaxN,G1,G3),
   prove(Atoms,PS1,MaxN,G3,G2).
 
-%% use new
+%% new abduction
 prove([Atom|Atoms],PS1,MaxN,G1,G2):-
   length(G1,L),
   L < MaxN,
@@ -90,11 +89,13 @@ lower_sig([P|Args],P,PS1,PS2):-
   length(Args,A),
   append(_,[P/A|PS2],PS1),!.
 
-nproveall(_Name,[],_PS,_G).
-
-nproveall(Name,[Atom|T],PS,G):-
+prove_deduce(Atom,PS,G):-
   length(G,N),
-  not(prove([Atom],PS,N,G,G)),
+  prove([Atom],PS,N,G,G).
+
+nproveall(_Name,[],_PS,_G).
+nproveall(Name,[Atom|T],PS,G):-
+  not(prove_deduce(Atom,PS,G)),
   nproveall(Name,T,PS,G).
 
 iterator(N,M):-
@@ -117,38 +118,25 @@ pprint([sub(Name,_P,MetaSub)|T]):-
   pprint(T).
 
 listtocomma([E],E):-!.
-
 listtocomma([H|T],(H,R)):-
   listtocomma(T,R).
 
 convert_preds([],[]).
-
-convert_preds(['@'(Atom)|T],[Atom|R]):-
-  !,
+convert_preds(['@'(Atom)|T],[Atom|R]):- !,
   convert_preds(T,R).
-
-convert_preds([List|T],[Atom|R]):-
-  !,
+convert_preds([List|T],[Atom|R]):- !,
   Atom=..List,
   convert_preds(T,R).
 
 atom_to_list([],[]).
-
 atom_to_list([Atom|T],[AtomAsList|Out]):-
   Atom =..AtomAsList,
   atom_to_list(T,Out).
 
-check_functions([],_PS,_G).
-
-check_functions([Atom|Atoms],PS,G) :-
-  check_function(Atom,PS,G),
-  check_functions(Atoms,PS,G).
-
-check_function([Head|Args],PS,G):-
-  length(G,N),
-  append(FuncArgs,[OrigReturn],Args),
-  append(FuncArgs,[TestReturn],TestArgs),
-  not((prove([[Head|TestArgs]],PS,N,G,G),TestReturn \= OrigReturn)).
+is_functional([],_,_).
+is_functional([Atom|Atoms],PS,G) :-
+  user:func_test(Atom,PS,G),
+  is_functional(Atoms,PS,G).
 
 :- user:discontiguous(prim/1).
 :- user:discontiguous(primcall/2).
