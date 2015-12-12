@@ -77,10 +77,11 @@ Alternatively, we can write the aforementioned metarule in the following equival
 ```prolog
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
   member(Q/2,PS),
-  member(R/2,PS).
+  member(R/2,PS),
+  Q\=some_func.
 ```
 
-In this example, where `PS` represents the predicate signature, the user can explicitly state how to bind the variables in the metarule. This approach is slightly more efficient.
+In this example, where `PS` represents the predicate signature, the user can explicitly state how to bind the variables in the metarule.
 
 Currently, the metarules are supplied by the user. We are working on automatically identifying the necessary metarules, and preliminary work is detailed in the following paper:
 
@@ -100,8 +101,7 @@ The above metarules are all non-recursive.  By contrast, the following metarule 
 
 ```prolog
 % P(A,B) <- Q(A,C), A>C, P(C,B),C>B.
-metarule([P,Q],([P,A,B]:-[[Q,A,C],@obj_gt(A,C),[P,C,B],@obj_gt(C,B)])) :-
-  member(Q/2,PS).
+metarule([P,Q],([P,A,B]:-[[Q,A,C],@obj_gt(A,C),[P,C,B],@obj_gt(C,B)])).
 ```
 
 Here, the atoms `@obj_gt(A,C)` and `@obj_gt(C,B)` define a total ordering over the terms. The user must define the ordering `@obj_gt(A,B)'. An total order is necessary to guarantee termination of the meta-interpreter. For example, suppose you are learning robot strategies for a robot in a one-dimensional space and each term is a state (a list of Prolog facts). The following ordering ensures that the robot always moves at least one place to the right. Because the space is finite, termination is guaranteed.
