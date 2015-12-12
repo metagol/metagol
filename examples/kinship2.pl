@@ -28,5 +28,5 @@ a :-
     ancestor(george_sixth,prince_harry),
     ancestor(queen_mother,prince_william)
   ],
-  learn(ancestor,Pos,[],H),
+  learn(Pos,[],H),
   pprint(H).

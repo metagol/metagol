@@ -45,7 +45,7 @@ x :-
   Neg = [
     great_grandparent(prince_charles,prince_william)
   ],
-  learn(great_grandparent,Pos,Neg,H),
+  learn(Pos,Neg,H),
   pprint(H).
 ```
 Running the above program will print the following output.
@@ -119,17 +119,15 @@ To learn a sequence of tasks, use the following command.
 
 ```prolog
 Seq = [
-    (parent,
-      [
-        parent(ann,andy),
-        parent(steve,andy),
-        parent(ann,amy)
+    ([
+      parent(ann,andy),
+      parent(steve,andy),
+      parent(ann,amy)
       ],[]),
-    (grandparent,
-      [
-        grandparent(ann,amelia),
-        grandparent(steve,amelia)
-      ],[])
+    ([
+    grandparent(ann,amelia),
+      grandparent(steve,amelia)
+    ],[])
   ],
   learn_seq(Seq,H),
   pprint(H).
@@ -166,7 +164,7 @@ func_test(Atom,PS,G):-
   not((metagol:prove_deduce(Actual,PS,G),Z \= B)).
 ```
 
-This func test is used in the robot-func example.  The `Atom` variable is formed of a predicate symbol `P` and two states `A` and `B`, which represent initial and final state pairs respectively.  The func_test checks whether the learned hypothesis can be applied to the initial state to reach any state `Z` other that the expected final state `B`. 
+This func test is used in the robot-func example.  The `Atom` variable is formed of a predicate symbol `P` and two states `A` and `B`, which represent initial and final state pairs respectively.  The func_test checks whether the learned hypothesis can be applied to the initial state to reach any state `Z` other that the expected final state `B`.
 
 ```prolog
 metagol:limit_recursion. % default false

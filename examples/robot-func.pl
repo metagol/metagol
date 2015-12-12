@@ -39,7 +39,7 @@ a :-
             world((3/3),(3/3),false,_)
             )
           ],
-    learn(f,Pos,[],H),
+    learn(Pos,[],H),
     pprint(H).
 
 %% FIRST-ORDER BACKGROUND KNOWLEDGE

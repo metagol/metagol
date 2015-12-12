@@ -24,5 +24,5 @@ a :-
   Neg = [
     great_grandparent(prince_charles,prince_william)
   ],
-  learn(great_grandparent,Pos,Neg,H),
+  learn(Pos,Neg,H),
   pprint(H).

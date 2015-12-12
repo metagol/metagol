@@ -30,17 +30,8 @@ metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 %% SEQUENTIAL LEARNING
 a :-
   Seq = [
-    (parent,
-      [
-        parent(ann,andy),
-        parent(steve,andy),
-        parent(ann,amy)
-      ],[]),
-    (grandparent,
-      [
-        grandparent(ann,amelia),
-        grandparent(steve,amelia)
-      ],[])
+    ([parent(ann,andy),parent(steve,andy),parent(ann,amy)],[]),
+    ([grandparent(ann,amelia),grandparent(steve,amelia)],[])
   ],
   learn_seq(Seq,H),
   pprint(H).

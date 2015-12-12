@@ -32,7 +32,7 @@ a :-
             world((5/5),(5/5),false)
             )
           ],
-    learn(f,Pos,[],H),
+    learn(Pos,[],H),
     pprint(H).
 
 %% FIRST-ORDER BACKGROUND KNOWLEDGE

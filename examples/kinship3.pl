@@ -53,7 +53,7 @@ a :-
   Neg = [
     grandparent(amy,amelia)
   ],
-  learn(grandparent,Pos,Neg,H),
+  learn(Pos,Neg,H),
   pprint(H).
 
 %% THIS SHOULD FAIL
@@ -64,4 +64,4 @@ b :-
   Neg = [
     grandparent(ann,amelia)
   ],
-  (learn(grandparent,Pos,Neg,_) -> false; writeln('failed to learn a theory')).
+  (learn(Pos,Neg,_) -> false; writeln('failed to learn a theory')).

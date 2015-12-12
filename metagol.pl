@@ -1,4 +1,4 @@
-:- module(metagol,[learn/4,learn_seq/2,pprint/1,member/2]).
+:- module(metagol,[learn/4,learn/3,learn_seq/2,pprint/1,member/2]).
 
 :- user:call(op(950,fx,'@')).
 
@@ -15,25 +15,31 @@ default(max_clauses(6)).
 get_option(X):-call(X),!.
 get_option(X):-default(X).
 
-learn(Name,Pos,Neg,G):-
-  learn(Name,Pos,Neg,[],_PS,[],G).
+learn(Pos,Neg,G):-
+  learn(Pos,Neg,[],_PS,[],G).
 
-learn(Name,Pos1,Neg1,PS1,PS2,G1,G2):-
+learn(_Name,Pos,Neg,G):- % depreciated
+  learn(Pos,Neg,[],_PS,[],G).
+
+learn(Pos1,Neg1,PS1,PS2,G1,G2):-
   atom_to_list(Pos1,Pos2),
   atom_to_list(Neg1,Neg2),
-  proveall(Name,Pos2,PS1,PS2,G1,G2),
+  proveall(Pos2,PS1,PS2,G1,G2),
   nproveall(Neg2,PS2,G2),
   (functional -> is_functional(Pos2,PS2,G2); true).
+
+target_name([[P|_]|_],P).
 
 learn_seq(Seq,G):-
   learn_seq_aux(Seq,[],_PS2,[],G).
 
 learn_seq_aux([],PS,PS,G,G).
-learn_seq_aux([(Name,Pos,Neg)|T],PS1,PS2,G1,G2):-
-  learn(Name,Pos,Neg,PS1,PS3,G1,G3),!, % purposely never backtrack
+learn_seq_aux([(Pos,Neg)|T],PS1,PS2,G1,G2):-
+  learn(Pos,Neg,PS1,PS3,G1,G3),!, % purposely never backtrack
   learn_seq_aux(T,PS3,PS2,G3,G2).
 
-proveall(Name,Atoms,PS1,PS2,G1,G2):-
+proveall(Atoms,PS1,PS2,G1,G2):-
+  target_name(Atoms,Name),
   iterator(N,M),
   format('% clauses: ~d invented predicates: ~d\n',[N,M]),
   init_sig(Name,M,PS1,PS2),
