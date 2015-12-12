@@ -121,9 +121,13 @@ pprint_aux([sub(Name,_P,MetaSub)|T]):-
   copy_term(Clause,(ListHead:-ListBodyWithAts)),
   Head=..ListHead,
   convert_preds(ListBodyWithAts,AtomBodyList),
-  listtocomma(AtomBodyList,Body),
-  numbervars((Head:-Body),0,_),
-  format('~q.~n', [(Head:-Body)]),
+  (AtomBodyList==[] -> AtomClause=Head
+                       ;
+                       listtocomma(AtomBodyList,Body),
+                       AtomClause=(Head:-Body)
+  ),
+  numbervars(AtomClause,0,_),
+  format('~q.~n', [AtomClause]),
   pprint_aux(T).
 
 listtocomma([E],E):-!.
