@@ -1,6 +1,6 @@
-# Metagol (ALPHA)
+# Metagol (BETA)
 
-THIS IS STILL AN ALPHA VERSION AND IT NOT YET READY FOR USE
+This is a beta version. Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) or Martin Möhrmann (martisch@uni-osnabrueck.de) with any bugs / feedback.
 
 Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework (MIL).  For more details about MIL, see the following papers.
 
