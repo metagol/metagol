@@ -169,7 +169,7 @@ user:term_expansion(metarule(MetaSub,Clause),Asserts):-
 
 user:term_expansion((metarule(MetaSub,Clause,PS):-Body),Asserts):-
   is_list(MetaSub),
-  gen_metarule_name(Clause,Name),
+  gen_metarule_name(id(MetaSub,Clause,Body),Name),
   user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts).
 
 user:term_expansion(metarule(Name,MetaSub,Clause),Asserts):-
