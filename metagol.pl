@@ -153,9 +153,14 @@ is_functional([Atom|Atoms],Sig,G) :-
   user:func_test(Atom,Sig,G),
   is_functional(Atoms,Sig,G).
 
+:- user:multifile(prim/1).
+:- user:multifile(primcall/2).
+:- user:multifile(primtest/2).
+
 :- user:discontiguous(prim/1).
 :- user:discontiguous(primcall/2).
 :- user:discontiguous(primtest/2).
+
 :- user:discontiguous(metarule/4).
 :- user:discontiguous(metarule_init/3).
 
