@@ -15,14 +15,14 @@ default(min_clauses(1)).
 default(max_clauses(6)).
 default(metarule_next_id(1)).
 
-get_option(X):-call(X),!.
-get_option(X):-default(X).
+get_option(Option):-call(Option),!.
+get_option(Option):-default(Option).
 
-set_option(X):-
-  functor(X,P,A),
-  functor(R,P,A),
-  retractall(R),
-  assert(X).
+set_option(Option):-
+  functor(Option,Name,Arity),
+  functor(Retract,Name,Arity),
+  retractall(Retract),
+  assert(Option).
 
 learn(_Name,Pos,Neg,G):- % deprecated
   write('WARNING: metagol learn(Name,...) is deprecated. Use learn/3 instead.'),nl,
@@ -49,7 +49,7 @@ proveall(Atoms,Sig1,Sig2,G):-
   augmented_sig(Name/Arity,M,Sig1,Sig2),
   prove(Atoms,Sig2,N,[],G).
 
-prove([],_,_,G,G).
+prove([],_Sig,_MaxN,G,G).
 
 prove(['@'(Atom)|Atoms],Sig,MaxN,G1,G2):- !,
   user:call(Atom),
@@ -63,7 +63,7 @@ prove([[P|Args]|Atoms],Sig,MaxN,G1,G2):-
 
 %% use existing abduction
 prove([Atom|Atoms],Sig,MaxN,G1,G2):-
-  Atom=[P|_],
+  Atom=[P|_Args],
   member(sub(Name,P,MetaSub),G1),
   user:metarule_init(Name,MetaSub,(Atom:-Body)),
   prove(Body,Sig,MaxN,G1,G3),
@@ -99,8 +99,8 @@ target_predicate([[P|Args]|_],P/A):-
   length(Args,A).
 
 invented_symbols(0,_Name,[]):-!.
-invented_symbols(M,Name,[Sk/_|Sig]) :-
-  atomic_list_concat([Name,'_',M],Sk),
+invented_symbols(M,Name,[InvSym/_Arity|Sig]) :-
+  atomic_list_concat([Name,'_',M],InvSym),
   succ(Prev,M),
   invented_symbols(Prev,Name,Sig).
 
@@ -112,8 +112,8 @@ augmented_sig(P/A,M,Sig1,[P/A|Sig2]):-
   invented_symbols(M,P,InventedSymbols),
   append(InventedSymbols,Sig1,Sig2).
 
-initial_sig(_,_,Prims):- !,
-  findall(X,user:prim(X),Prims).
+initial_sig(_Pos,_Neg,Prims):- !,
+  findall(P/A,user:prim(P/A),Prims).
 
 pprint(G1):-
   reverse(G1,G2),
@@ -199,7 +199,7 @@ add_metaruleinit((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
   ].
 
 %% automatically adds the bindings for the metasubs
-gen_body(MetaSub,([P|_]:-Goals),PS,Body):-
+gen_body(MetaSub,([P|_Args]:-Goals),PS,Body):-
   remove_var(P,MetaSub,MetaSubNew),
   gen_body_aux(MetaSubNew,Goals,PS,Body).
 
