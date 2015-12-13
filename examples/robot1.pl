@@ -26,19 +26,14 @@ metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
 
 %% LEARNING
 a :-
-    Pos = [
-            f(
-            world((1/1),(1/1),false),
-            world((5/5),(5/5),false)
-            )
-          ],
-    learn(Pos,[],H),
-    pprint(H).
+  Pos = [f(world((1/1),(1/1),false),
+           world((5/5),(5/5),false))],
+  learn(Pos,[],H),
+  pprint(H).
 
 %% FIRST-ORDER BACKGROUND KNOWLEDGE
 max_right(6).
 max_forwards(6).
-energy_bound(100).
 
 grab_ball(world(Pos,Pos,false),world(Pos,Pos,true)).
 
