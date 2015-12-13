@@ -1,6 +1,7 @@
-:- module(metagol,[learn/4,learn/3,pprint/1,member/2]).
+:- module(metagol,[learn/4,learn/3,pprint/1]).
 
 :- user:call(op(950,fx,'@')).
+:- user:use_module(library(lists)).
 
 :- use_module(library(lists)).
 :- use_module(library(charsio)).
