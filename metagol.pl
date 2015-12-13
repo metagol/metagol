@@ -25,7 +25,8 @@ set_option(X):-
   assert(X).
 
 learn(_Name,Pos,Neg,G):- % deprecated
-  learn(Pos,Neg,[],_PS,[],G).
+  write('WARNING: metagol learn(Name,...) is deprecated. Use learn/3 instead.'),nl,
+  learn(Pos,Neg,G).
 
 learn(Pos1,Neg1,G):-
   atom_to_list(Pos1,Pos2),
