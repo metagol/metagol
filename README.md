@@ -115,6 +115,8 @@ obj_gt(A,B):-
 
 ## Dependent learning
 
+(TODO) THIS IS NOT YET WORKING IN THE BETA VERSION
+
 To learn a sequence of tasks, use the following command.
 
 ```prolog
@@ -125,7 +127,7 @@ Seq = [
       parent(ann,amy)
       ],[]),
     ([
-    grandparent(ann,amelia),
+      grandparent(ann,amelia),
       grandparent(steve,amelia)
     ],[])
   ],
@@ -170,13 +172,13 @@ This func test is used in the robot-func example.  The `Atom` variable is formed
 metagol:limit_recursion. % default false
 ```
 
-(todo)
+(TODO) THIS IS NOT YET WORKING IN THE BETA VERSION
 
 ```prolog
 metagol:fold_theory. % default false
 ```
 
-(todo)
+(TODO) THIS IS NOT YET WORKING IN THE BETA VERSION
 
 ## Further details
 
