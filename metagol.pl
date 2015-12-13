@@ -8,12 +8,20 @@
 :- dynamic(functional/0).
 :- dynamic(min_clauses/1).
 :- dynamic(max_clauses/1).
+:- dynamic(metarule_next_id/1).
 
 default(min_clauses(1)).
 default(max_clauses(6)).
+default(metarule_next_id(1)).
 
 get_option(X):-call(X),!.
 get_option(X):-default(X).
+
+set_option(X):-
+    functor(X,P,A),
+    functor(R,P,A),
+    retractall(R),
+    assert(X).
 
 learn(Pos,Neg,G):-
   learn(Pos,Neg,[],_PS,[],G).
@@ -157,11 +165,10 @@ is_functional([Atom|Atoms],PS,G) :-
 :- user:discontiguous(metarule/4).
 :- user:discontiguous(metarule_init/3).
 
-gen_metarule_name(Clause,Name):-
-  copy_term(Clause,Copy),
-  numbervars(Copy,0,_),
-  write_to_chars(Copy,Codes),
-  atom_codes(Name,Codes).
+gen_metarule_id(Id):-
+  get_option(metarule_next_id(Id)),
+  succ(Id,IdNext),
+  set_option(metarule_next_id(IdNext)),!.
 
 user:term_expansion(prim(P/A),[prim(P/A),primtest(P,Args),(primcall(P,Args):-Call)]):-
   functor(Call,P,A),
@@ -173,7 +180,7 @@ user:term_expansion(metarule(MetaSub,Clause),Asserts):-
 
 user:term_expansion((metarule(MetaSub,Clause,PS):-Body),Asserts):-
   is_list(MetaSub),
-  gen_metarule_name(id(MetaSub,Clause,Body),Name),
+  gen_metarule_id(Name),
   user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts).
 
 user:term_expansion(metarule(Name,MetaSub,Clause),Asserts):-
