@@ -17,36 +17,42 @@ Metagol is free for academic use. If you intend to use it for commercial purpose
 Metagol is written in Prolog and runs with both Yap and, albeit slower, SWI Prolog. Metagol is contained in a single file called 'metagol.pl'. To use Metagol, load the metagol.pl module into your Prolog compiler. The following code demonstrates using Metagol to learn the great grandparent relation.
 
 ```prolog
-
-%% LOAD METAGOL
 :- use_module('metagol').
 
 %% FIRST-ORDER BACKGROUND KNOWLEDGE
-parent(elizabeth_second,prince_charles).
-parent(prince_philip,prince_charles).
-parent(prince_charles,prince_william).
-parent(prince_charles,prince_harry).
-parent(princess_diana,prince_william).
-parent(princess_diana,prince_harry).
-parent(prince_william,prince_george).
+mother(ann,amy).
+mother(ann,andy).
+mother(amy,amelia).
+mother(linda,gavin).
+father(steve,amy).
+father(steve,andy).
+father(gavin,amelia).
+father(andy,spongebob).
 
-%% PREDICATES TO BE USED IN THE LEARNING
-prim(parent/2).
+%% PREDICATES TO BE USED IN THE LEARNING.
+prim(mother/2).
+prim(father/2).
 
 %% METARULES
+metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
+metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,A,B]])).
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
-%% LEARNING
-x :-
+%% LEARNING TASK
+a :-
   Pos = [
-    great_grandparent(elizabeth_second,prince_george),
-    great_grandparent(prince_philip,prince_george)
-    ],
+    grandparent(ann,amelia),
+    grandparent(steve,amelia),
+    grandparent(ann,spongebob),
+    grandparent(steve,spongebob),
+    grandparent(linda,amelia)
+  ],
   Neg = [
-    great_grandparent(prince_charles,prince_william)
+    grandparent(amy,amelia)
   ],
   learn(Pos,Neg,H),
   pprint(H).
+
 ```
 Running the above program will print the following output.
 
@@ -54,11 +60,14 @@ Running the above program will print the following output.
 % clauses: 1 invented predicates: 0
 % clauses: 2 invented predicates: 0
 % clauses: 2 invented predicates: 1
-great_grandparent(A,B) :- great_grandparent_1(A,C), parent(C,B).
-great_grandparent_1(A,B) :- parent(A,C), parent(C,B).
+% clauses: 3 invented predicates: 0
+% clauses: 3 invented predicates: 1
+grandparent(A,B):-grandparent_1(A,C),grandparent_1(C,B).
+grandparent_1(A,B):-mother(A,B).
+grandparent_1(A,B):-father(A,B).
 ```
 
-In this solution, the predicate `great_grandparent_1/2` is invented. See the aforementioned papers for details on Metagol's predicate invention.
+In this solution, the predicate `grand_parent_1/2` is invented and corresponds to the parent relation. See the aforementioned papers for details on Metagol's predicate invention.
 
 ## Metarules
 
@@ -68,20 +77,17 @@ Metagol requires that the user provides a set of second-order metarules, a form 
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 ```
 
-In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` are existentially quantified second-order variables, and the symbols `A`, `B`, and `C` are universally quantified first-order variables.
+In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` are existentially quantified second-order variables, and the symbols `A`, `B`, and `C` are universally quantified first-order variables. The list in the first argument of the metarule denotes existentially quantified variables. Metagol will attempt to find substitutions for these variables during the proof of a goal.
 
-The list in the first argument is used to denote existentially quantified variables. Metagol will attempt to find substitutions for these variables during the proof of a goal.
-
-Alternatively, we can write the aforementioned metarule in the following equivalent form:
+We can write the aforementioned metarule in the following explicit equivalent form:
 
 ```prolog
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
   member(Q/2,PS),
-  member(R/2,PS),
-  Q\=some_func.
+  member(R/2,PS).
 ```
 
-In this example, where `PS` represents the predicate signature, the user can explicitly state how to bind the variables in the metarule.
+In this example, where `PS` represents the predicate signature, the user can explicitly state how to bind the variables in the metarule. This allows more control. For instance, to bind a variable to a subset of the predicate signature.
 
 Currently, the metarules are supplied by the user. We are working on automatically identifying the necessary metarules, and preliminary work is detailed in the following paper:
 
@@ -112,6 +118,8 @@ obj_gt(A,B):-
   member(robot_position(BPos),B),
   APos < BPos.
 ```
+
+For more examples of learning with recursion see the sorter.pl and strings2.pl example files.
 
 ## Dependent learning
 
@@ -166,7 +174,7 @@ func_test(Atom,PS,G):-
   not((metagol:prove_deduce(Actual,PS,G),Z \= B)).
 ```
 
-This func test is used in the robot-func example.  The `Atom` variable is formed of a predicate symbol `P` and two states `A` and `B`, which represent initial and final state pairs respectively.  The func_test checks whether the learned hypothesis can be applied to the initial state to reach any state `Z` other that the expected final state `B`.
+This func test is used in the robot examples. Here, the `Atom` variable is formed of a predicate symbol `P` and two states `A` and `B`, which represent initial and final state pairs respectively.  The func_test checks whether the learned hypothesis can be applied to the initial state to reach any state `Z` other that the expected final state `B`. For more examples of functional tests, see the robots.pl, sorter.pl, and strings2.pl files.
 
 ```prolog
 metagol:limit_recursion. % default false

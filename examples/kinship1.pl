@@ -30,7 +30,7 @@ metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
 metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,A,B]])).
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
-%% LEARNING TASK
+%% LEARNING GRANDPARENT BY INVENTING PARENT
 a :-
   Pos = [
     grandparent(ann,amelia),

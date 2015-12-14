@@ -22,12 +22,13 @@ prim(pick_up_left/2).
 prim(split/2).
 prim(combine/2).
 
-metarule([P,Q],([P,A,B]:-[[Q,A,C],@obj_gt(A,C),[P,C,B],@obj_gt(C,B)]),PS):-
-  member(Q/2,PS).
+metarule([P,Q],([P,A,B]:-[[Q,A,C],@obj_gt(A,C),[P,C,B],@obj_gt(C,B)])).
+metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
-metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
-  member(Q/2,PS),
-  member(R/2,PS).
+a:-
+  examples(10,TrainExamples),!,
+  learn(TrainExamples,[],G),
+  pprint(G).
 
 example(N,A,B):-
   randseq(N,N,L1),
@@ -35,8 +36,7 @@ example(N,A,B):-
   A = [values(L1),energy(0),intervals([1-N]),robot_pos(1),holding_left(none),holding_right(none),left_bag([]),right_bag([])],
   B = [values(L2),energy(_),intervals(_),robot_pos(_),holding_left(_),holding_right(_),left_bag(_),right_bag(_)].
 
-%% M=num examples
-%% N=num objects
+
 examples(M,Xs):-
   findall(G,(
     between(1,M,_),
@@ -72,36 +72,6 @@ obj_gt(A,B):-
   world_check(robot_pos(APos),A),
   world_check(robot_pos(BPos),B),
   APos < BPos,!.
-
-t:-
-    examples(100,Xs),
-    foreach(member(G,Xs),call(G)).
-
-a:-
-  %% set_rand,!,
-  examples(10,TrainExamples),!,
-
-  writeln('TRAIN EXAMPLES:'),
-  forall(member(G, TrainExamples), (
-    G=..[_,A,_],world_check(values(X),A),writeln(X))),
-
-  writeln('generating testing examples'),
-  %% TEST EXAMPLES
-  findall(N/Xs,(
-    member(N,[10,20,30,40,50,60,70,80,90,100]),
-    %% NumExamples, SpaceSize, NumLetters
-    examples(10,N,Xs)
-    %% write('test examples '), write(N), nl,
-    %% forall(member([_,A,_],Xs),(world_check(values(X),A),writeln(X)))
-    ),TestExamples),!,
-  %% train_and_test(learn,metagol_d,TrainExamples,TestExamples).
-
-  learn(f,TrainExamples,[],G),
-  pprint(G).
-
-  %% LearnCall =.. [metagol_d,f,TrainExamples,[],G],!,
-  %% train_and_test(metagolo_linear,metagolo_linear,TrainExamples,TestExamples).
-  %% train_and_test(metagolo_log,metagolo_log,TrainExamples,TestExamples).
 
 
 %% FIRST-ORDER BACKGROUND KNOWLEDGE
@@ -457,24 +427,6 @@ set_rand:-
   setrand(rand(X,Y,Z)).
 
 resource_complexity(S,E):- world_check(energy(E),S).
-
-
-%% train_and_test(LearnFunc,Name,TrainExamples,TestExamples):-
-%%   duplicate_term(TrainExamples,ThisTrain),
-%%   duplicate_term(TestExamples,ThisTest),
-%%   LearnCall =.. [LearnFunc,f,ThisTrain,[],G],!,
-%%   get_time(T1),
-%%   call(LearnCall),!,
-%%   get_time(T2),
-%%   Duration is T2-T1,
-%%   pprint(G),
-%%   format('~w-learning-time,~f ~n',[Name,Duration]),
-%%   try_retract,
-%%   forall(member(N/Xs,ThisTest),(
-%%     %% ff(Name,N,Xs,PS,G)
-%%     get_bound(Xs,Energy),
-%%     format('~w-energy,~d,~d ~n',[Name,N,Energy])
-%%   )).
 
 try_retract:-
   retract(energy_bound(_)),!.

@@ -1,9 +1,13 @@
 %% Learning robot strategies
-%% Example taken from the following paper:
+%% Example taken from the following papers:
+%% * A. Cropper and S.H. Muggleton. Learning efficient logical robot strategies involving composable objects. Proceedings of the Twenty-Fourth International Joint Conference on Artificial Intelligence, IJCAI 2015.
 %% * A. Cropper and S.H. Muggleton. Logical minimisation of meta-rules within meta-interpretive learning. In Proceedings of the 24th International Conference on Inductive Logic Programming, pages 65-78. Springer-Verlag, 2015. LNAI 9046.
 %% * A. Cropper and S.H. Muggleton. Can predicate invention compensate for incomplete background knowledge?. In Proceedings of the 13th Scandinavian Conference on Artificial Intelligence, pages 27-36. IOS Press, 2015.
 
 :- use_module('../metagol').
+
+%% METAGOL SETTINGS
+metagol:functional. % force functional solution
 
 %% PREDICATES TO BE USED IN THE LEARNING
 prim(move_left/2).
@@ -14,20 +18,28 @@ prim(grab_ball/2).
 prim(drop_ball/2).
 
 %% METARULES
-metarule([P,Q],([P,A,B]:-[[Q,A,B]]),PS):-
-  member(Q/2,PS).
+metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
+metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
-metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
-  member(Q/2,PS),
-  member(R/2,PS).
+%% CUSTOM FUNCTIONAL CHECK
+func_test(Atom,PS,G):-
+  Atom = [P,A,B],
+  Actual = [P,A,Z],
+  not((metagol:prove_deduce(Actual,PS,G),Z \= B)).
 
-%% metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
-%% metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
-
-%% LEARNING
+%% ROBOT LEARNING TO MOVE A BALL TO A SPECIFIC POSITION
 a :-
-  Pos = [f(world((1/1),(1/1),false),
-           world((6/6),(6/6),false))],
+    Pos = [f(world((1/1),(1/1),false),world((3/3),(3/3),false))],
+    learn(Pos,[],H),
+    pprint(H).
+
+b :-
+  Pos = [f(world((1/1),(1/1),false),world((5/5),(5/5),false))],
+  learn(Pos,[],H),
+  pprint(H).
+
+c :-
+  Pos = [f(world((1/1),(1/1),false),world((6/6),(6/6),false))],
   learn(Pos,[],H),
   pprint(H).
 
