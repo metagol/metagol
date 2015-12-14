@@ -7,8 +7,6 @@ prim(skip1/2).
 prim(write1/3).
 prim(next_empty/1).
 
-:- user:call(op(950,fx,'@')).
-
 copy1([H|RestIn]/[H|RestOut],[H|RestIn]/RestOut).
 skip1([_|RestIn]/Out,RestIn/Out).
 write1(In/[H|RestOut],In/RestOut,H).

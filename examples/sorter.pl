@@ -8,9 +8,6 @@
 
 :- use_module(library(random)).
 :- use_module(library(system)).
-:- use_module(library(lists)).
-
-:- user:call(op(950,fx,'@')).
 
 %% METAGOL SETTINGS
 metagol:max_clauses(4).
