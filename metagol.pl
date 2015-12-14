@@ -177,7 +177,8 @@ user:term_expansion(prim(P/A),[prim(P/A),primtest(P,Args),(primcall(P,Args):-Cal
 
 user:term_expansion(metarule(MetaSub,Clause),Asserts):-
   gen_body(MetaSub,Clause,PS,Body),
-  user:term_expansion((metarule(MetaSub,Clause,PS):-Body),Asserts).
+  clean_metasub(MetaSub,MetaSubClean),
+  user:term_expansion((metarule(MetaSubClean,Clause,PS):-Body),Asserts).
 
 user:term_expansion((metarule(MetaSub,Clause,PS):-Body),Asserts):-
   is_list(MetaSub),
@@ -187,7 +188,8 @@ user:term_expansion((metarule(MetaSub,Clause,PS):-Body),Asserts):-
 user:term_expansion(metarule(Name,MetaSub,Clause),Asserts):-
   atom(Name),
   gen_body(MetaSub,Clause,PS,Body),
-  user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts).
+  clean_metasub(MetaSub,MetaSubClean),
+  user:term_expansion((metarule(Name,MetaSubClean,Clause,PS):-Body),Asserts).
 
 user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
   add_metaruleinit((metarule(Name,MetaSub,Clause,PS):-Body),Asserts).
@@ -199,21 +201,45 @@ add_metaruleinit((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
   ].
 
 %% automatically adds the bindings for the metasubs
-gen_body(MetaSub,([P|_Args]:-Goals),PS,Body):-
-  remove_var(P,MetaSub,MetaSubNew),
+gen_body(MetaSub,(Head:-Goals),PS,Body):-
+  term_variables(Head,HeadVars),
+  remove_vars(HeadVars,MetaSub,MetaSubNew),
   gen_body_aux(MetaSubNew,Goals,PS,Body).
 
 gen_body_aux([],_Goals,_PS,true):-!.
 
-gen_body_aux(Vars,[[Var|Args]|Goals],PS,(member(Var/A,PS),Body)):-
-  select_var(Var,Vars,NewVars),!,
-  length(Args,A),
-  gen_body_aux(NewVars,Goals,PS,Body).
+gen_body_aux(Vars1,[[Var|Args]|Goals],PS,(member(Var/Arity,PS),Body)):-
+  select_var(Var,Arity,Vars1,Vars2),!,
+  (var(Arity)->length(Args,Arity);true),
+  term_variables(Args,TermVars),
+  remove_vars(TermVars,Vars2,Vars3),
+  gen_body_aux(Vars3,Goals,PS,Body).
 
-gen_body_aux(Vars,[_|Goals],PS,Body):-
-  gen_body_aux(Vars,Goals,PS,Body).
+gen_body_aux(Vars1,[[_|Args]|Goals],PS,Body):-
+  term_variables(Args,TermVars),
+  remove_vars(TermVars,Vars1,Vars2),
+  gen_body_aux(Vars2,Goals,PS,Body).
+
+clean_metasub([],[]).
+
+clean_metasub([Var|Vars],[Var|R]):-
+    var(Var),!,
+    clean_metasub(Vars,R).
+
+clean_metasub([Var/_Arity|Vars],[Var|R]):-
+    clean_metasub(Vars,R).
+
+remove_vars([],Vars,Vars).
+
+remove_vars([Var|VarList],Vars,R):-
+    remove_var(Var,Vars,VarsNew),
+    remove_vars(VarList,VarsNew,R).
 
 remove_var(_Var,[],[]).
+
+remove_var(Var,[V/_|Vars],R):-
+  Var==V,!,
+  remove_var(Var,Vars,R).
 
 remove_var(Var,[V|Vars],R):-
   Var==V,!,
@@ -222,8 +248,11 @@ remove_var(Var,[V|Vars],R):-
 remove_var(Var,[V|Vars],[V|R]):-
   remove_var(Var,Vars,R).
 
-select_var(Var,[V|Vars],Vars):-
+select_var(Var,_Arity,[V|Vars],Vars):-
   Var==V,!.
 
-select_var(Var,[V|Vars],[V|R]):-
-  select_var(Var,Vars,R).
+select_var(Var,Arity,[V/Arity|Vars],Vars):-
+  Var==V,!.
+
+select_var(Var,Arity,[V|Vars],[V|R]):-
+  select_var(Var,Arity,Vars,R).

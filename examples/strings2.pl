@@ -16,17 +16,15 @@ next_empty([_]/_).
 
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])). % chain
 metarule([P,Q,R],([P,A,B]:-[[Q,A],[R,A,B]])). % precon
-metarule([P,Q,X],([P,A,B]:-[[Q,A,B,X]]),Sig):- member(Q/3,Sig). % curry
+metarule([P,Q,X],([P,A,B]:-[[Q,A,B,X]])). % curry
 metarule([P,Q],([P,A,B]:-[[Q,A,C],@obj_gt(A,C),[P,C,B],@obj_gt(C,B)])). % tail rec
 
 a :-
-  Pos = [
-   f(['a','b','c']/['a','b','c','d'],_/[]),
-   f(['a','a','c']/['a','a','c','d'],_/[]),
-   f(['a','c']/['a','c','d'],_/[])
-   ],
-   learn(Pos,[],H),
-   pprint(H).
+  Pos = [f(['a','b','c']/['a','b','c','d'],_/[]),
+         f(['a','a','c']/['a','a','c','d'],_/[]),
+         f(['a','c']/['a','c','d'],_/[])],
+  learn(Pos,[],H),
+  pprint(H).
 
 obj_gt(A,B):-
   A = In1/_,

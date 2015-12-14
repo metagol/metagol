@@ -3,12 +3,10 @@
 prim(num/1).
 
 num(X):-
- between(0,inf,X).
+  between(0,inf,X).
 
-metarule([P,Q,A],([P,A,B]:-[[Q,A],[Q,B]]),Sig):-
-  member(Q/1,Sig).
-metarule([P,Q,B],([P,A,B]:-[[Q,A],[Q,B]]),Sig):-
-  member(Q/1,Sig).
+metarule([P,Q,A],([P,A,B]:-[[Q,A],[Q,B]])).
+metarule([P,Q,B],([P,A,B]:-[[Q,A],[Q,B]])).
 
 a :-
   Pos = [

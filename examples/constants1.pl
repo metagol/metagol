@@ -1,7 +1,7 @@
 :- use_module('../metagol').
 
-metarule([P,A],([P,A,_B]:-[]),_):-true.
-metarule([P,B],([P,_A,B]:-[]),_):-true.
+metarule([P,A],([P,A,_B]:-[])).
+metarule([P,B],([P,_A,B]:-[])).
 
 a :-
   Pos = [
