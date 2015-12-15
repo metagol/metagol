@@ -76,7 +76,7 @@ prove([Atom|Atoms],Sig1,MaxN,G1,G2):-
   L < MaxN,
   lower_sig(Atom,P,Sig1,Sig2),
   user:metarule(Name,MetaSub,(Atom :- Body),Sig2),
-  not(memberchk(sub(Name,P,MetaSub),G1)),
+  \+ memberchk(sub(Name,P,MetaSub),G1),
   prove(Body,Sig1,MaxN,[sub(Name,P,MetaSub)|G1],G3),
   prove(Atoms,Sig1,MaxN,G3,G2).
 
@@ -86,7 +86,7 @@ prove_deduce(Atom,Sig,G):-
 
 nproveall([],_Sig,_G).
 nproveall([Atom|T],Sig,G):-
-  not(prove_deduce(Atom,Sig,G)),
+  \+ prove_deduce(Atom,Sig,G),
   nproveall(T,Sig,G).
 
 iterator(N,M):-
