@@ -25,7 +25,8 @@ set_option(Option):-
   assert(Option).
 
 learn(_Name,Pos,Neg,G):- % deprecated
-  write('WARNING: metagol learn(Name,...) is deprecated. Use learn/3 instead.'),nl,
+  write('WARNING: metagol learn(Name,...) is deprecated. s'),
+  write('Use learn/3 instead.'),nl,
   learn(Pos,Neg,G).
 
 learn(Pos1,Neg1,G):-
@@ -171,9 +172,10 @@ gen_metarule_id(Id):-
   succ(Id,IdNext),
   set_option(metarule_next_id(IdNext)).
 
-user:term_expansion(prim(P/A),[prim(P/A),primtest(P,Args),(primcall(P,Args):-Call)]):-
+user:term_expansion(prim(P/A),Asserts):-
   functor(Call,P,A),
-  Call=..[P|Args].
+  Call=..[P|Args],
+  Asserts=[prim(P/A),primtest(P,Args),(primcall(P,Args):-Call)].
 
 user:term_expansion(metarule(MetaSub,Clause),Asserts):-
   gen_body(MetaSub,Clause,PS,Body),
