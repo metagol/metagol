@@ -31,7 +31,7 @@ learn(_Name,Pos,Neg,G):- % deprecated
 learn(Pos1,Neg1,G):-
   atom_to_list(Pos1,Pos2),
   atom_to_list(Neg1,Neg2),
-  initial_sig(Pos2,Neg2,Sig1),!,
+  initial_sig(Pos2,Neg2,Sig1),
   proveall(Pos2,Sig1,Sig2,G),
   nproveall(Neg2,Sig2,G),
   (functional -> is_functional(Pos2,Sig2,G); true).
@@ -43,7 +43,7 @@ learn_seq_aux([(Pos,Neg)|T],[G|Out]):-
   learn_seq(T,Out).
 
 proveall(Atoms,Sig1,Sig2,G):-
-  target_predicate(Atoms,Name/Arity),!,
+  target_predicate(Atoms,Name/Arity),
   iterator(N,M),
   format('% clauses: ~d invented predicates: ~d\n',[N,M]),
   augmented_sig(Name/Arity,M,Sig1,Sig2),
@@ -90,7 +90,7 @@ nproveall([Atom|T],Sig,G):-
 
 iterator(N,M):-
   get_option(min_clauses(MinN)),
-  get_option(max_clauses(MaxN)),!,
+  get_option(max_clauses(MaxN)),
   between(MinN,MaxN,N),
   succ(MaxM,N),
   between(0,MaxM,M).
@@ -141,7 +141,7 @@ listtocomma([H|T],(H,R)):-
 convert_preds([],[]).
 convert_preds(['@'(Atom)|T],[Atom|R]):- !,
   convert_preds(T,R).
-convert_preds([List|T],[Atom|R]):- !,
+convert_preds([List|T],[Atom|R]):-
   Atom=..List,
   convert_preds(T,R).
 
@@ -169,7 +169,7 @@ is_functional([Atom|Atoms],Sig,G) :-
 gen_metarule_id(Id):-
   get_option(metarule_next_id(Id)),
   succ(Id,IdNext),
-  set_option(metarule_next_id(IdNext)),!.
+  set_option(metarule_next_id(IdNext)).
 
 user:term_expansion(prim(P/A),[prim(P/A),primtest(P,Args),(primcall(P,Args):-Call)]):-
   functor(Call,P,A),
