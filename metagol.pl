@@ -31,10 +31,9 @@ learn(_Name,Pos,Neg,G):- % deprecated
 learn(Pos1,Neg1,G):-
   atom_to_list(Pos1,Pos2),
   atom_to_list(Neg1,Neg2),
-  initial_sig(Pos2,Neg2,Sig1),
-  proveall(Pos2,Sig1,Sig2,G),
-  nproveall(Neg2,Sig2,G),
-  (functional -> is_functional(Pos2,Sig2,G); true).
+  proveall(Pos2,Sig,G),
+  nproveall(Neg2,Sig,G),
+  (functional -> is_functional(Pos2,Sig,G); true).
 
 learn_seq_aux([],[]).
 learn_seq_aux([(Pos,Neg)|T],[G|Out]):-
@@ -42,7 +41,8 @@ learn_seq_aux([(Pos,Neg)|T],[G|Out]):-
   %% TODO: assert G to BK, and also assert prims
   learn_seq(T,Out).
 
-proveall(Atoms,Sig1,Sig2,G):-
+proveall(Atoms,Sig2,G):-
+  initial_sig(Sig1),
   target_predicate(Atoms,Name/Arity),
   iterator(N,M),
   format('% clauses: ~d invented predicates: ~d\n',[N,M]),
@@ -112,7 +112,7 @@ augmented_sig(P/A,M,Sig1,[P/A|Sig2]):-
   invented_symbols(M,P,InventedSymbols),
   append(InventedSymbols,Sig1,Sig2).
 
-initial_sig(_Pos,_Neg,Prims):- !,
+initial_sig(Prims):-
   findall(P/A,user:prim(P/A),Prims).
 
 pprint(G1):-
