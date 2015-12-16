@@ -107,13 +107,13 @@ The above metarules are all non-recursive.  By contrast, the following metarule 
 
 ```prolog
 % P(A,B) <- Q(A,C), A>C, P(C,B),C>B.
-metarule([P,Q],([P,A,B]:-[[Q,A,C],@obj_gt(A,C),[P,C,B],@obj_gt(C,B)])).
+metarule([P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])).
 ```
 
-Here, the atoms `@obj_gt(A,C)` and `@obj_gt(C,B)` define a total ordering over the terms. The user must define the ordering `@obj_gt(A,B)'. An total order is necessary to guarantee termination of the meta-interpreter. For example, suppose you are learning robot strategies for a robot in a one-dimensional space and each term is a state (a list of Prolog facts). The following ordering ensures that the robot always moves at least one place to the right. Because the space is finite, termination is guaranteed.
+Here, the atoms `@term_gt(A,C)` and `@term_gt(C,B)` define a total ordering over the terms. The user must define the ordering `@term_gt(A,B)'. An total order is necessary to guarantee termination of the meta-interpreter. For example, suppose you are learning robot strategies for a robot in a one-dimensional space and each term is a state (a list of Prolog facts). The following ordering ensures that the robot always moves at least one place to the right. Because the space is finite, termination is guaranteed.
 
 ```prolog
-obj_gt(A,B):-
+term_gt(A,B):-
   member(robot_position(APos),A),
   member(robot_position(BPos),B),
   APos < BPos.

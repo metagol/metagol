@@ -19,7 +19,7 @@ prim(pick_up_left/2).
 prim(split/2).
 prim(combine/2).
 
-metarule([P,Q],([P,A,B]:-[[Q,A,C],@obj_gt(A,C),[P,C,B],@obj_gt(C,B)])).
+metarule([P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])).
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
 a:-
@@ -57,7 +57,7 @@ sum_intervals([X-Y|T],Acc1,Total):-
   Acc2 is Acc1 + Dif,
   sum_intervals(T,Acc2,Total).
 
-obj_gt(A,B):-
+term_gt(A,B):-
   world_check(intervals(Xs),A),
   world_check(intervals(Zs),B),
   sum_intervals(Xs,0,SumXs),
@@ -65,7 +65,7 @@ obj_gt(A,B):-
   SumXs > SumZs,!.
 
 
-obj_gt(A,B):-
+term_gt(A,B):-
   world_check(robot_pos(APos),A),
   world_check(robot_pos(BPos),B),
   APos < BPos,!.

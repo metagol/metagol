@@ -15,7 +15,7 @@ next_empty([_]/_).
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])). % chain
 metarule([P,Q,R],([P,A,B]:-[[Q,A],[R,A,B]])). % precon
 metarule([P,Q,X],([P,A,B]:-[[Q,A,B,X]])). % curry
-metarule([P,Q],([P,A,B]:-[[Q,A,C],@gt(A,C),[P,C,B],@gt(C,B)])). % tail rec
+metarule([P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])). % tail rec
 
 a :-
   Pos = [f(['a','b','c']/['a','b','c','d'],_/[]),
@@ -24,7 +24,7 @@ a :-
   learn(Pos,[],H),
   pprint(H).
 
-gt(A,B):-
+term_gt(A,B):-
   A = In1/_,
   B = In2/_,
   length(In1,X),
