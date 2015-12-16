@@ -51,6 +51,7 @@ proveall(Atoms,Sig2,G):-
 
 prove([],_Sig,_MaxN,G,G).
 
+%% prove order constraint
 prove(['@'(Atom)|Atoms],Sig,MaxN,G1,G2):- !,
   user:call(Atom),
   prove(Atoms,Sig,MaxN,G1,G2).
