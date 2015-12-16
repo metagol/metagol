@@ -4,7 +4,6 @@
 :- user:use_module(library(lists)).
 
 :- use_module(library(lists)).
-:- use_module(library(charsio)).
 
 :- dynamic(functional/0).
 :- dynamic(min_clauses/1).
