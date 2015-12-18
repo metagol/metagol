@@ -170,7 +170,7 @@ If the functional flag is enabled, then the must define a func_test predicate. A
 func_test(Atom,PS,G):-
   Atom = [P,A,B],
   Actual = [P,A,Z],
-  not((metagol:prove_deduce(Actual,PS,G),Z \= B)).
+  not((metagol:prove_deduce([Actual],PS,G),Z \= B)).
 ```
 
 This func test is used in the robot examples. Here, the `Atom` variable is formed of a predicate symbol `P` and two states `A` and `B`, which represent initial and final state pairs respectively.  The func_test checks whether the learned hypothesis can be applied to the initial state to reach any state `Z` other that the expected final state `B`. For more examples of functional tests, see the robots.pl, sorter.pl, and strings2.pl files.
