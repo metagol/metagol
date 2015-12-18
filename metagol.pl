@@ -48,7 +48,7 @@ proveall(Atoms,Sig2,G):-
   augmented_sig(Name/Arity,M,Sig1,Sig2),
   prove(Atoms,Sig2,N,[],G).
 
-prove([],_Sig,_MaxN,G,G).
+prove([],_,_,G,G).
 
 %% prove order constraint
 prove(['@'(Atom)|Atoms],Sig,MaxN,G1,G2):- !,
@@ -79,14 +79,15 @@ prove([Atom|Atoms],Sig1,MaxN,G1,G2):-
   prove(Body,Sig1,MaxN,[sub(Name,P,MetaSub)|G1],G3),
   prove(Atoms,Sig1,MaxN,G3,G2).
 
-prove_deduce(Atom,Sig,G):-
+prove_deduce([],_,_).
+prove_deduce([Atom|Atoms],PS,G):-
   length(G,N),
-  prove([Atom],Sig,N,G,G).
+  prove([Atom],PS,N,G,G),
+  prove_deduce(Atoms,PS,G).
 
-nproveall([],_Sig,_G).
-nproveall([Atom|T],Sig,G):-
-  \+ prove_deduce(Atom,Sig,G),
-  nproveall(T,Sig,G).
+nproveall([],_,_):-!.
+nproveall(Atoms,PS,G) :-
+  \+ prove_deduce(Atoms,PS,G).
 
 iterator(N,M):-
   get_option(min_clauses(MinN)),
@@ -98,7 +99,7 @@ iterator(N,M):-
 target_predicate([[P|Args]|_],P/A):-
   length(Args,A).
 
-invented_symbols(0,_Name,[]):-!.
+invented_symbols(0,_,[]):-!.
 invented_symbols(M,Name,[InvSym/_Arity|Sig]) :-
   atomic_list_concat([Name,'_',M],InvSym),
   succ(Prev,M),

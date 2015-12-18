@@ -25,7 +25,7 @@ metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 func_test(Atom,PS,G):-
   Atom = [P,A,B],
   Actual = [P,A,Z],
-  \+ (metagol:prove_deduce(Actual,PS,G),Z \= B).
+  \+ (metagol:prove_deduce([Actual],PS,G),Z \= B).
 
 %% ROBOT LEARNING TO MOVE A BALL TO A SPECIFIC POSITION
 a :-
