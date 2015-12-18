@@ -128,19 +128,16 @@ For more examples of learning with recursion see the sorter.pl and strings2.pl e
 To learn a sequence of tasks, use the following command.
 
 ```prolog
-Seq = [
-    ([
-      parent(ann,andy),
-      parent(steve,andy),
-      parent(ann,amy)
-      ],[]),
-    ([
-      grandparent(ann,amelia),
-      grandparent(steve,amelia)
-    ],[])
-  ],
-  learn_seq(Seq,H),
-  pprint(H).
+T1 = [
+  parent(ann,andy),
+  parent(steve,andy),
+  parent(ann,amy)]/[],
+T2 = [
+  grandparent(ann,amelia),
+  grandparent(steve,amelia)
+  ]/[],
+learn_seq([T1,T2],H),
+pprint(H).
 ```
 
 ## Metagol settings
@@ -200,7 +197,7 @@ For more information on Metagol and the MIL framework, see the following papers:
 * A. Cropper and S.H. Muggleton. [Can predicate invention compensate for incomplete background knowledge?](http://www.andrewcropper.com/pubs/scai2015-incomplete.pdf). In Proceedings of the 13th Scandinavian Conference on Artificial Intelligence, pages 27-36. IOS Press, 2015.
 
 * S.H. Muggleton, D. Lin, and A. Tamaddoni-Nezhad. [Meta-interpretive learning of higher-order dyadic datalog: Predicate invention revisited](http://www.doc.ic.ac.uk/~shm/Papers/metagolD_MLJ.pdf). Machine Learning, 100(1):49-73, 2015.
-* 
+*
 * S.H. Muggleton, D. Lin, N. Pahlavi, and A. Tamaddoni-Nezhad. [Meta-interpretive learning: application to grammatical inference](http://www.doc.ic.ac.uk/~shm/Papers/metagol_gram.pdf). Machine Learning, 94:25-49, 2014.
 
 

@@ -1,4 +1,4 @@
-:- module(metagol,[learn/4,learn/3,pprint/1]).
+:- module(metagol,[learn/4,learn/3,learn_seq/2,pprint/1]).
 
 :- user:call(op(950,fx,'@')).
 :- user:use_module(library(lists)).
@@ -9,19 +9,13 @@
 :- dynamic(min_clauses/1).
 :- dynamic(max_clauses/1).
 :- dynamic(metarule_next_id/1).
+:- dynamic(user:prim/1).
+:- dynamic(user:primtest/2).
+:- dynamic(user:primcall/2).
 
 default(min_clauses(1)).
 default(max_clauses(6)).
 default(metarule_next_id(1)).
-
-get_option(Option):-call(Option),!.
-get_option(Option):-default(Option).
-
-set_option(Option):-
-  functor(Option,Name,Arity),
-  functor(Retract,Name,Arity),
-  retractall(Retract),
-  assert(Option).
 
 learn(_Name,Pos,Neg,G):- % deprecated
   write('WARNING: metagol learn(Name,...) is deprecated. s'),
@@ -35,11 +29,16 @@ learn(Pos1,Neg1,G):-
   nproveall(Neg2,Sig,G),
   (functional -> is_functional(Pos2,Sig,G); true).
 
+learn_seq(Seq,G2):-
+  learn_seq_aux(Seq,G1),
+  flatten(G1,G2).
+
 learn_seq_aux([],[]).
-learn_seq_aux([(Pos,Neg)|T],[G|Out]):-
+learn_seq_aux([Pos/Neg|T],[G|Out]):-
   learn(Pos,Neg,G),!,
-  %% TODO: assert G to BK, and also assert prims
-  learn_seq(T,Out).
+  assert_clauses(G),
+  assert_prims(G),!,
+  learn_seq_aux(T,Out).
 
 proveall(Atoms,Sig2,G):-
   initial_sig(Sig1),
@@ -155,6 +154,46 @@ is_functional([],_,_).
 is_functional([Atom|Atoms],Sig,G) :-
   user:func_test(Atom,Sig,G),
   is_functional(Atoms,Sig,G).
+
+assert_prims(G):-
+  setof(P/A,(
+    member(sub(Name,_,MetaSub),G),
+    user:metarule_init(Name,MetaSub,([P|Args]:-_)),
+    length(Args,A)),
+  Prims),
+  assert_prims_aux(Prims).
+
+assert_prims_aux([]).
+assert_prims_aux([P/A|T]):-
+  functor(Call,P,A),
+  Call=..[P|Args],
+  assert(user:prim(P/A)),
+  assert(user:primtest(P,Args)),
+  assert(user:(primcall(P,Args):- Call)),!,
+  assert_prims_aux(T).
+
+assert_clauses([]).
+assert_clauses([sub(Name,_,MetaSub)|T]):-
+  user:metarule_init(Name,MetaSub,Clause),
+  copy_term(Clause,(ListHead:-ListBodyWithAts)),
+  Head=..ListHead,
+  convert_preds(ListBodyWithAts,AtomBodyList),
+  (AtomBodyList==[] -> AtomClause=Head
+                       ;
+                       listtocomma(AtomBodyList,Body),
+                       AtomClause=(Head:-Body)
+  ),
+  assert(user:AtomClause),!,
+  assert_clauses(T).
+
+get_option(Option):-call(Option),!.
+get_option(Option):-default(Option).
+
+set_option(Option):-
+  functor(Option,Name,Arity),
+  functor(Retract,Name,Arity),
+  retractall(Retract),
+  assert(Option).
 
 :- user:multifile(prim/1).
 :- user:multifile(primcall/2).
