@@ -4,6 +4,7 @@
 
 :- use_module(library(lists)).
 :- use_module(library(apply)).
+:- use_module(library(pairs)).
 
 :- dynamic
     functional/0,
@@ -113,7 +114,10 @@ initial_sig(Prims):-
 
 pprint(G1):-
   reverse(G1,G2),
-  maplist(pprint_clause,G2).
+  map_list_to_pairs(arg(2),G2,Pairs),
+  keysort(Pairs,Sorted),
+  pairs_values(Sorted,G3),
+  maplist(pprint_clause,G3).
 
 pprint_clause(Sub):-
   construct_clause(Sub,Clause),
