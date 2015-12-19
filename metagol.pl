@@ -33,7 +33,7 @@ learn_seq_aux([],[]).
 learn_seq_aux([Pos/Neg|T],[G|Out]):-
   learn(Pos,Neg,G), !,
   maplist(assert_clause,G),
-  assert_prims(G), !,
+  assert_prims(G),
   learn_seq_aux(T,Out).
 
 proveall(Atoms,Sig2,G):-
@@ -158,21 +158,20 @@ assert_prims(G):-
            user:metarule_init(Name,MetaSub,([P|Args]:-_)),
            length(Args,A)
          ),
-         Prims),
-  assert_prims_aux(Prims).
+         Prims), !,
+  maplist(assert_prim,Prims).
 
-assert_prims_aux([]).
-assert_prims_aux([P/A|T]):-
+assert_prim(Prim):-
+  prim_asserts(Prim,Asserts),
+  maplist(user:assertz,Asserts).
+
+prim_asserts(P/A,[prim(P/A), primtest(P,Args), (primcall(P,Args):-Call)]):-
   functor(Call,P,A),
-  Call=..[P|Args],
-  assert(user:prim(P/A)),
-  assert(user:primtest(P,Args)),
-  assert(user:(primcall(P,Args):- Call)), !,
-  assert_prims_aux(T).
+  Call =.. [P|Args].
 
 assert_clause(Sub):-
-  construct_clause(Sub,Clause), !,
-  assert(user:Clause), !.
+  construct_clause(Sub,Clause),
+  assert(user:Clause).
 
 get_option(Option):-call(Option), !.
 get_option(Option):-default(Option).
@@ -182,11 +181,6 @@ set_option(Option):-
   functor(Retract,Name,Arity),
   retractall(Retract),
   assert(Option).
-
-:- multifile
-    user:prim/1,
-    user:primcall/2,
-    user:primtest/2.
 
 :- discontiguous
     user:prim/1,
@@ -203,9 +197,7 @@ gen_metarule_id(Id):-
   set_option(metarule_next_id(IdNext)).
 
 user:term_expansion(prim(P/A),Asserts):-
-  functor(Call,P,A),
-  Call =.. [P|Args],
-  Asserts=[prim(P/A), primtest(P,Args), (primcall(P,Args):-Call)].
+  prim_asserts(P/A,Asserts).
 
 user:term_expansion(metarule(MetaSub,Clause),Asserts):-
   gen_body(MetaSub,Clause,PS,Body),
