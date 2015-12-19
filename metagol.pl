@@ -3,6 +3,7 @@
 :- user:use_module(library(lists)).
 
 :- use_module(library(lists)).
+:- use_module(library(apply)).
 
 :- dynamic
     functional/0,
@@ -111,10 +112,9 @@ initial_sig(Prims):-
 
 pprint(G1):-
   reverse(G1,G2),
-  pprint_aux(G2).
+  maplist(pprint_clause,G2).
 
-pprint_aux([]).
-pprint_aux([sub(Name,_P,MetaSub)|T]):-
+pprint_clause(sub(Name,_P,MetaSub)):-
   user:metarule_init(Name,MetaSub,Clause),
   copy_term(Clause,(ListHead:-ListBodyWithAts)),
   Head=..ListHead,
@@ -125,8 +125,7 @@ pprint_aux([sub(Name,_P,MetaSub)|T]):-
                        AtomClause=(Head:-Body)
   ),
   numbervars(AtomClause,0,_),
-  format('~q.~n', [AtomClause]),
-  pprint_aux(T).
+  format('~q.~n', [AtomClause]).
 
 listtocomma([E],E):-!.
 listtocomma([H|T],(H,R)):-
