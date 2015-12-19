@@ -79,11 +79,9 @@ prove([Atom|Atoms],Sig1,MaxN,G1,G2):-
   prove(Body,Sig1,MaxN,[sub(Name,P,MetaSub)|G1],G3),
   prove(Atoms,Sig1,MaxN,G3,G2).
 
-prove_deduce([],_,_).
-prove_deduce([Atom|Atoms],PS,G):-
+prove_deduce(Atoms,PS,G):-
   length(G,N),
-  prove([Atom],PS,N,G,G),
-  prove_deduce(Atoms,PS,G).
+  prove(Atoms,PS,N,G,G).
 
 nproveall([],_,_):-!.
 nproveall(Atoms,PS,G) :-
