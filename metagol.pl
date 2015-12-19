@@ -1,6 +1,5 @@
-:- module(metagol,[learn/4,learn/3,learn_seq/2,pprint/1]).
+:- module(metagol,[learn/4,learn/3,learn_seq/2,pprint/1,op(950,fx,'@')]).
 
-:- user:call(op(950,fx,'@')).
 :- user:use_module(library(lists)).
 
 :- use_module(library(lists)).
