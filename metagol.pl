@@ -135,6 +135,7 @@ construct_clause(sub(Name,_P,MetaSub),AtomClause):-
      AtomClause = (Head:-Body)
   ).
 
+listtocomma([],true):- !.
 listtocomma([E],E):- !.
 listtocomma([H|T],(H,R)):-
   listtocomma(T,R).
