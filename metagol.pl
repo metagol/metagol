@@ -228,11 +228,12 @@ user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),
 gen_body(MetaSub,(Head:-Goals),PS,Body):-
   term_variables(Head,HeadVars),
   remove_vars(HeadVars,MetaSub,MetaSubNew),
-  gen_body_aux(MetaSubNew,Goals,PS,Body).
+  gen_body_aux(MetaSubNew,Goals,PS,ListBody),
+  listtocomma(ListBody,Body).
 
-gen_body_aux([],_Goals,_PS,true):- !.
+gen_body_aux([],_Goals,_PS,[]):- !.
 
-gen_body_aux(Vars1,[[Var|Args]|Goals],PS,(member(Var/Arity,PS),Body)):-
+gen_body_aux(Vars1,[[Var|Args]|Goals],PS,[member(Var/Arity,PS)|Body]):-
   select_var(Var,Arity,Vars1,Vars2), !,
   (  var(Arity)
   -> length(Args,Arity)
