@@ -27,7 +27,7 @@ learn(Pos1,Neg1,G):-
   atom_to_list(Neg1,Neg2),
   proveall(Pos2,Sig,G),
   nproveall(Neg2,Sig,G),
-  (functional -> is_functional(Pos2,Sig,G); true).
+  (get_option(functional) -> is_functional(Pos2,Sig,G); true).
 
 learn_seq(Seq,G2):-
   learn_seq_aux(Seq,G1),
