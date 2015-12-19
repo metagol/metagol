@@ -93,11 +93,12 @@ iterator(N,M):-
 target_predicate([[P|Args]|_],P/A):-
   length(Args,A).
 
-invented_symbols(0,_,[]):-!.
-invented_symbols(M,Name,[InvSym/_Arity|Sig]) :-
-  atomic_list_concat([Name,'_',M],InvSym),
-  succ(Prev,M),
-  invented_symbols(Prev,Name,Sig).
+invented_symbols(M,Name,Sig) :-
+  findall( InvSym/_Artiy,
+           ( between(1,M,I),
+             atomic_list_concat([Name,'_',I],InvSym)
+           ),
+           Sig).
 
 lower_sig([P|Args],P,Sig1,Sig2):-
   length(Args,A),
