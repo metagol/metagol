@@ -1,4 +1,4 @@
-:- module(metagol,[learn/4,learn/3,learn_seq/2,pprint/1,op(950,fx,'@')]).
+:- module(metagol,[learn/3,learn_seq/2,pprint/1,op(950,fx,'@')]).
 
 :- user:use_module(library(lists)).
 
@@ -16,11 +16,6 @@
 default(min_clauses(1)).
 default(max_clauses(6)).
 default(metarule_next_id(1)).
-
-learn(_Name,Pos,Neg,G):- % deprecated
-  write('WARNING: metagol learn(Name,...) is deprecated. s'),
-  write('Use learn/3 instead.'),nl,
-  learn(Pos,Neg,G).
 
 learn(Pos1,Neg1,G):-
   atom_to_list(Pos1,Pos2),
