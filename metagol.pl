@@ -163,9 +163,9 @@ assert_prims(G):-
 
 assert_prim(Prim):-
   prim_asserts(Prim,Asserts),
-  maplist(user:assertz,Asserts).
+  maplist(assertz,Asserts).
 
-prim_asserts(P/A,[prim(P/A), primtest(P,Args), (primcall(P,Args):-Call)]):-
+prim_asserts(P/A,[user:prim(P/A), user:primtest(P,Args), user:(primcall(P,Args):-Call)]):-
   functor(Call,P,A),
   Call =.. [P|Args].
 
