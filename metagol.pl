@@ -4,13 +4,14 @@
 
 :- use_module(library(lists)).
 
-:- dynamic(functional/0).
-:- dynamic(min_clauses/1).
-:- dynamic(max_clauses/1).
-:- dynamic(metarule_next_id/1).
-:- dynamic(user:prim/1).
-:- dynamic(user:primtest/2).
-:- dynamic(user:primcall/2).
+:- dynamic
+    functional/0,
+    min_clauses/1,
+    max_clauses/1,
+    metarule_next_id/1,
+    user:prim/1,
+    user:primtest/2,
+    user:primcall/2.
 
 default(min_clauses(1)).
 default(max_clauses(6)).
@@ -195,16 +196,19 @@ set_option(Option):-
   retractall(Retract),
   assert(Option).
 
-:- user:multifile(prim/1).
-:- user:multifile(primcall/2).
-:- user:multifile(primtest/2).
+:- multifile
+    user:prim/1,
+    user:primcall/2,
+    user:primtest/2.
 
-:- user:discontiguous(prim/1).
-:- user:discontiguous(primcall/2).
-:- user:discontiguous(primtest/2).
+:- discontiguous
+    user:prim/1,
+    user:primcall/2,
+    user:primtest/2.
 
-:- user:discontiguous(metarule/4).
-:- user:discontiguous(metarule_init/3).
+:- discontiguous
+    user:metarule/4,
+    user:metarule_init/3.
 
 gen_metarule_id(Id):-
   get_option(metarule_next_id(Id)),
