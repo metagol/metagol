@@ -32,7 +32,7 @@ learn_seq(Seq,G2):-
 learn_seq_aux([],[]).
 learn_seq_aux([Pos/Neg|T],[G|Out]):-
   learn(Pos,Neg,G),!,
-  assert_clauses(G),
+  maplist(assert_clause,G),
   assert_prims(G),!,
   learn_seq_aux(T,Out).
 
@@ -115,7 +115,12 @@ pprint(G1):-
   reverse(G1,G2),
   maplist(pprint_clause,G2).
 
-pprint_clause(sub(Name,_P,MetaSub)):-
+pprint_clause(Sub):-
+  construct_clause(Sub,Clause),
+  numbervars(Clause,0,_),
+  format('~q.~n', [Clause]).
+
+construct_clause(sub(Name,_P,MetaSub),AtomClause):-
   user:metarule_init(Name,MetaSub,Clause),
   copy_term(Clause,(ListHead:-ListBodyWithAts)),
   Head=..ListHead,
@@ -124,9 +129,7 @@ pprint_clause(sub(Name,_P,MetaSub)):-
                        ;
                        listtocomma(AtomBodyList,Body),
                        AtomClause=(Head:-Body)
-  ),
-  numbervars(AtomClause,0,_),
-  format('~q.~n', [AtomClause]).
+  ).
 
 listtocomma([E],E):-!.
 listtocomma([H|T],(H,R)):-
@@ -166,19 +169,9 @@ assert_prims_aux([P/A|T]):-
   assert(user:(primcall(P,Args):- Call)),!,
   assert_prims_aux(T).
 
-assert_clauses([]).
-assert_clauses([sub(Name,_,MetaSub)|T]):-
-  user:metarule_init(Name,MetaSub,Clause),
-  copy_term(Clause,(ListHead:-ListBodyWithAts)),
-  Head=..ListHead,
-  convert_preds(ListBodyWithAts,AtomBodyList),
-  (AtomBodyList==[] -> AtomClause=Head
-                       ;
-                       listtocomma(AtomBodyList,Body),
-                       AtomClause=(Head:-Body)
-  ),
-  assert(user:AtomClause),!,
-  assert_clauses(T).
+assert_clause(Sub):-
+  construct_clause(Sub,Clause),!,
+  assert(user:Clause),!.
 
 get_option(Option):-call(Option),!.
 get_option(Option):-default(Option).
