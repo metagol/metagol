@@ -16,11 +16,11 @@ a :-
    q(1,1),
    q(2,2),
    q(4,4)
-   ],
- Neg = [
+  ],
+  Neg = [
    q(2,4),
    q(3,4),
    q(3,1)
- ],
-   learn(Pos,Neg,H),
-   pprint(H).
+  ],
+  learn(Pos,Neg,H),
+  pprint(H).

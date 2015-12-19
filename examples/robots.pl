@@ -29,9 +29,9 @@ func_test(Atom,PS,G):-
 
 %% ROBOT LEARNING TO MOVE A BALL TO A SPECIFIC POSITION
 a :-
-    Pos = [f(world((1/1),(1/1),false),world((3/3),(3/3),false))],
-    learn(Pos,[],H),
-    pprint(H).
+  Pos = [f(world((1/1),(1/1),false),world((3/3),(3/3),false))],
+  learn(Pos,[],H),
+  pprint(H).
 
 b :-
   Pos = [f(world((1/1),(1/1),false),world((5/5),(5/5),false))],
