@@ -229,14 +229,10 @@ user:term_expansion(metarule(Name,MetaSub,Clause),Asserts):-
   clean_metasub(MetaSub,MetaSubClean),
   user:term_expansion((metarule(Name,MetaSubClean,Clause,PS):-Body),Asserts).
 
-user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
-  add_metaruleinit((metarule(Name,MetaSub,Clause,PS):-Body),Asserts).
-
-add_metaruleinit((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
-  Asserts = [
-   (metarule(Name,MetaSub,Clause,PS):-Body),
-   (metarule_init(Name,MetaSub,Clause))
-  ].
+user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),
+                    [ (metarule(Name,MetaSub,Clause,PS):-Body),
+                      (metarule_init(Name,MetaSub,Clause))
+                    ]).
 
 %% automatically adds the bindings for the metasubs
 gen_body(MetaSub,(Head:-Goals),PS,Body):-
