@@ -81,8 +81,12 @@ prove_deduce(Atoms,PS,G):-
   prove(Atoms,PS,N,G,G).
 
 nproveall([],_,_):- !.
-nproveall(Atoms,PS,G):-
-  \+ prove_deduce(Atoms,PS,G).
+nproveall([Atom|Atoms],PS,G):-
+  \+ prove_deduce([Atom],PS,G),
+  nproveall(Atoms,PS,G).
+
+%% nproveall(Atoms,PS,G):-
+%%   \+ prove_deduce(Atoms,PS,G).
 
 iterator(N,M):-
   get_option(min_clauses(MinN)),
