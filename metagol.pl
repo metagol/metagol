@@ -72,9 +72,16 @@ prove([Atom|Atoms],Sig1,MaxN,G1,G2):-
   L < MaxN,
   lower_sig(Atom,P,Sig1,Sig2),
   user:metarule(Name,MetaSub,(Atom :- Body),Sig2),
-  \+ memberchk(sub(Name,P,MetaSub),G1),
+  %% \+ memberchk(sub(Name,P,MetaSub),G1), % old code which caused problems in constants3.pl
+  new_metasub(G1,sub(Name,P,MetaSub)),
   prove(Body,Sig1,MaxN,[sub(Name,P,MetaSub)|G1],G3),
   prove(Atoms,Sig1,MaxN,G3,G2).
+
+new_metasub([],_).
+new_metasub([H|_],A):-
+  H == A,!,false.
+new_metasub([_|T],A):-
+  new_metasub(T,A).
 
 prove_deduce(Atoms,PS,G):-
   length(G,N),
