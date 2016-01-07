@@ -12,7 +12,7 @@ Metagol is maintained by Andrew Cropper (a.cropper13@imperial.ac.uk), Martin Mö
 
 ## Using Metagol
 
-Metagol is written in Prolog and runs with both Yap and, albeit slower, SWI. Metagol is contained in a single file called 'metagol.pl', the latest release can be found here: https://github.com/metagol/metagol/releases/tag/v1.0.0 To use Metagol, load the metagol module into your Prolog compiler. The following code demonstrates using Metagol to learn the grandparent relation.
+Metagol is written in Prolog and runs with both Yap and, albeit slower, SWI. Metagol is contained in a single file called 'metagol.pl'. The latest release can be found here: https://github.com/metagol/metagol/releases/tag/v1.0.0 To use Metagol, load the metagol module into your Prolog compiler. The following code demonstrates using Metagol to learn the grandparent relation.
 
 ```prolog
 :- use_module('metagol').
