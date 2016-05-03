@@ -46,8 +46,7 @@ proveall(Atoms,Sig,G):-
   invented_symbols(N,Name/Arity,Sig),
   prove(Atoms,Sig,Sig,N,cl(0,[]),cl(N,G)).
 
-prove([],_Sig,_FullSig,_MaxN,CL,CL).
-
+prove([],_Sig,_FullSig,_MaxN,Cl,Cl).
 prove([Atom|Atoms],Sig,FullSig,MaxN,G1,G2):-
   prove_aux(Atom,Sig,FullSig,MaxN,G1,G3),
   prove(Atoms,Sig,FullSig,MaxN,G3,G2).
@@ -61,7 +60,7 @@ prove_aux([P|Args],_Sig,_FullSig,_MaxN,G,G):-
 %% use existing abduction
 prove_aux(Atom,Sig1,FullSig,MaxN,cl(N,Cl),G2):-
   Atom=[P|_Args],
-  bind_lower(Atom,P,FullSig,Sig1,Sig2),
+  select_lower(Atom,P,FullSig,Sig1,Sig2),
   member(sub(Name,P,MetaSub),Cl),
   user:metarule_init(Name,MetaSub,(Atom:-Body)),
   prove(Body,Sig2,FullSig,MaxN,cl(N,Cl),G2).
@@ -73,13 +72,25 @@ prove_aux(Atom,Sig1,FullSig,MaxN,cl(N1,Cl1),G2):-
   user:metarule(Name,MetaSub,(Atom :- Body),Sig2),
   prove(Body,Sig2,FullSig,MaxN,cl(N3,[sub(Name,P,MetaSub)|Cl1]),G2).
 
+select_lower([P|_],P,FullSig,_Sig1,Sig2):-
+  nonvar(P),!,
+  append(_,[sym(P,_,_)|Sig2],FullSig),!.
+select_lower([P|Args],P,_FullSig,Sig1,Sig2):-
+  length(Args,A),
+  append(_,[sym(P,A,U)|Sig2],Sig1),
+  ( var(U)
+  -> !, fail
+  ;  true ).
+
 bind_lower([P|_],P,FullSig,_Sig1,Sig2):-
   nonvar(P),!,
   append(_,[sym(P,_,_)|Sig2],FullSig),!.
 bind_lower([P|Args],P,_FullSig,Sig1,Sig2):-
   length(Args,A),
   append(_,[sym(P,A,U)|Sig2],Sig1),
-  ( var(U) -> U = 1, ! ; true ).
+  ( var(U)
+  -> U = 1, !
+  ;  true ).
 
 prove_deduce(Atoms,PS,G):-
   length(G,N),
