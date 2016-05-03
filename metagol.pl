@@ -44,34 +44,34 @@ proveall(Atoms,Sig,G):-
   iterator(N),
   format('% clauses: ~d\n',[N]),
   invented_symbols(N,Name/Arity,Sig),
-  prove(Atoms,Sig,Sig,0,N,N,[],G).
+  prove(Atoms,Sig,Sig,N,cl(0,[]),cl(N,G)).
 
-prove([],_Sig,_FullSig,N,N,_MaxN,G,G).
+prove([],_Sig,_FullSig,_MaxN,CL,CL).
 
-prove([Atom|Atoms],Sig,FullSig,N1,N2,MaxN,G1,G2):-
-  prove_aux(Atom,Sig,FullSig,N1,N3,MaxN,G1,G3),
-  prove(Atoms,Sig,FullSig,N3,N2,MaxN,G3,G2).
+prove([Atom|Atoms],Sig,FullSig,MaxN,G1,G2):-
+  prove_aux(Atom,Sig,FullSig,MaxN,G1,G3),
+  prove(Atoms,Sig,FullSig,MaxN,G3,G2).
 
 %% prove order constraint
-prove_aux('@'(Atom),_Sig,_FullSig,N,N,_MaxN,G,G):- !,
+prove_aux('@'(Atom),_Sig,_FullSig,_MaxN,G,G):- !,
   user:call(Atom).
 %% prove primitive atom
-prove_aux([P|Args],_Sig,_FullSig,N,N,_MaxN,G,G):-
+prove_aux([P|Args],_Sig,_FullSig,_MaxN,G,G):-
   user:primcall(P,Args).
 %% use existing abduction
-prove_aux(Atom,Sig1,FullSig,N1,N2,MaxN,G1,G2):-
+prove_aux(Atom,Sig1,FullSig,MaxN,cl(N,Cl),G2):-
   Atom=[P|_Args],
   bind_lower(Atom,P,FullSig,Sig1,Sig2),
-  member(sub(Name,P,MetaSub),G1),
+  member(sub(Name,P,MetaSub),Cl),
   user:metarule_init(Name,MetaSub,(Atom:-Body)),
-  prove(Body,Sig2,FullSig,N1,N2,MaxN,G1,G2).
+  prove(Body,Sig2,FullSig,MaxN,cl(N,Cl),G2).
 %% new abduction
-prove_aux(Atom,Sig1,FullSig,N1,N2,MaxN,G1,G2):-
+prove_aux(Atom,Sig1,FullSig,MaxN,cl(N1,Cl1),G2):-
   N1 < MaxN,
   succ(N1,N3),
   bind_lower(Atom,P,FullSig,Sig1,Sig2),
   user:metarule(Name,MetaSub,(Atom :- Body),Sig2),
-  prove(Body,Sig2,FullSig,N3,N2,MaxN,[sub(Name,P,MetaSub)|G1],G2).
+  prove(Body,Sig2,FullSig,MaxN,cl(N3,[sub(Name,P,MetaSub)|Cl1]),G2).
 
 bind_lower([P|_],P,FullSig,_Sig1,Sig2):-
   nonvar(P),!,
@@ -82,7 +82,8 @@ bind_lower([P|Args],P,_FullSig,Sig1,Sig2):-
   ( var(U) -> U = 1, ! ; true ).
 
 prove_deduce(Atoms,PS,G):-
-  prove(Atoms,PS,PS,0,0,0,G,G).
+  length(G,N),
+  prove(Atoms,PS,PS,N,cl(N,G),cl(N,G)).
 
 nproveall([],_,_):- !.
 nproveall([Atom|Atoms],PS,G):-
