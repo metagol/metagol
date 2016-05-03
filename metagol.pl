@@ -47,30 +47,31 @@ proveall(Atoms,Sig,G):-
   prove(Atoms,Sig,Sig,0,N,N,[],G).
 
 prove([],_Sig,_FullSig,N,N,_MaxN,G,G).
+
+prove([Atom|Atoms],Sig,FullSig,N1,N2,MaxN,G1,G2):-
+  prove_aux(Atom,Sig,FullSig,N1,N3,MaxN,G1,G3),
+  prove(Atoms,Sig,FullSig,N3,N2,MaxN,G3,G2).
+
 %% prove order constraint
-prove(['@'(Atom)|Atoms],Sig,FullSig,N1,N2,MaxN,G1,G2):- !,
-  user:call(Atom),
-  prove(Atoms,Sig,FullSig,N1,N2,MaxN,G1,G2).
+prove_aux('@'(Atom),_Sig,_FullSig,N,N,_MaxN,G,G):- !,
+  user:call(Atom).
 %% prove primitive atom
-prove([[P|Args]|Atoms],Sig,FullSig,N1,N2,MaxN,G1,G2):-
-  user:primcall(P,Args),
-  prove(Atoms,Sig,FullSig,N1,N2,MaxN,G1,G2).
+prove_aux([P|Args],_Sig,_FullSig,N,N,_MaxN,G,G):-
+  user:primcall(P,Args).
 %% use existing abduction
-prove([Atom|Atoms],Sig1,FullSig,N1,N2,MaxN,G1,G2):-
+prove_aux(Atom,Sig1,FullSig,N1,N2,MaxN,G1,G2):-
   Atom=[P|_Args],
   bind_lower(Atom,P,FullSig,Sig1,Sig2),
   member(sub(Name,P,MetaSub),G1),
   user:metarule_init(Name,MetaSub,(Atom:-Body)),
-  prove(Body,Sig2,FullSig,N1,N3,MaxN,G1,G3),
-  prove(Atoms,Sig1,FullSig,N3,N2,MaxN,G3,G2).
+  prove(Body,Sig2,FullSig,N1,N2,MaxN,G1,G2).
 %% new abduction
-prove([Atom|Atoms],Sig1,FullSig,N1,N2,MaxN,G1,G2):-
+prove_aux(Atom,Sig1,FullSig,N1,N2,MaxN,G1,G2):-
   N1 < MaxN,
   succ(N1,N3),
   bind_lower(Atom,P,FullSig,Sig1,Sig2),
   user:metarule(Name,MetaSub,(Atom :- Body),Sig2),
-  prove(Body,Sig2,FullSig,N3,N4,MaxN,[sub(Name,P,MetaSub)|G1],G3),
-  prove(Atoms,Sig1,FullSig,N4,N2,MaxN,G3,G2).
+  prove(Body,Sig2,FullSig,N3,N2,MaxN,[sub(Name,P,MetaSub)|G1],G2).
 
 bind_lower([P|_],P,FullSig,_Sig1,Sig2):-
   nonvar(P),!,
