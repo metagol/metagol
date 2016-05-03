@@ -26,7 +26,9 @@ learn(Pos1,Neg1,G):-
   atom_to_list(Neg1,Neg2),
   proveall(Pos2,Sig,G),
   nproveall(Neg2,Sig,G),
-  (get_option(functional) -> is_functional(Pos2,Sig,G); true).
+  ( get_option(functional)
+  -> is_functional(Pos2,Sig,G)
+  ;  true ).
 
 learn_seq(Seq,G2):-
   learn_seq_aux(Seq,G1),
@@ -46,7 +48,7 @@ proveall(Atoms,Sig,G):-
   invented_symbols(N,Name/Arity,Sig),
   prove(Atoms,Sig,Sig,N,cl(0,[]),cl(N,G)).
 
-prove([],_Sig,_FullSig,_MaxN,Cl,Cl).
+prove([],_Sig,_FullSig,_MaxN,G,G).
 prove([Atom|Atoms],Sig,FullSig,MaxN,G1,G2):-
   prove_aux(Atom,Sig,FullSig,MaxN,G1,G3),
   prove(Atoms,Sig,FullSig,MaxN,G3,G2).
@@ -69,12 +71,12 @@ prove_aux(Atom,Sig1,FullSig,MaxN,cl(N1,Cl1),G2):-
   N1 < MaxN,
   succ(N1,N3),
   bind_lower(Atom,P,FullSig,Sig1,Sig2),
-  user:metarule(Name,MetaSub,(Atom :- Body),Sig2),
+  user:metarule(Name,MetaSub,(Atom:-Body),Sig2),
   prove(Body,Sig2,FullSig,MaxN,cl(N3,[sub(Name,P,MetaSub)|Cl1]),G2).
 
 select_lower([P|_],P,FullSig,_Sig1,Sig2):-
-  nonvar(P),!,
-  append(_,[sym(P,_,_)|Sig2],FullSig),!.
+  nonvar(P), !,
+  append(_,[sym(P,_A,_U)|Sig2],FullSig), !.
 select_lower([P|Args],P,_FullSig,Sig1,Sig2):-
   length(Args,A),
   append(_,[sym(P,A,U)|Sig2],Sig1),
@@ -84,7 +86,7 @@ select_lower([P|Args],P,_FullSig,Sig1,Sig2):-
 
 bind_lower([P|_],P,FullSig,_Sig1,Sig2):-
   nonvar(P),!,
-  append(_,[sym(P,_,_)|Sig2],FullSig),!.
+  append(_,[sym(P,_,_)|Sig2],FullSig), !.
 bind_lower([P|Args],P,_FullSig,Sig1,Sig2):-
   length(Args,A),
   append(_,[sym(P,A,U)|Sig2],Sig1),
@@ -96,7 +98,7 @@ prove_deduce(Atoms,PS,G):-
   length(G,N),
   prove(Atoms,PS,PS,N,cl(N,G),cl(N,G)).
 
-nproveall([],_,_):- !.
+nproveall([],_PS,_G):- !.
 nproveall([Atom|Atoms],PS,G):-
   \+ prove_deduce([Atom],PS,G),
   nproveall(Atoms,PS,G).
@@ -125,18 +127,17 @@ pprint(G1):-
 pprint_clause(Sub):-
   construct_clause(Sub,Clause),
   numbervars(Clause,0,_),
-  format('~q.~n', [Clause]).
+  format('~q.~n',[Clause]).
 
 construct_clause(sub(Name,_P,MetaSub),AtomClause):-
   user:metarule_init(Name,MetaSub,Clause),
   copy_term(Clause,(ListHead:-ListBodyWithAts)),
   Head=..ListHead,
   convert_preds(ListBodyWithAts,AtomBodyList),
-  (  AtomBodyList == []
+  ( AtomBodyList == []
   -> AtomClause = Head
   ;  listtocomma(AtomBodyList,Body),
-     AtomClause = (Head:-Body)
-  ).
+     AtomClause = (Head:-Body) ).
 
 listtocomma([],true):- !.
 listtocomma([E],E):- !.
@@ -155,7 +156,7 @@ atom_to_list([Atom|T],[AtomAsList|Out]):-
   Atom =.. AtomAsList,
   atom_to_list(T,Out).
 
-is_functional([],_,_).
+is_functional([],_Sig,_G).
 is_functional([Atom|Atoms],Sig,G):-
   user:func_test(Atom,Sig,G),
   is_functional(Atoms,Sig,G).
