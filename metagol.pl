@@ -41,9 +41,9 @@ learn_seq_aux([Pos/Neg|T],[G|Out]):-
 
 proveall(Atoms,Sig,G):-
   target_predicate(Atoms,Name/Arity),
-  iterator(N,M),
-  format('% clauses: ~d invented predicates: ~d\n',[N,M]),
-  invented_symbols(M,Name/Arity,Sig),
+  iterator(N),
+  format('% clauses: ~d\n',[N]),
+  invented_symbols(N,Name/Arity,Sig),
   prove(Atoms,Sig,Sig,0,N,N,[],G).
 
 prove([],_Sig,_FullSig,N,N,_MaxN,G,G).
@@ -74,10 +74,11 @@ prove([Atom|Atoms],Sig1,FullSig,N1,N2,MaxN,G1,G2):-
 
 bind_lower([P|_],P,FullSig,_Sig1,Sig2):-
   nonvar(P),!,
-  append(_,[P/_|Sig2],FullSig),!.
+  append(_,[sym(P,_,_)|Sig2],FullSig),!.
 bind_lower([P|Args],P,_FullSig,Sig1,Sig2):-
-  length(Args,A),!,
-  append(_,[P/A|Sig2],Sig1).
+  length(Args,A),
+  append(_,[sym(P,A,U)|Sig2],Sig1),
+  ( var(U) -> U = 1, ! ; true ).
 
 prove_deduce(Atoms,PS,G):-
   prove(Atoms,PS,PS,0,0,0,G,G).
@@ -87,22 +88,19 @@ nproveall([Atom|Atoms],PS,G):-
   \+ prove_deduce([Atom],PS,G),
   nproveall(Atoms,PS,G).
 
-iterator(N,M):-
+iterator(N):-
   get_option(min_clauses(MinN)),
   get_option(max_clauses(MaxN)),
-  between(MinN,MaxN,N),
-  succ(MaxM,N),
-  between(0,MaxM,M).
+  between(MinN,MaxN,N).
 
 target_predicate([[P|Args]|_],P/A):-
   length(Args,A).
 
-invented_symbols(M,Name/Arity,[Name/Arity|Sig]):-
-  findall( InvSym/_Artiy,
-           ( between(1,M,I),
-             atomic_list_concat([Name,'_',I],InvSym)
-           ),
-           Sig).
+invented_symbols(N,Name/Arity,[sym(Name,Arity,_U)|Sig]):-
+  succ(M,N),
+  findall(sym(InvSym,_Artiy,_Used),
+          (between(1,M,I),atomic_list_concat([Name,'_',I],InvSym)),
+          Sig).
 
 pprint(G1):-
   reverse(G1,G2),
