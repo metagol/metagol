@@ -1,18 +1,19 @@
 # Metagol
 
-Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework (MIL).  For more details about MIL, see the following papers.
-
-* S.H. Muggleton, D. Lin, N. Pahlavi, and A. Tamaddoni-Nezhad. [Meta-interpretive learning: application to grammatical inference](http://www.doc.ic.ac.uk/~shm/Papers/metagol_gram.pdf). Machine Learning, 94:25-49, 2014.
-
-* S.H. Muggleton, D. Lin, and A. Tamaddoni-Nezhad. [Meta-interpretive learning of higher-order dyadic datalog: Predicate invention revisited](http://www.doc.ic.ac.uk/~shm/Papers/metagolD_MLJ.pdf). Machine Learning, 100(1):49-73, 2015.
-
-Metagol is maintained by Andrew Cropper (a.cropper13@imperial.ac.uk), Martin Möhrmann (martisch@uni-osnabrueck.de), and Stephen Muggleton (s.muggleton@imperial.ac.uk).
+Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework (MIL).  For more details about MIL see the papers detailed at the end of this readme file. 
 
 <!-- Metagol is free for academic use. If you intend to use it for commercial purposes then contact one of the maintainers above. -->
 
+The latest stable version of Metagol is v1.0.0 available here: 
+
+[https://github.com/metagol/metagol/releases/tag/v1.0.0](https://github.com/metagol/metagol/releases/tag/v1.0.0)
+
+
+Metagol is maintained by Andrew Cropper (a.cropper13@imperial.ac.uk), Martin Möhrmann (martisch@uni-osnabrueck.de), and Stephen Muggleton (s.muggleton@imperial.ac.uk).
+
 ## Using Metagol
 
-Metagol is written in Prolog and runs with both Yap and, albeit slower, SWI. Metagol is contained in a single file called 'metagol.pl'. The latest release can be found here: https://github.com/metagol/metagol/releases/tag/v1.0.0 To use Metagol, load the metagol module into your Prolog compiler. The following code demonstrates using Metagol to learn the grandparent relation.
+Metagol is written in Prolog and runs with both Yap and, albeit slower, SWI. Metagol is contained in a single file called 'metagol.pl'. To use Metagol, load the metagol module into your Prolog compiler. The following code demonstrates using Metagol to learn the grandparent relation.
 
 ```prolog
 :- use_module('metagol').
@@ -55,17 +56,15 @@ a :-
 Running the above program will print the following output.
 
 ```prolog
-% clauses: 1 invented predicates: 0
-% clauses: 2 invented predicates: 0
-% clauses: 2 invented predicates: 1
-% clauses: 3 invented predicates: 0
-% clauses: 3 invented predicates: 1
+% clauses: 1
+% clauses: 2
+% clauses: 3
 grandparent(A,B):-grandparent_1(A,C),grandparent_1(C,B).
 grandparent_1(A,B):-mother(A,B).
 grandparent_1(A,B):-father(A,B).
 ```
 
-In this solution, the predicate `grandparent_1/2` is invented and corresponds to the parent relation. See the aforementioned papers for details on Metagol's predicate invention.
+In this solution, the predicate `grandparent_1/2` is invented and corresponds to the parent relation. 
 
 ## Metarules
 
