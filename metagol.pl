@@ -10,7 +10,8 @@
     functional/0,
     min_clauses/1,
     max_clauses/1,
-    metarule_next_id/1.
+    metarule_next_id/1,
+    user:primcall/2.
 
 :- discontiguous
     user:metarule/4,
