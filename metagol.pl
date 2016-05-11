@@ -184,27 +184,12 @@ user:term_expansion(prim(P/A),user:(primcall(P,Args):-Call)):-
     functor(Call,P,A),
     Call =.. [P|Args].
 
+
 user:term_expansion(metarule(MetaSub,Clause),Asserts):-
-  clean_metasub(MetaSub,MetaSubClean),
-  user:term_expansion(metarule(MetaSubClean,Clause,_PS),Asserts).
+  user:term_expansion(metarule(_Name,MetaSub,Clause,_PS),Asserts).
 
 user:term_expansion(metarule(MetaSub,Clause,PS),Asserts):-
-  is_list(MetaSub),
-  gen_metarule_id(Name),
-  user:term_expansion(metarule(Name,MetaSub,Clause,PS),Asserts).
+  user:term_expansion(metarule(_Name,MetaSub,Clause,PS),Asserts).
 
-user:term_expansion(metarule(Name,MetaSub,Clause),Asserts):-
-  atom(Name),
-  clean_metasub(MetaSub,MetaSubClean),
-  user:term_expansion(metarule(Name,MetaSubClean,Clause,_PS),Asserts).
-
-user:term_expansion(metarule(Name,MetaSub,Clause,PS),
-                   [metarule(Name,MetaSub,Clause,PS),
-                    metarule_init(Name,MetaSub,Clause)]).
-
-clean_metasub([],[]).
-clean_metasub([Var|Vars],[Var|R]):-
-  var(Var), !,
-  clean_metasub(Vars,R).
-clean_metasub([Var/_Arity|Vars],[Var|R]):-
-  clean_metasub(Vars,R).
+user:term_expansion(metarule(Name1,MetaSub,Clause,PS),[metarule(Name2,MetaSub,Clause,PS),metarule_init(Name2,MetaSub,Clause)]):-
+  (var(Name1)->gen_metarule_id(Name2);Name2=Name1).
