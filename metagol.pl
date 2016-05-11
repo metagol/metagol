@@ -16,6 +16,7 @@
 :- discontiguous
     user:metarule/4,
     user:metarule_init/3,
+    user:prim/1,
     user:primcall/2.
 
 default(min_clauses(1)).
@@ -60,7 +61,9 @@ prove_aux('@'(Atom),_Sig,_FullSig,_MaxN,G,G):- !,
 
 %% prove primitive atom
 prove_aux([P|Args],_Sig,_FullSig,_MaxN,G,G):-
-  user:primcall(P,Args).
+  (ground(P)-> (user:prim(P/_),!,user:primcall(P,Args)); user:primcall(P,Args)).
+%% prove_aux([P|Args],_Sig,_FullSig,_MaxN,G,G):-
+  %% user:primcall(P,Args).
 
 %% use existing abduction
 prove_aux(Atom,Sig1,FullSig,MaxN,cl(N,G1),G2):-
@@ -180,10 +183,9 @@ gen_metarule_id(Id):-
   succ(Id,IdNext),
   set_option(metarule_next_id(IdNext)).
 
-user:term_expansion(prim(P/A),user:(primcall(P,Args):-Call)):-
+user:term_expansion(prim(P/A),[user:prim(P/A),user:(primcall(P,Args):-Call)]):-
     functor(Call,P,A),
     Call =.. [P|Args].
-
 
 user:term_expansion(metarule(MetaSub,Clause),Asserts):-
   user:term_expansion(metarule(_Name,MetaSub,Clause,_PS),Asserts).
