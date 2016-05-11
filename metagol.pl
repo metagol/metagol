@@ -190,6 +190,9 @@ user:term_expansion(prim(P/A),[user:prim(P/A),user:(primcall(P,Args):-Call)]):-
 user:term_expansion(metarule(MetaSub,Clause),Asserts):-
   user:term_expansion(metarule(_Name,MetaSub,Clause,_PS),Asserts).
 
+user:term_expansion(metarule(Name,MetaSub,Clause),Asserts):-
+  user:term_expansion(metarule(Name,MetaSub,Clause,_PS),Asserts).
+
 user:term_expansion(metarule(MetaSub,Clause,PS),Asserts):-
   user:term_expansion(metarule(_Name,MetaSub,Clause,PS),Asserts).
 
