@@ -191,9 +191,11 @@ user:term_expansion(metarule(MetaSub,Clause),Asserts):-
   user:term_expansion(metarule(_Name,MetaSub,Clause,_PS),Asserts).
 
 user:term_expansion(metarule(Name,MetaSub,Clause),Asserts):-
+  atom(Name),
   user:term_expansion(metarule(Name,MetaSub,Clause,_PS),Asserts).
 
 user:term_expansion(metarule(MetaSub,Clause,PS),Asserts):-
+  is_list(MetaSub),
   user:term_expansion(metarule(_Name,MetaSub,Clause,PS),Asserts).
 
 user:term_expansion(metarule(Name1,MetaSub,Clause,PS),[metarule(Name2,MetaSub,Clause,PS),metarule_init(Name2,MetaSub,Clause)]):-
