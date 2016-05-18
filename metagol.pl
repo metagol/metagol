@@ -62,8 +62,6 @@ prove_aux('@'(Atom),_Sig,_FullSig,_MaxN,G,G):- !,
 %% prove primitive atom
 prove_aux([P|Args],_Sig,_FullSig,_MaxN,G,G):-
   (ground(P)-> (user:prim(P/_),!,user:primcall(P,Args)); user:primcall(P,Args)).
-%% prove_aux([P|Args],_Sig,_FullSig,_MaxN,G,G):-
-  %% user:primcall(P,Args).
 
 %% use existing abduction
 prove_aux(Atom,Sig1,FullSig,MaxN,cl(N,G1),G2):-
