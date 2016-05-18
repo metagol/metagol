@@ -77,7 +77,10 @@ prove_aux(Atom,Sig1,FullSig,MaxN,cl(N1,G1),G2):-
   succ(N1,N3),
   bind_lower(Atom,P,FullSig,Sig1,Sig2),
   user:metarule(Name,MetaSub,(Atom:-Body),Sig2),
-  when(ground(MetaSub),(\+memberchk(sub(Name,P,MetaSub),G1))),
+  (memberchk(sub(Name,P,_),G1) ->
+    when(ground(MetaSub),(\+memberchk(sub(Name,P,MetaSub),G1)));
+    true
+  ),
   prove(Body,Sig2,FullSig,MaxN,cl(N3,[sub(Name,P,MetaSub)|G1]),G2).
 
 select_lower([P|_],P,FullSig,_Sig1,Sig2):-
