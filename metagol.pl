@@ -189,15 +189,23 @@ user:term_expansion(prim(P/A),[user:prim(P/A),user:(primcall(P,Args):-Call)]):-
     Call =.. [P|Args].
 
 user:term_expansion(metarule(MetaSub,Clause),Asserts):-
-  user:term_expansion(metarule(_Name,MetaSub,Clause,_PS),Asserts).
+  get_asserts(_Name,MetaSub,Clause,Asserts).
 
 user:term_expansion(metarule(Name,MetaSub,Clause),Asserts):-
-  atom(Name),
-  user:term_expansion(metarule(Name,MetaSub,Clause,_PS),Asserts).
+  get_asserts(Name,MetaSub,Clause,Asserts).
 
-user:term_expansion(metarule(MetaSub,Clause,PS),Asserts):-
-  is_list(MetaSub),
-  user:term_expansion(metarule(_Name,MetaSub,Clause,PS),Asserts).
+user:term_expansion((metarule(MetaSub,Clause):-Body),Asserts):-
+  gen_metarule_id(Name),
+  user:term_expansion((metarule(Name,MetaSub,Clause):-Body),Asserts).
 
-user:term_expansion(metarule(Name1,MetaSub,Clause,PS),[metarule(Name2,MetaSub,Clause,PS),metarule_init(Name2,MetaSub,Clause)]):-
-  (var(Name1)->gen_metarule_id(Name2);Name2=Name1).
+user:term_expansion((metarule(Name,MetaSub,Clause):-Body),Asserts):-
+  Asserts = [
+    (metarule(Name,MetaSub,Clause,_PS):-Body),
+    metarule_init(Name,MetaSub,Clause)].
+
+get_asserts(Name,MetaSub,Clause,Asserts):-
+  (var(Name)->gen_metarule_id(AssertName);AssertName=Name),
+  Asserts = [
+    metarule(AssertName,MetaSub,Clause,_PS),
+    metarule_init(AssertName,MetaSub,Clause)
+  ].
