@@ -76,16 +76,6 @@ metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
 In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` are existentially quantified second-order variables, and the symbols `A`, `B`, and `C` are universally quantified first-order variables. The symbols in the list in the first argument of the metarule denote existentially quantified variables. Metagol will attempt to find substitutions for these variables during the proof of a goal.
 
-We can write the aforementioned metarule in the following explicit equivalent form:
-
-```prolog
-metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]]),PS):-
-  member(Q/2,PS),
-  member(R/2,PS).
-```
-
-Here, the user can explicitly states how to bind the variables in the metarule to symbols on the predicate signature `PS`.
-
 Currently, the metarules are supplied by the user. We are working on automatically identifying the necessary metarules, and preliminary work is detailed in the following paper:
 
 * A. Cropper and S.H. Muggleton. [Logical minimisation of meta-rules within meta-interpretive learning](http://www.andrewcropper.com/pubs/ilp2014-minmeta.pdf). In Proceedings of the 24th International Conference on Inductive Logic Programming, pages 65-78. Springer-Verlag, 2015. LNAI 9046.
@@ -118,6 +108,7 @@ term_gt(A,B):-
 
 For more examples of learning with recursion see the sorter.pl and strings2.pl example files.
 
+<!-- 
 ## Sequential learning
 
 To learn a sequence of tasks use the following command.
@@ -137,6 +128,7 @@ pprint(H).
 
 In this approach, the solution to parent task (including its constituent predicates) is added to the background knowledge so that it can be used to solve the grandparent task.
 
+-->
 ## Metagol settings
 
 The following settings are all optional.
