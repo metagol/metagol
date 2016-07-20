@@ -12,6 +12,7 @@
     max_clauses/1,
     metarule_next_id/1,
     user:prim/1,
+    user:background/1,
     user:primcall/2.
 
 :- discontiguous
