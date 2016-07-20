@@ -1,15 +1,16 @@
 # Metagol
 
-Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework (MIL).  For more details about MIL see the papers detailed at the end of this readme file. 
+Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework (MIL).  For more details about MIL see the papers listed at the end of this readme file.
 
 <!-- Metagol is free for academic use. If you intend to use it for commercial purposes then contact one of the maintainers above. -->
 
-The latest stable version of Metagol is v1.0.0 available here: 
+The latest stable version of Metagol is v1.0.0 available here:
 
 [https://github.com/metagol/metagol/releases/tag/v1.0.0](https://github.com/metagol/metagol/releases/tag/v1.0.0)
 
+Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) with any questions / bug finds.
 
-Metagol is maintained by Andrew Cropper (a.cropper13@imperial.ac.uk), Martin Möhrmann (martisch@uni-osnabrueck.de), and Stephen Muggleton (s.muggleton@imperial.ac.uk).
+<!-- , Martin Möhrmann (martisch@uni-osnabrueck.de), and Stephen Muggleton (s.muggleton@imperial.ac.uk). -->
 
 ## Using Metagol
 
@@ -64,7 +65,7 @@ grandparent_1(A,B):-mother(A,B).
 grandparent_1(A,B):-father(A,B).
 ```
 
-In this solution, the predicate `grandparent_1/2` is invented and corresponds to the parent relation. 
+In this solution, the predicate `grandparent_1/2` is invented and corresponds to the parent relation.
 
 ## Metarules
 
@@ -178,11 +179,13 @@ metagol:fold_theory. % default false
 
 For more information on Metagol and the MIL framework, see the following papers:
 
-* A. Cropper and S.H. Muggleton. [Learning efficient logical robot strategies involving composable objects](http://www.andrewcropper.com/pubs/ijcai2015-metagolo.pdf). In Proceedings of the 24th International Joint Conference Artificial Intelligence (IJCAI 2015), pages 3423-3429. IJCAI, 2015.
+* A. Cropper and S.H. Muggleton. [Learning higher-order logic programs through abstraction and invention](http://www.andrewcropper.com/pubs/ijcai16-metafunc.pdf). In Proceedings of the 25th International Joint Conference Artificial Intelligence (IJCAI 2016), pages 1418-1424. IJCAI, 2016.
 
-* A. Cropper and S.H. Muggleton. [Logical minimisation of meta-rules within meta-interpretive learning](http://www.andrewcropper.com/pubs/ilp2014-minmeta.pdf). In Proceedings of the 24th International Conference on Inductive Logic Programming, pages 65-78. Springer-Verlag, 2015. LNAI 9046.
+* A. Cropper and S.H. Muggleton. [Learning efficient logical robot strategies involving composable objects](http://www.andrewcropper.com/pubs/ijcai15-metagolo.pdf). In Proceedings of the 24th International Joint Conference Artificial Intelligence (IJCAI 2015), pages 3423-3429. IJCAI, 2015.
 
-* A. Cropper and S.H. Muggleton. [Can predicate invention compensate for incomplete background knowledge?](http://www.andrewcropper.com/pubs/scai2015-incomplete.pdf). In Proceedings of the 13th Scandinavian Conference on Artificial Intelligence, pages 27-36. IOS Press, 2015.
+* A. Cropper and S.H. Muggleton. [Logical minimisation of meta-rules within meta-interpretive learning](http://www.andrewcropper.com/pubs/ilp14-minmeta.pdf). In Proceedings of the 24th International Conference on Inductive Logic Programming, pages 65-78. Springer-Verlag, 2015. LNAI 9046.
+
+* A. Cropper and S.H. Muggleton. [Can predicate invention compensate for incomplete background knowledge?](http://www.andrewcropper.com/pubs/scai15-incomplete.pdf). In Proceedings of the 13th Scandinavian Conference on Artificial Intelligence, pages 27-36. IOS Press, 2015.
 
 * S.H. Muggleton, D. Lin, and A. Tamaddoni-Nezhad. [Meta-interpretive learning of higher-order dyadic datalog: Predicate invention revisited](http://www.doc.ic.ac.uk/~shm/Papers/metagolD_MLJ.pdf). Machine Learning, 100(1):49-73, 2015.
 
