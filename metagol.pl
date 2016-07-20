@@ -64,6 +64,11 @@ prove_aux('@'(Atom),_Sig,_FullSig,_MaxN,G,G):- !,
 prove_aux([P|Args],_Sig,_FullSig,_MaxN,G,G):-
   (ground(P)-> (user:prim(P/_),!,user:primcall(P,Args)); user:primcall(P,Args)).
 
+%% use interpreted BK
+prove_aux(Atom,Sig,FullSig,MaxN,cl(N,G1),G2):-
+  user:background((Atom:-Body)),
+  prove(Body,Sig,FullSig,MaxN,cl(N,G1),G2).
+
 %% use existing abduction
 prove_aux(Atom,Sig1,FullSig,MaxN,cl(N,G1),G2):-
   Atom=[P|_Args],
@@ -71,6 +76,7 @@ prove_aux(Atom,Sig1,FullSig,MaxN,cl(N,G1),G2):-
   member(sub(Name,P,MetaSub),G1),
   user:metarule_init(Name,MetaSub,(Atom:-Body)),
   prove(Body,Sig2,FullSig,MaxN,cl(N,G1),G2).
+
 
 %% new abduction
 prove_aux(Atom,Sig1,FullSig,MaxN,cl(N1,G1),G2):-

@@ -30,3 +30,15 @@ a :-
   ],
   learn(Pos,[],H),
   pprint(H).
+
+b :-
+  Pos = [
+    ancestor(elizabeth_second,prince_charles),
+    ancestor(george_sixth,prince_harry),
+    ancestor(queen_mother,prince_william),
+    ancestor(elizabeth_second,prince_charles),
+    ancestor(george_sixth,prince_harry),
+    ancestor(queen_mother,prince_william)
+  ],
+  learn(Pos,[],H),
+  pprint(H).

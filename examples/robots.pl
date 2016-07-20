@@ -5,9 +5,12 @@
 %% * A. Cropper and S.H. Muggleton. Can predicate invention compensate for incomplete background knowledge?. In Proceedings of the 13th Scandinavian Conference on Artificial Intelligence, pages 27-36. IOS Press, 2015.
 
 :- use_module('../metagol').
+%% :- use_module('../metagol-old').
 
 %% METAGOL SETTINGS
 metagol:functional. % force functional solution
+
+metagol:max_clauses(10).
 
 %% PREDICATES TO BE USED IN THE LEARNING
 prim(move_left/2).
@@ -28,10 +31,12 @@ func_test(Atom,PS,G):-
   \+ (metagol:prove_deduce([Actual],PS,G),Z \= B).
 
 %% ROBOT LEARNING TO MOVE A BALL TO A SPECIFIC POSITION
+
 a :-
   Pos = [f(world((1/1),(1/1),false),world((3/3),(3/3),false))],
   learn(Pos,[],H),
   pprint(H).
+  %% metagol:unfold(H,_).
 
 b :-
   Pos = [f(world((1/1),(1/1),false),world((5/5),(5/5),false))],
@@ -40,6 +45,11 @@ b :-
 
 c :-
   Pos = [f(world((1/1),(1/1),false),world((6/6),(6/6),false))],
+  learn(Pos,[],H),
+  pprint(H).
+
+d :-
+  Pos = [f(world((1/1),(1/1),false),world((7/7),(7/7),false))],
   learn(Pos,[],H),
   pprint(H).
 
@@ -86,3 +96,8 @@ move_forwards(world(X1/Y1,_,true),world(X1/Y2,X1/Y2,true)):-
   max_forwards(MAXFORWARDS),
   Y1 < MAXFORWARDS,
   Y2 is Y1+1.
+
+
+
+
+

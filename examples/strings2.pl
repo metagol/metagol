@@ -2,6 +2,8 @@
 
 metagol:functional.
 
+metagol:max_clauses(10).
+
 prim(copy1/2).
 prim(skip1/2).
 prim(write1/3).
@@ -15,7 +17,7 @@ next_empty([_]/_).
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])). % chain
 metarule([P,Q,R],([P,A,B]:-[[Q,A],[R,A,B]])). % precon
 metarule([P,Q,X],([P,A,B]:-[[Q,A,B,X]])). % curry
-metarule([P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])). % tail rec
+metarule(tailrec,[P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])). % tail rec
 
 a :-
   Pos = [

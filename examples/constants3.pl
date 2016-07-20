@@ -16,3 +16,12 @@ a:-
     f(andy,laura),
     f(andy,amelia)],[],H),
   pprint(H).
+
+
+b:-
+  learn([
+    f(andy,laura),
+    f(andy,amelia),
+    f(andy,laura),
+    f(andy,amelia)],[],H),
+  pprint(H).
