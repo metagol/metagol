@@ -11,6 +11,7 @@
     min_clauses/1,
     max_clauses/1,
     metarule_next_id/1,
+    user:prim/1,
     user:primcall/2.
 
 :- discontiguous
@@ -213,3 +214,27 @@ get_asserts(Name,MetaSub,Clause,Asserts):-
     metarule(AssertName,MetaSub,Clause,_PS),
     metarule_init(AssertName,MetaSub,Clause)
   ].
+
+assert_program(G):-
+  maplist(assert_clause,G).
+
+assert_clause(Sub):-
+  construct_clause(Sub,Clause),
+  assert(user:Clause).
+
+assert_prims(G):-
+  setof( P/A,
+         ( member(sub(Name,_,MetaSub),G),
+           user:metarule_init(Name,MetaSub,([P|Args]:-_)),
+           length(Args,A)
+         ),
+         Prims), !,
+  maplist(assert_prim,Prims).
+
+assert_prim(Prim):-
+  prim_asserts(Prim,Asserts),
+  maplist(assertz,Asserts).
+
+prim_asserts(P/A,[user:prim(P/A), user:primtest(P,Args), user:(primcall(P,Args):-Call)]):-
+  functor(Call,P,A),
+  Call =.. [P|Args].
