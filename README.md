@@ -1,16 +1,8 @@
 # Metagol
 
-Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework (MIL).  For more details about MIL see the papers listed at the end of this readme file.
+Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework (MIL).  For more details about MIL see the papers listed at the end of this readme file. The latest stable version of Metagol is version [https://github.com/metagol/metagol/releases/tag/2.0](2.0).
 
-<!-- Metagol is free for academic use. If you intend to use it for commercial purposes then contact one of the maintainers above. -->
-
-The latest stable version of Metagol is v1.0.0 available here:
-
-[https://github.com/metagol/metagol/releases/tag/v1.0.0](https://github.com/metagol/metagol/releases/tag/v1.0.0)
-
-Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) with any questions / bug finds.
-
-<!-- , Martin Möhrmann (martisch@uni-osnabrueck.de), and Stephen Muggleton (s.muggleton@imperial.ac.uk). -->
+Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) with any questions / bugs.
 
 ## Using Metagol
 
