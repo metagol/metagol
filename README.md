@@ -1,6 +1,6 @@
 # Metagol
 
-Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework (MIL).  For more details about MIL see the papers listed at the end of this readme file. The latest stable version of Metagol is version [https://github.com/metagol/metagol/releases/tag/2.0](2.0).
+Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework (MIL).  For more information about MIL see the papers listed at the end of this readme file. The latest version of Metagol is version [https://github.com/metagol/metagol/releases/tag/2.0](2.0).
 
 Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) with any questions / bugs.
 
@@ -67,7 +67,7 @@ Metagol requires that the user provides a set of second-order metarules, a form 
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 ```
 
-In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` are existentially quantified second-order variables, and the symbols `A`, `B`, and `C` are universally quantified first-order variables. The symbols in the list in the first argument of the metarule denote existentially quantified variables. Metagol will attempt to find substitutions for these variables during the proof of a goal.
+In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` denote existentially quantified second-order variables, and the symbols `A`, `B`, and `C` denote universally quantified first-order variables. The list of symbols in the first argument denote variables which Metagol will attempt to find substitutions for during the proof of a goal.
 
 Currently, the metarules are supplied by the user. We are working on automatically identifying the necessary metarules, and preliminary work is detailed in the following paper:
 
@@ -101,7 +101,6 @@ term_gt(A,B):-
 
 For more examples of learning with recursion see the sorter.pl and strings2.pl example files.
 
-<!-- 
 ## Sequential learning
 
 To learn a sequence of tasks use the following command.
@@ -121,7 +120,6 @@ pprint(H).
 
 In this approach, the solution to parent task (including its constituent predicates) is added to the background knowledge so that it can be used to solve the grandparent task.
 
--->
 ## Metagol settings
 
 The following settings are all optional.
@@ -131,7 +129,6 @@ Metagol searches for a hypothesis using iterative deepening on the number of cla
 ```prolog
 metagol:min_clauses(Integer). % default 1
 ```
-
 The user can also specify a maximum solution length as follows.
 
 ```prolog
