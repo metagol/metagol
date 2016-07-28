@@ -92,28 +92,22 @@ prove_aux(Atom,Sig1,FullSig,MaxN,cl(N1,G1),G2):-
   prove(Body,Sig2,FullSig,MaxN,cl(N3,[sub(Name,P,MetaSub)|G1]),G2).
 
 select_lower([P|_],P,FullSig,_Sig1,Sig2):-
-  ground(P), !,
-  (memberchk(sym(P,_,_),FullSig)->
-    append(_,[sym(P,_,_)|Sig2],FullSig),!;
-    Sig2=[]).
+  ground(P),!,
+  ((append(_,[sym(P,_,_)|Sig2],FullSig),!);Sig2=[]).
+
 select_lower([P|Args],P,_FullSig,Sig1,Sig2):-
   length(Args,A),
   append(_,[sym(P,A,U)|Sig2],Sig1),
-  ( var(U)
-  -> !, fail
-  ;  true ).
+  (var(U)-> !,fail;true ).
 
 bind_lower([P|_],P,FullSig,_Sig1,Sig2):-
   ground(P),!,
-  (memberchk(sym(P,_,_),FullSig)->
-    append(_,[sym(P,_,_)|Sig2],FullSig),!;
-    Sig2=[]).
+  ((append(_,[sym(P,_,_)|Sig2],FullSig),!);Sig2=[]).
+
 bind_lower([P|Args],P,_FullSig,Sig1,Sig2):-
   length(Args,A),
   append(_,[sym(P,A,U)|Sig2],Sig1),
-  ( var(U)
-  -> U = 1, !
-  ;  true ).
+  (var(U)-> U = 1,!;true).
 
 prove_deduce(Atoms,PS,G):-
   length(G,N),
