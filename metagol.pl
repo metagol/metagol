@@ -72,9 +72,10 @@ prove_aux(Atom,Sig,FullSig,MaxN,cl(N,G1),G2):-
 
 %% use existing abduction
 prove_aux(Atom,Sig1,FullSig,MaxN,cl(N,G1),G2):-
-  Atom=[P|_Args],
-  select_lower(Atom,P,FullSig,Sig1,Sig2),
-  member(sub(Name,P,MetaSub),G1),
+  Atom=[P|Args],
+  length(Args,A),
+  select_lower(P,A,FullSig,Sig1,Sig2),
+  member(sub(Name,P,A,MetaSub),G1),
   user:metarule_init(Name,MetaSub,(Atom:-Body)),
   prove(Body,Sig2,FullSig,MaxN,cl(N,G1),G2).
 
@@ -83,29 +84,29 @@ prove_aux(Atom,Sig1,FullSig,MaxN,cl(N,G1),G2):-
 prove_aux(Atom,Sig1,FullSig,MaxN,cl(N1,G1),G2):-
   N1 < MaxN,
   succ(N1,N3),
-  bind_lower(Atom,P,FullSig,Sig1,Sig2),
+  Atom=[P|Args],
+  length(Args,A),
+  bind_lower(P,A,FullSig,Sig1,Sig2),
   user:metarule(Name,MetaSub,(Atom:-Body),Sig2),
-  (memberchk(sub(Name,P,_),G1) ->
-    when(ground(MetaSub),(\+memberchk(sub(Name,P,MetaSub),G1)));
+  (memberchk(sub(Name,P,A,_),G1) ->
+    when(ground(MetaSub),(\+memberchk(sub(Name,P,A,MetaSub),G1)));
     true
   ),
-  prove(Body,Sig2,FullSig,MaxN,cl(N3,[sub(Name,P,MetaSub)|G1]),G2).
+  prove(Body,Sig2,FullSig,MaxN,cl(N3,[sub(Name,P,A,MetaSub)|G1]),G2).
 
-select_lower([P|_],P,FullSig,_Sig1,Sig2):-
+select_lower(P,A,FullSig,_Sig1,Sig2):-
   ground(P),!,
-  ((append(_,[sym(P,_,_)|Sig2],FullSig),!);Sig2=[]).
+  ((append(_,[sym(P,A,_)|Sig2],FullSig),!);Sig2=[]).
 
-select_lower([P|Args],P,_FullSig,Sig1,Sig2):-
-  length(Args,A),
+select_lower(P,A,_FullSig,Sig1,Sig2):-
   append(_,[sym(P,A,U)|Sig2],Sig1),
   (var(U)-> !,fail;true ).
 
-bind_lower([P|_],P,FullSig,_Sig1,Sig2):-
+bind_lower(P,A,FullSig,_Sig1,Sig2):-
   ground(P),!,
-  ((append(_,[sym(P,_,_)|Sig2],FullSig),!);Sig2=[]).
+  ((append(_,[sym(P,A,_)|Sig2],FullSig),!);Sig2=[]).
 
-bind_lower([P|Args],P,_FullSig,Sig1,Sig2):-
-  length(Args,A),
+bind_lower(P,A,_FullSig,Sig1,Sig2):-
   append(_,[sym(P,A,U)|Sig2],Sig1),
   (var(U)-> U = 1,!;true).
 
@@ -144,7 +145,7 @@ pprint_clause(Sub):-
   numbervars(Clause,0,_),
   format('~q.~n',[Clause]).
 
-construct_clause(sub(Name,_P,MetaSub),AtomClause):-
+construct_clause(sub(Name,_P,_A,MetaSub),AtomClause):-
   user:metarule_init(Name,MetaSub,Clause),
   copy_term(Clause,(ListHead:-ListBodyWithAts)),
   Head=..ListHead,
@@ -224,13 +225,9 @@ assert_clause(Sub):-
   assert(user:Clause).
 
 assert_prims(G):-
-  setof( P/A,
-         ( member(sub(Name,_,MetaSub),G),
-           user:metarule_init(Name,MetaSub,([P|Args]:-_)),
-           length(Args,A)
-         ),
-         Prims), !,
-  maplist(assert_prim,Prims).
+  findall(P/A,(member(sub(_Name,P,A,_MetaSub),G)),Prims),!,
+  list_to_set(Prims,PrimSet),
+  maplist(assert_prim,PrimSet).
 
 assert_prim(Prim):-
   prim_asserts(Prim,Asserts),
