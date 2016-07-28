@@ -57,6 +57,10 @@ prove([Atom|Atoms],Sig,FullSig,MaxN,G1,G2):-
   prove_aux(Atom,Sig,FullSig,MaxN,G1,G3),
   prove(Atoms,Sig,FullSig,MaxN,G3,G2).
 
+prove_deduce(Atoms,PS,G):-
+  length(G,N),
+  prove(Atoms,PS,PS,N,G,G).
+
 %% prove order constraint
 prove_aux('@'(Atom),_Sig,_FullSig,_MaxN,G,G):- !,
   user:call(Atom).
@@ -108,10 +112,6 @@ bind_lower(P,A,FullSig,_Sig1,Sig2):-
 bind_lower(P,A,_FullSig,Sig1,Sig2):-
   append(_,[sym(P,A,U)|Sig2],Sig1),
   (var(U)-> U = 1,!;true).
-
-prove_deduce(Atoms,PS,G):-
-  length(G,N),
-  prove(Atoms,PS,PS,N,cl(N,G),cl(N,G)).
 
 nproveall([],_PS,_G):- !.
 nproveall([Atom|Atoms],PS,G):-
