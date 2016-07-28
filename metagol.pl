@@ -47,10 +47,10 @@ learn_seq_aux([Pos/Neg|T],[G|Out]):-
 
 proveall(Atoms,Sig,G):-
   target_predicate(Atoms,Name/Arity),
-  iterator(N),
-  format('% clauses: ~d\n',[N]),
-  invented_symbols(N,Name/Arity,Sig),
-  prove(Atoms,Sig,Sig,N,cl(0,[]),cl(N,G)).
+  iterator(MaxN),
+  format('% clauses: ~d\n',[MaxN]),
+  invented_symbols(MaxN,Name/Arity,Sig),
+  prove(Atoms,Sig,Sig,MaxN,[],G).
 
 prove([],_Sig,_FullSig,_MaxN,G,G).
 prove([Atom|Atoms],Sig,FullSig,MaxN,G1,G2):-
@@ -66,24 +66,23 @@ prove_aux([P|Args],_Sig,_FullSig,_MaxN,G,G):-
   (ground(P)-> (user:prim(P/_),!,user:primcall(P,Args)); user:primcall(P,Args)).
 
 %% use interpreted BK
-prove_aux(Atom,Sig,FullSig,MaxN,cl(N,G1),G2):-
+prove_aux(Atom,Sig,FullSig,MaxN,G1,G2):-
   user:background((Atom:-Body)),
-  prove(Body,Sig,FullSig,MaxN,cl(N,G1),G2).
+  prove(Body,Sig,FullSig,MaxN,G1,G2).
 
 %% use existing abduction
-prove_aux(Atom,Sig1,FullSig,MaxN,cl(N,G1),G2):-
+prove_aux(Atom,Sig1,FullSig,MaxN,G1,G2):-
   Atom=[P|Args],
   length(Args,A),
   select_lower(P,A,FullSig,Sig1,Sig2),
   member(sub(Name,P,A,MetaSub),G1),
   user:metarule_init(Name,MetaSub,(Atom:-Body)),
-  prove(Body,Sig2,FullSig,MaxN,cl(N,G1),G2).
-
+  prove(Body,Sig2,FullSig,MaxN,G1,G2).
 
 %% new abduction
-prove_aux(Atom,Sig1,FullSig,MaxN,cl(N1,G1),G2):-
-  N1 < MaxN,
-  succ(N1,N3),
+prove_aux(Atom,Sig1,FullSig,MaxN,G1,G2):-
+  length(G1,N),
+  N < MaxN,
   Atom=[P|Args],
   length(Args,A),
   bind_lower(P,A,FullSig,Sig1,Sig2),
@@ -92,7 +91,7 @@ prove_aux(Atom,Sig1,FullSig,MaxN,cl(N1,G1),G2):-
     when(ground(MetaSub),(\+memberchk(sub(Name,P,A,MetaSub),G1)));
     true
   ),
-  prove(Body,Sig2,FullSig,MaxN,cl(N3,[sub(Name,P,A,MetaSub)|G1]),G2).
+  prove(Body,Sig2,FullSig,MaxN,[sub(Name,P,A,MetaSub)|G1],G2).
 
 select_lower(P,A,FullSig,_Sig1,Sig2):-
   ground(P),!,
