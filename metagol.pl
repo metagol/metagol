@@ -208,7 +208,6 @@ user:term_expansion((metarule(Name,MetaSub,Clause):-Body),Asserts):-
   user:term_expansion((metarule(Name,MetaSub,Clause,_PS):-Body),Asserts).
 
 user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
-  writeln(Name),
   Asserts = [(metarule(Name,MetaSub,Clause,PS):-Body),metarule_init(Name,MetaSub,Clause)].
 
 get_asserts(Name,MetaSub,Clause,Asserts):-
@@ -234,6 +233,6 @@ assert_prim(Prim):-
   prim_asserts(Prim,Asserts),
   maplist(assertz,Asserts).
 
-prim_asserts(P/A,[user:prim(P/A), user:primtest(P,Args), user:(primcall(P,Args):-Call)]):-
+prim_asserts(P/A,[user:prim(P/A), user:(primcall(P,Args):-Call)]):-
   functor(Call,P,A),
   Call =.. [P|Args].
