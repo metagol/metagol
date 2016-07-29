@@ -35,15 +35,16 @@ learn(Pos1,Neg1,G):-
   ;  true ).
 
 learn_seq(Seq,G2):-
-  learn_seq_aux(Seq,G1),
+  maplist(learn_task,Seq,G1),
   flatten(G1,G2).
 
-learn_seq_aux([],[]).
-learn_seq_aux([Pos/Neg|T],[G|Out]):-
-  learn(Pos,Neg,G), !,
+learn_task(Pos/Neg,G):-
+  Pos=[H|_],
+  functor(H,Name,Arity),
+  format('% learning ~w\n',[Name/Arity]),
+  learn(Pos,Neg,G),!,
   maplist(assert_clause,G),
-  assert_prims(G),
-  learn_seq_aux(T,Out).
+  assert_prims(G).
 
 proveall(Atoms,Sig,G):-
   target_predicate(Atoms,Name/Arity),
