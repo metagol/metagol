@@ -90,7 +90,7 @@ prove_aux(Atom,Sig1,FullSig,MaxN,G1,G2):-
   Atom=[P|Args],
   length(Args,A),
   bind_lower(P,A,FullSig,Sig1,Sig2),
-  user:metarule(Name,MetaSub,(Atom:-Body),Sig2),
+  user:metarule(Name,MetaSub,(Atom:-Body),FullSig),
   (memberchk(sub(Name,P,A,_),G1) ->
     when(ground(MetaSub),(\+memberchk(sub(Name,P,A,MetaSub),G1)));
     true
@@ -205,9 +205,11 @@ user:term_expansion((metarule(MetaSub,Clause):-Body),Asserts):-
   user:term_expansion((metarule(Name,MetaSub,Clause):-Body),Asserts).
 
 user:term_expansion((metarule(Name,MetaSub,Clause):-Body),Asserts):-
-  Asserts = [
-    (metarule(Name,MetaSub,Clause,_PS):-Body),
-    metarule_init(Name,MetaSub,Clause)].
+  user:term_expansion((metarule(Name,MetaSub,Clause,_PS):-Body),Asserts).
+
+user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
+  writeln(Name),
+  Asserts = [(metarule(Name,MetaSub,Clause,PS):-Body),metarule_init(Name,MetaSub,Clause)].
 
 get_asserts(Name,MetaSub,Clause,Asserts):-
   (var(Name)->gen_metarule_id(AssertName);AssertName=Name),
