@@ -30,9 +30,7 @@ learn(Pos1,Neg1,G):-
   atom_to_list(Neg1,Neg2),
   proveall(Pos2,Sig,G),
   nproveall(Neg2,Sig,G),
-  ( get_option(functional)
-  -> is_functional(Pos2,Sig,G)
-  ;  true ).
+  (get_option(functional) -> is_functional(Pos2,Sig,G); true).
 
 learn_seq(Seq,G2):-
   maplist(learn_task,Seq,G1),
@@ -48,6 +46,7 @@ learn_task(Pos/Neg,G):-
 
 proveall(Atoms,Sig,G):-
   target_predicate(Atoms,Name/Arity),
+  format('% learning ~w\n',[Name/Arity]),
   iterator(MaxN),
   format('% clauses: ~d\n',[MaxN]),
   invented_symbols(MaxN,Name/Arity,Sig),
