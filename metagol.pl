@@ -50,43 +50,43 @@ proveall(Atoms,Sig,G):-
   iterator(MaxN),
   format('% clauses: ~d\n',[MaxN]),
   invented_symbols(MaxN,Name/Arity,Sig),
-  prove(Atoms,Sig,Sig,MaxN,[],G).
+  prove(Atoms,Sig,Sig,MaxN,0,_N,[],G).
 
-prove([],_Sig,_FullSig,_MaxN,G,G).
-prove([Atom|Atoms],Sig,FullSig,MaxN,G1,G2):-
-  prove_aux(Atom,Sig,FullSig,MaxN,G1,G3),
-  prove(Atoms,Sig,FullSig,MaxN,G3,G2).
+prove([],_Sig,_FullSig,_MaxN,N,N,G,G).
+prove([Atom|Atoms],Sig,FullSig,MaxN,N1,N2,G1,G2):-
+  prove_aux(Atom,Sig,FullSig,MaxN,N1,N3,G1,G3),
+  prove(Atoms,Sig,FullSig,MaxN,N3,N2,G3,G2).
 
 prove_deduce(Atoms,PS,G):-
   length(G,N),
-  prove(Atoms,PS,PS,N,G,G).
+  prove(Atoms,PS,PS,N,N,N,G,G).
 
 %% prove order constraint
-prove_aux('@'(Atom),_Sig,_FullSig,_MaxN,G,G):- !,
+prove_aux('@'(Atom),_Sig,_FullSig,_MaxN,N,N,G,G):- !,
   user:call(Atom).
 
 %% prove primitive atom
-prove_aux([P|Args],_Sig,_FullSig,_MaxN,G,G):-
+prove_aux([P|Args],_Sig,_FullSig,_MaxN,N,N,G,G):-
   (ground(P)-> (user:prim(P/_),!,user:primcall(P,Args)); user:primcall(P,Args)).
 
 %% use interpreted BK
-prove_aux(Atom,Sig,FullSig,MaxN,G1,G2):-
+prove_aux(Atom,Sig,FullSig,MaxN,N1,N2,G1,G2):-
   user:background((Atom:-Body)),
-  prove(Body,Sig,FullSig,MaxN,G1,G2).
+  prove(Body,Sig,FullSig,MaxN,N1,N2,G1,G2).
 
 %% use existing abduction
-prove_aux(Atom,Sig1,FullSig,MaxN,G1,G2):-
+prove_aux(Atom,Sig1,FullSig,MaxN,N1,N2,G1,G2):-
   Atom=[P|Args],
   length(Args,A),
   select_lower(P,A,FullSig,Sig1,Sig2),
   member(sub(Name,P,A,MetaSub),G1),
+  (\+ground(MetaSub)-> writeln('wtf?'); true),
   user:metarule_init(Name,MetaSub,(Atom:-Body)),
-  prove(Body,Sig2,FullSig,MaxN,G1,G2).
+  prove(Body,Sig2,FullSig,MaxN,N1,N2,G1,G2).
 
 %% new abduction
-prove_aux(Atom,Sig1,FullSig,MaxN,G1,G2):-
-  length(G1,N),
-  N < MaxN,
+prove_aux(Atom,Sig1,FullSig,MaxN,N1,N2,G1,G2):-
+  N1 < MaxN,
   Atom=[P|Args],
   length(Args,A),
   bind_lower(P,A,FullSig,Sig1,Sig2),
@@ -95,7 +95,8 @@ prove_aux(Atom,Sig1,FullSig,MaxN,G1,G2):-
     when(ground(MetaSub),(\+memberchk(sub(Name,P,A,MetaSub),G1)));
     true
   ),
-  prove(Body,Sig2,FullSig,MaxN,[sub(Name,P,A,MetaSub)|G1],G2).
+  succ(N1,N3),
+  prove(Body,Sig2,FullSig,MaxN,N3,N2,[sub(Name,P,A,MetaSub)|G1],G2).
 
 select_lower(P,A,FullSig,_Sig1,Sig2):-
   ground(P),!,
@@ -149,10 +150,9 @@ construct_clause(sub(Name,_P,_A,MetaSub),AtomClause):-
   copy_term(Clause,(ListHead:-ListBodyWithAts)),
   Head=..ListHead,
   convert_preds(ListBodyWithAts,AtomBodyList),
-  ( AtomBodyList == []
-  -> AtomClause = Head
-  ;  listtocomma(AtomBodyList,Body),
-     AtomClause = (Head:-Body) ).
+  (AtomBodyList == []-> AtomClause = Head;
+    listtocomma(AtomBodyList,Body),
+    AtomClause = (Head:-Body) ).
 
 listtocomma([],true):- !.
 listtocomma([E],E):- !.
