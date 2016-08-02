@@ -50,41 +50,41 @@ proveall(Atoms,Sig,G):-
   iterator(MaxN),
   format('% clauses: ~d\n',[MaxN]),
   invented_symbols(MaxN,Name/Arity,Sig),
-  prove(Atoms,Sig,Sig,MaxN,0,_N,[],G).
+    prove(Atoms,Sig,_Sig,MaxN,0,_N,[],G).
 
-prove([],_Sig,_FullSig,_MaxN,N,N,G,G).
-prove([Atom|Atoms],Sig,FullSig,MaxN,N1,N2,G1,G2):-
-  prove_aux(Atom,Sig,FullSig,MaxN,N1,N3,G1,G3),
-  prove(Atoms,Sig,FullSig,MaxN,N3,N2,G3,G2).
+prove([],_FullSig,_Sig,_MaxN,N,N,G,G).
+prove([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,G1,G2):-
+  prove_aux(Atom,FullSig,Sig,MaxN,N1,N3,G1,G3),
+  prove(Atoms,FullSig,Sig,MaxN,N3,N2,G3,G2).
 
-prove_deduce(Atoms,PS,G):-
+prove_deduce(Atoms,Sig,G):-
   length(G,N),
-  prove(Atoms,PS,PS,N,N,N,G,G).
+  prove(Atoms,Sig,_,N,N,N,G,G).
 
 %% prove order constraint
-prove_aux('@'(Atom),_Sig,_FullSig,_MaxN,N,N,G,G):- !,
+prove_aux('@'(Atom),_FullSig,_Sig,_MaxN,N,N,G,G):- !,
   user:call(Atom).
 
 %% prove primitive atom
-prove_aux([P|Args],_Sig,_FullSig,_MaxN,N,N,G,G):-
+prove_aux([P|Args],_FullSig,_Sig,_MaxN,N,N,G,G):-
   (ground(P)-> (user:prim(P/_),!,user:primcall(P,Args)); user:primcall(P,Args)).
 
 %% use interpreted BK
-prove_aux(Atom,Sig,FullSig,MaxN,N1,N2,G1,G2):-
+prove_aux(Atom,FullSig,Sig,MaxN,N1,N2,G1,G2):-
   user:background((Atom:-Body)),
-  prove(Body,Sig,FullSig,MaxN,N1,N2,G1,G2).
+  prove(Body,FullSig,Sig,MaxN,N1,N2,G1,G2).
 
 %% use existing abduction
-prove_aux(Atom,Sig1,FullSig,MaxN,N1,N2,G1,G2):-
+prove_aux(Atom,FullSig,Sig1,MaxN,N1,N2,G1,G2):-
   Atom=[P|Args],
   length(Args,A),
   select_lower(P,A,FullSig,Sig1,Sig2),
   member(sub(Name,P,A,MetaSub),G1),
   user:metarule_init(Name,MetaSub,(Atom:-Body)),
-  prove(Body,Sig2,FullSig,MaxN,N1,N2,G1,G2).
+  prove(Body,FullSig,Sig2,MaxN,N1,N2,G1,G2).
 
 %% new abduction
-prove_aux(Atom,Sig1,FullSig,MaxN,N1,N2,G1,G2):-
+prove_aux(Atom,FullSig,Sig1,MaxN,N1,N2,G1,G2):-
   N1 < MaxN,
   Atom=[P|Args],
   length(Args,A),
@@ -95,7 +95,7 @@ prove_aux(Atom,Sig1,FullSig,MaxN,N1,N2,G1,G2):-
     true
   ),
   succ(N1,N3),
-  prove(Body,Sig2,FullSig,MaxN,N3,N2,[sub(Name,P,A,MetaSub)|G1],G2).
+  prove(Body,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,MetaSub)|G1],G2).
 
 select_lower(P,A,FullSig,_Sig1,Sig2):-
   ground(P),!,
