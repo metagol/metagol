@@ -80,7 +80,6 @@ prove_aux(Atom,Sig1,FullSig,MaxN,N1,N2,G1,G2):-
   length(Args,A),
   select_lower(P,A,FullSig,Sig1,Sig2),
   member(sub(Name,P,A,MetaSub),G1),
-  (\+ground(MetaSub)-> writeln('wtf?'); true),
   user:metarule_init(Name,MetaSub,(Atom:-Body)),
   prove(Body,Sig2,FullSig,MaxN,N1,N2,G1,G2).
 
