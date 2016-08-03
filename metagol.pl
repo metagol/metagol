@@ -132,18 +132,15 @@ iterator(N):-
 target_predicate([[P|Args]|_],P/A):-
   length(Args,A).
 
-invented_symbols(N,Name/Arity,[sym(Name,Arity,_U)|Sig]):-
+invented_symbols(N,P/A,[sym(P,A,_U)|Sig]):-
   succ(M,N),
-  findall(sym(InvSym,_Artiy,_Used),
-          (between(1,M,I),atomic_list_concat([Name,'_',I],InvSym)),
-          Sig).
+  findall(sym(InvSym,_Artiy,_Used),(between(1,M,I),atomic_list_concat([P,'_',I],InvSym)),Sig).
 
 pprint(G1):-
-  reverse(G1,G2),
-  map_list_to_pairs(arg(2),G2,Pairs),
+  map_list_to_pairs(arg(2),G1,Pairs),
   keysort(Pairs,Sorted),
-  pairs_values(Sorted,G3),
-  maplist(pprint_clause,G3).
+  pairs_values(Sorted,G2),
+  maplist(pprint_clause,G2).
 
 pprint_clause(Sub):-
   construct_clause(Sub,Clause),
