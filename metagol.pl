@@ -37,9 +37,6 @@ learn_seq(Seq,G2):-
   flatten(G1,G2).
 
 learn_task(Pos/Neg,G):-
-  Pos=[H|_],
-  functor(H,Name,Arity),
-  format('% learning ~w\n',[Name/Arity]),
   learn(Pos,Neg,G),!,
   maplist(assert_clause,G),
   assert_prims(G).
