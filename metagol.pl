@@ -73,7 +73,7 @@ prove_aux('@'(Atom),_FullSig,_Sig,_MaxN,N,N,G,G):-!,
 
 %% prove primitive atom
 prove_aux([P|Args],_FullSig,_Sig,_MaxN,N,N,G,G):-
-  (ground(P)-> (user:prim(P/_),!,user:primcall(P,Args)); user:primcall(P,Args)).
+  (nonvar(P)-> (user:prim(P/_),!,user:primcall(P,Args)); user:primcall(P,Args)).
 
 %% use interpreted BK
 prove_aux(Atom,FullSig,Sig,MaxN,N1,N2,G1,G2):-
@@ -104,7 +104,7 @@ prove_aux(Atom,FullSig,Sig1,MaxN,N1,N2,G1,G2):-
   prove(Body,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,MetaSub)|G1],G2).
 
 select_lower(P,A,FullSig,_Sig1,Sig2):-
-  ground(P),!,
+  nonvar(P),!,
   ((append(_,[sym(P,A,_)|Sig2],FullSig),!);Sig2=[]).
 
 select_lower(P,A,_FullSig,Sig1,Sig2):-
@@ -112,7 +112,7 @@ select_lower(P,A,_FullSig,Sig1,Sig2):-
   (var(U)-> !,fail;true ).
 
 bind_lower(P,A,FullSig,_Sig1,Sig2):-
-  ground(P),!,
+  nonvar(P),!,
   ((append(_,[sym(P,A,_)|Sig2],FullSig),!);Sig2=[]).
 
 bind_lower(P,A,_FullSig,Sig1,Sig2):-
