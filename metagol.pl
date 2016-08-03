@@ -198,8 +198,8 @@ gen_metarule_id(Id):-
   set_option(metarule_next_id(IdNext)).
 
 user:term_expansion(prim(P/A),[user:prim(P/A),user:(primcall(P,Args):-Call)]):-
-    functor(Call,P,A),
-    Call =.. [P|Args].
+  functor(Call,P,A),
+  Call =.. [P|Args].
 
 user:term_expansion(metarule(MetaSub,Clause),Asserts):-
   get_asserts(_Name,MetaSub,Clause,Asserts).
