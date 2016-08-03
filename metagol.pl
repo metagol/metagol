@@ -30,7 +30,7 @@ learn(Pos1,Neg1,G):-
   atom_to_list(Neg1,Neg2),
   proveall(Pos2,Sig,G),
   nproveall(Neg2,Sig,G),
-  (get_option(functional) -> is_functional(Pos2,Sig,G); true).
+  is_functional(Pos2,Sig,G).
 
 learn_seq(Seq,G2):-
   maplist(learn_task,Seq,G1),
@@ -53,13 +53,13 @@ proveall(Atoms,Sig,G):-
   prove_examples(Atoms,Sig,_Sig,MaxN,0,_N,[],G).
 
 prove_examples([],_FullSig,_Sig,_MaxN,N,N,G,G).
-prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,G1,G2):-
-  prove_deduce([Atom],FullSig,G1),!,
-  (get_option(functional)->is_functional([Atom],Sig,G1);true),
-  prove_examples(Atoms,FullSig,Sig,MaxN,N1,N2,G1,G2).
-prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,G1,G2):-
-  prove([Atom],FullSig,Sig,MaxN,N1,N3,G1,G3),
-  prove_examples(Atoms,FullSig,Sig,MaxN,N3,N2,G3,G2).
+prove_examples([E|Es],FullSig,Sig,MaxN,N1,N2,G1,G2):-
+  prove_deduce([E],FullSig,G1),!,
+  is_functional([E],Sig,G1),
+  prove_examples(Es,FullSig,Sig,MaxN,N1,N2,G1,G2).
+prove_examples([E|Es],FullSig,Sig,MaxN,N1,N2,G1,G2):-
+  prove([E],FullSig,Sig,MaxN,N1,N3,G1,G3),
+  prove_examples(Es,FullSig,Sig,MaxN,N3,N2,G3,G2).
 
 prove_deduce(Atoms,Sig,G):-
   length(G,N),
@@ -179,10 +179,12 @@ atom_to_list([Atom|T],[AtomAsList|Out]):-
   Atom =.. AtomAsList,
   atom_to_list(T,Out).
 
-is_functional([],_Sig,_G).
-is_functional([Atom|Atoms],Sig,G):-
+is_functional(Atoms,Sig,G):-
+  (get_option(functional) -> is_functional_aux(Atoms,Sig,G); true).
+is_functional_aux([],_Sig,_G).
+is_functional_aux([Atom|Atoms],Sig,G):-
   user:func_test(Atom,Sig,G),
-  is_functional(Atoms,Sig,G).
+  is_functional_aux(Atoms,Sig,G).
 
 get_option(Option):-call(Option), !.
 get_option(Option):-default(Option).
