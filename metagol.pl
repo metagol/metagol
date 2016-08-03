@@ -42,11 +42,11 @@ learn_task(Pos/Neg,G):-
   assert_prims(G).
 
 proveall(Atoms,Sig,G):-
-  target_predicate(Atoms,Name/Arity),
-  format('% learning ~w\n',[Name/Arity]),
+  target_predicate(Atoms,P/A),
+  format('% learning ~w\n',[P/A]),
   iterator(MaxN),
   format('% clauses: ~d\n',[MaxN]),
-  invented_symbols(MaxN,Name/Arity,Sig),
+  invented_symbols(MaxN,P/A,Sig),
   prove_examples(Atoms,Sig,_Sig,MaxN,0,_N,[],G).
 
 prove_examples([],_FullSig,_Sig,_MaxN,N,N,G,G).
@@ -68,7 +68,7 @@ prove([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,G1,G2):-
   prove(Atoms,FullSig,Sig,MaxN,N3,N2,G3,G2).
 
 %% prove order constraint
-prove_aux('@'(Atom),_FullSig,_Sig,_MaxN,N,N,G,G):- !,
+prove_aux('@'(Atom),_FullSig,_Sig,_MaxN,N,N,G,G):-!,
   user:call(Atom).
 
 %% prove primitive atom
