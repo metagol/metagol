@@ -26,8 +26,8 @@ default(max_clauses(6)).
 default(metarule_next_id(1)).
 
 learn(Pos1,Neg1,G):-
-  atom_to_list(Pos1,Pos2),
-  atom_to_list(Neg1,Neg2),
+  maplist(atom_to_list,Pos1,Pos2),
+  maplist(atom_to_list,Neg1,Neg2),
   proveall(Pos2,Sig,G),
   nproveall(Neg2,Sig,G),
   is_functional(Pos2,Sig,G).
@@ -168,10 +168,8 @@ convert_preds([List|T],[Atom|R]):-
   Atom =.. List,
   convert_preds(T,R).
 
-atom_to_list([],[]).
-atom_to_list([Atom|T],[AtomAsList|Out]):-
-  Atom =.. AtomAsList,
-  atom_to_list(T,Out).
+atom_to_list(Atom,AtomAsList):-
+  Atom =..AtomAsList.
 
 is_functional(Atoms,Sig,G):-
   (get_option(functional) -> is_functional_aux(Atoms,Sig,G); true).
