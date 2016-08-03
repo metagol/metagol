@@ -96,10 +96,7 @@ prove_aux(Atom,FullSig,Sig1,MaxN,N1,N2,G1,G2):-
   length(Args,A),
   bind_lower(P,A,FullSig,Sig1,Sig2),
   user:metarule(Name,MetaSub,(Atom:-Body),FullSig),
-  (memberchk(sub(Name,P,A,_),G1) ->
-    when(ground(MetaSub),(\+memberchk(sub(Name,P,A,MetaSub),G1)));
-    true
-  ),
+  check_new_metasub(Name,P,A,MetaSub,G1),
   succ(N1,N3),
   prove(Body,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,MetaSub)|G1],G2).
 
@@ -118,6 +115,12 @@ bind_lower(P,A,FullSig,_Sig1,Sig2):-
 bind_lower(P,A,_FullSig,Sig1,Sig2):-
   append(_,[sym(P,A,U)|Sig2],Sig1),
   (var(U)-> U = 1,!;true).
+
+check_new_metasub(Name,P,A,MetaSub,G):-
+  memberchk(sub(Name,P,A,_),G),!,
+  last(MetaSub,X),
+  when(nonvar(X),\+memberchk(sub(Name,P,A,MetaSub),G)).
+check_new_metasub(_Name,_P,_A,_MetaSub,_G).
 
 nproveall([],_PS,_G):- !.
 nproveall([Atom|Atoms],PS,G):-
