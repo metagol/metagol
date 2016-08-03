@@ -50,40 +50,25 @@ proveall(Atoms,Sig,G):-
   iterator(MaxN),
   format('% clauses: ~d\n',[MaxN]),
   invented_symbols(MaxN,Name/Arity,Sig),
-  %% writeln(Sig),
-  %% prove(Atoms,Sig,_Sig,MaxN,0,_N,[],G).
-  outer(Atoms,Sig,_Sig,MaxN,0,_N,[],G).
+  prove_examples(Atoms,Sig,_Sig,MaxN,0,_N,[],G).
 
+prove_examples([],_FullSig,_Sig,_MaxN,N,N,G,G).
+prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,G1,G2):-
+  prove_deduce([Atom],FullSig,G1),!,
+  (get_option(functional)->is_functional([Atom],Sig,G1);true),
+  prove_examples(Atoms,FullSig,Sig,MaxN,N1,N2,G1,G2).
+prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,G1,G2):-
+  prove([Atom],FullSig,Sig,MaxN,N1,N3,G1,G3),
+  prove_examples(Atoms,FullSig,Sig,MaxN,N3,N2,G3,G2).
+
+prove_deduce(Atoms,Sig,G):-
+  length(G,N),
+  prove(Atoms,Sig,_,N,N,N,G,G).
 
 prove([],_FullSig,_Sig,_MaxN,N,N,G,G).
 prove([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,G1,G2):-
   prove_aux(Atom,FullSig,Sig,MaxN,N1,N3,G1,G3),
   prove(Atoms,FullSig,Sig,MaxN,N3,N2,G3,G2).
-
-outer([],_FullSig,_Sig,_MaxN,N,N,G,G).
-outer([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,G1,G2):-
-  prove_deduce([Atom],FullSig,G1),!,
-  outer(Atoms,FullSig,Sig,MaxN,N3,N2,G1,G2).
-outer([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,G1,G2):-
-  prove([Atom],FullSig,Sig,MaxN,N1,N3,G1,G3),
-  outer(Atoms,FullSig,Sig,MaxN,N3,N2,G3,G2).
-
-
-%% outer([],_Sig,_MaxN,N,N,G,G,[]).
-%% %% outer([Atom|Atoms],Sig,MaxN,N1,N2,G1,G2):-
-%% %%   prove_deduce([Atom],Sig,G1),!,
-%% %%   outer(Atoms,Sig,MaxN,N1,N2,G1,G2).
-%% outer([Atom|Atoms],Sig,MaxN,N1,N2,G1,G2):-
-%%   %% writeln(Sig),
-%%   %% writeln(a-Sig),
-%%   prove([Atom],Sig,_Sig,MaxN,N1,N3,G1,G3),
-%%   %% writeln(b-Sig),
-%%   %% trace,
-%%   outer(Atoms,Sig,MaxN,N3,N2,G3,G2).
-
-prove_deduce(Atoms,Sig,G):-
-  length(G,N),
-  prove(Atoms,Sig,_,N,N,N,G,G).
 
 %% prove order constraint
 prove_aux('@'(Atom),_FullSig,_Sig,_MaxN,N,N,G,G):- !,
