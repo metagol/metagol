@@ -1,12 +1,14 @@
 # Metagol
 
-Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework (MIL).  For more information about MIL see the papers listed at the end of this readme file. Go to the releases page to find the latest version of Metagol: https://github.com/metagol/metagol/releases 
+Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework (MIL).  For more information about MIL see the papers listed at the end of this readme file.
+
+The latest release of Metagol can be found here https://github.com/metagol/metagol/releases
 
 Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) with any questions / bugs.
 
 ## Using Metagol
 
-Metagol is written in Prolog and runs with both Yap and, albeit slower, SWI. Metagol is contained in a single file called 'metagol.pl'. To use Metagol, load the metagol module into your Prolog compiler. The following code demonstrates using Metagol to learn the grandparent relation.
+Metagol is written in Prolog and runs with both Yap and SWI. Metagol is contained in a single file called 'metagol.pl'. To use Metagol, load the metagol module in your Prolog compiler. The following code demonstrates using Metagol to learn the grandparent relation given mother and father relations.
 
 ```prolog
 :- use_module('metagol').
@@ -61,13 +63,13 @@ In this solution, the predicate `grandparent_1/2` is invented and corresponds to
 
 ## Metarules
 
-Metagol requires that the user provides a set of second-order metarules, a form of language bias which defines the form of clauses permitted in a hypothesis, similar to mode declarations used in Progol, Aleph, etc. An example metarule is as follows:
+Metagol requires that the user provides a set of higher-order metarules, a form of language bias which defines the form of clauses permitted in a hypothesis. An example metarule is as follows:
 
 ```prolog
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 ```
 
-In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` denote existentially quantified second-order variables, and the symbols `A`, `B`, and `C` denote universally quantified first-order variables. The list of symbols in the first argument denote variables which Metagol will attempt to find substitutions for during the proof of a goal.
+In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` denote existentially quantified higher-order variables, and the symbols `A`, `B`, and `C` denote universally quantified first-order variables. The list of symbols in the first argument denote variables which Metagol will attempt to find substitutions for during the proof of a goal.
 
 Currently, the metarules are supplied by the user. We are working on automatically identifying the necessary metarules, and preliminary work is detailed in the following paper:
 
@@ -90,7 +92,7 @@ The above metarules are all non-recursive.  By contrast, the following metarule 
 metarule([P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])).
 ```
 
-Here, the atoms `@term_gt(A,C)` and `@term_gt(C,B)` define a total ordering over the terms. The user must define the ordering `@term_gt(A,B)`. An total order is necessary to guarantee termination of the meta-interpreter. For example, suppose you are learning robot strategies for a robot in a one-dimensional space and each term is a state (a list of Prolog facts). The following ordering ensures that the robot always moves at least one place to the right. Because the space is finite, termination is guaranteed.
+The atoms `@term_gt(A,C)` and `@term_gt(C,B)` define a total ordering over the terms, which must be supplied by the user. A total order is necessary to guarantee termination of the meta-interpreter. For example, suppose you are learning robot strategies for a robot in a one-dimensional space and each term is a state (a list of Prolog facts). The following ordering ensures that the robot always moves at least one place to the right. Because the space is finite, termination is guaranteed.
 
 ```prolog
 term_gt(A,B):-
@@ -99,7 +101,7 @@ term_gt(A,B):-
   APos < BPos.
 ```
 
-For more examples of learning with recursion see the sorter.pl and strings2.pl example files.
+For more examples of learning with recursion see kinship2, sorter.pl, and strings2.pl examples..
 
 ## Sequential learning
 
@@ -140,7 +142,6 @@ The following flag denotes whether the learned theory should be functional.
 ```prolog
 metagol:functional. % default false
 ```
-
 If the functional flag is enabled, then the must define a func_test predicate. An example func test is as follows.
 
 ```prolog
@@ -151,6 +152,13 @@ func_test(Atom,PS,G):-
 ```
 
 This func test is used in the robot examples. Here, the `Atom` variable is formed of a predicate symbol `P` and two states `A` and `B`, which represent initial and final state pairs respectively.  The func_test checks whether the learned hypothesis can be applied to the initial state to reach any state `Z` other that the expected final state `B`. For more examples of functional tests, see the robots.pl, sorter.pl, and strings2.pl files.
+
+By default, Metagol hides orderings when printing solutions. You can override this using the following flag.
+
+```prolog
+metagol:show_orderings. % default false
+```
+
 
 <!-- ```prolog
 metagol:limit_recursion. % default false
