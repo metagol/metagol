@@ -8,6 +8,7 @@
 
 :- dynamic
     functional/0,
+    print_ordering/0,
     min_clauses/1,
     max_clauses/1,
     metarule_next_id/1,
@@ -165,7 +166,8 @@ listtocomma([H|T],(H,R)):-
   listtocomma(T,R).
 
 convert_preds([],[]).
-convert_preds(['@'(Atom)|T],[Atom|R]):- !,
+convert_preds(['@'(Atom)|T],Out):- !,
+  (get_option(print_ordering) -> Out=[Atom|R]; Out=R),
   convert_preds(T,R).
 convert_preds([List|T],[Atom|R]):-
   Atom =.. List,
