@@ -1,3 +1,5 @@
+%% This is a copyrighted file under the BSD 3-clause licence, details of which can be found in the root directory.
+
 :- module(metagol,[learn/3,learn_seq/2,pprint/1,op(950,fx,'@')]).
 
 :- user:use_module(library(lists)).
