@@ -1,8 +1,6 @@
-# Metagol
+Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework. Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) with any questions / bugs.
 
-Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework. Releases are [here](https://github.com/metagol/metagol/releases). Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) with any questions / bugs.
-
-## Using Metagol
+#### Using Metagol
 
 Metagol is written in Prolog and runs with both Yap and SWI. To use Metagol, consult the 'metagol.pl' file. The following code demonstrates using Metagol to learn the grandparent relation given the mother and father relations as background knowledge.
 
@@ -59,7 +57,7 @@ grandparent_1(A,B):-father(A,B).
 
 where the predicate `grandparent_1/2` is invented and corresponds to the parent relation.
 
-## Metarules
+#### Metarules
 
 Metagol requires higher-order metarules to define the form of clauses permitted in a hypothesis. An example metarule is as follows:
 
@@ -109,7 +107,7 @@ For more examples of learning with recursion see kinship2, sorter.pl, and string
 
 <!-- TODO Interpreted BK -->
 
-## Sequential learning
+#### Sequential learning
 
 To learn a sequence of tasks use the following command.
 
@@ -128,7 +126,7 @@ pprint(H).
 
 In this approach, the solution to parent task (including its constituent predicates) is added to the background knowledge so that it can be used to solve the grandparent task.
 
-## Metagol settings
+#### Metagol settings
 
 The following settings are all optional.
 
@@ -178,7 +176,7 @@ metagol:fold_theory. % default false
 
 (TODO) THIS IS NOT YET WORKING IN THE BETA VERSION -->
 
-## Further details
+#### Further details
 
 For more information on Metagol and the MIL framework, see the following papers:
 
