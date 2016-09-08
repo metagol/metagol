@@ -1,10 +1,10 @@
 # Metagol
 
-Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework. Releases are [here](https://github.com/metagol/metagol/releases) Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) with any questions / bugs.
+Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework. Releases are [here](https://github.com/metagol/metagol/releases). Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) with any questions / bugs.
 
 ## Using Metagol
 
-Metagol is written in Prolog and runs with both Yap and SWI. To use Metagol, just consult the metagol.pl file. The following code demonstrates using Metagol to learn the grandparent relation given the mother and father relations as background knowledge.
+Metagol is written in Prolog and runs with both Yap and SWI. To use Metagol, consult the 'metagol.pl' file. The following code demonstrates using Metagol to learn the grandparent relation given the mother and father relations as background knowledge.
 
 ```prolog
 :- use_module('metagol').
@@ -57,7 +57,7 @@ grandparent_1(A,B):-mother(A,B).
 grandparent_1(A,B):-father(A,B).
 ```
 
-Here, the predicate `grandparent_1/2` is invented and corresponds to the parent relation.
+where the predicate `grandparent_1/2` is invented and corresponds to the parent relation.
 
 ## Metarules
 
@@ -69,7 +69,7 @@ metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
 In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` denote existentially quantified higher-order variables, and the symbols `A`, `B`, and `C` denote universally quantified first-order variables. The list of symbols in the first argument denote the existentially quantified variables which Metagol will attempt to find substitutions for during the learning.
 
-Metarules are currently supplied by the user. We are working on automatically identifying the necessary metarules, and preliminary work is detailed in the following paper:
+Metarules are currently supplied by the user. We are working on automatically identifying the necessary metarules, with preliminary work detailed in the following paper:
 
 * A. Cropper and S.H. Muggleton. [Logical minimisation of meta-rules within meta-interpretive learning](http://andrewcropper.com/pubs/ilp14-minmeta.pdf). In Proceedings of the 24th International Conference on Inductive Logic Programming, pages 65-78. Springer-Verlag, 2015. LNAI 9046.
 
@@ -83,13 +83,19 @@ metarule([P,Q,R],([P,A,B]:-[[Q,A],[R,A,B]])). % precon
 metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,B]])). % postcon
 ```
 
-The above metarules are all non-recursive.  By contrast, the following metarule is recursive.
+The above metarules are all non-recursive. By contrast, the following metarule is recursive.
+
+```prolog
+metarule([P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]])).
+```
+
+However, using recursive metarules can lead to infinite search spaces. To guarantee termination of Metagol, the user must define a total ordering over the terms, as follows:
 
 ```prolog
 metarule([P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])).
 ```
 
-The atoms `@term_gt(A,C)` and `@term_gt(C,B)` define a total ordering over the terms, which must be supplied by the user. A total order is necessary to guarantee termination of the meta-interpreter. For instance, suppose you are learning robot strategies for a robot in a one-dimensional space and each term is a state (a list of Prolog facts). The following ordering ensures that the robot always moves at least one place to the right. Because the space is finite, termination is guaranteed.
+The atoms `@term_gt(A,C)` and `@term_gt(C,B)` must be supplied by the user. For instance, suppose you are learning robot strategies for a robot in a one-dimensional space where each term is a world state (a list of Prolog facts). Then the following ordering ensures that the robot always moves at least one place to the right. Because the space is finite, termination is guaranteed.
 
 ```prolog
 term_gt(A,B):-
@@ -97,8 +103,11 @@ term_gt(A,B):-
   member(robot_position(BPos),B),
   APos < BPos.
 ```
+For more examples of learning with recursion see kinship2, sorter.pl, and strings2.pl examples.
 
-For more examples of learning with recursion see kinship2, sorter.pl, and strings2.pl examples..
+<!-- TODO METARULE CONSTRAINTS -->
+
+<!-- TODO Interpreted BK -->
 
 ## Sequential learning
 
