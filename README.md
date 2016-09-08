@@ -1,19 +1,15 @@
 # Metagol
 
-Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework (MIL).  For more information about MIL see the papers listed at the end of this readme file.
-
-The latest release of Metagol can be found here https://github.com/metagol/metagol/releases
-
-Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) with any questions / bugs.
+Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework. Releases are [here](https://github.com/metagol/metagol/releases) Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) with any questions / bugs.
 
 ## Using Metagol
 
-Metagol is written in Prolog and runs with both Yap and SWI. Metagol is contained in a single file called 'metagol.pl'. To use Metagol, load the metagol module in your Prolog compiler. The following code demonstrates using Metagol to learn the grandparent relation given mother and father relations.
+Metagol is written in Prolog and runs with both Yap and SWI. To use Metagol, just consult the metagol.pl file. The following code demonstrates using Metagol to learn the grandparent relation given the mother and father relations as background knowledge.
 
 ```prolog
 :- use_module('metagol').
 
-%% FIRST-ORDER BACKGROUND KNOWLEDGE
+%% first-order background knowledge
 mother(ann,amy).
 mother(ann,andy).
 mother(amy,amelia).
@@ -23,17 +19,18 @@ father(steve,andy).
 father(gavin,amelia).
 father(andy,spongebob).
 
-%% PREDICATES TO BE USED IN THE LEARNING.
+%% predicates which can be used in the learning
 prim(mother/2).
 prim(father/2).
 
-%% METARULES
+%% metarules
 metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
 metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,A,B]])).
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
-%% LEARNING TASK
+%% learning task
 a :-
+  %% positive examples
   Pos = [
     grandparent(ann,amelia),
     grandparent(steve,amelia),
@@ -41,11 +38,12 @@ a :-
     grandparent(steve,spongebob),
     grandparent(linda,amelia)
   ],
+  %% negative examples
   Neg = [
     grandparent(amy,amelia)
   ],
-  learn(Pos,Neg,H),
-  pprint(H).
+  learn(Pos,Neg,Prog),
+  pprint(Prog).
 
 ```
 Running the above program will print the following output.
@@ -59,21 +57,21 @@ grandparent_1(A,B):-mother(A,B).
 grandparent_1(A,B):-father(A,B).
 ```
 
-In this solution, the predicate `grandparent_1/2` is invented and corresponds to the parent relation.
+Here, the predicate `grandparent_1/2` is invented and corresponds to the parent relation.
 
 ## Metarules
 
-Metagol requires that the user provides a set of higher-order metarules, a form of language bias which defines the form of clauses permitted in a hypothesis. An example metarule is as follows:
+Metagol requires higher-order metarules to define the form of clauses permitted in a hypothesis. An example metarule is as follows:
 
 ```prolog
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 ```
 
-In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` denote existentially quantified higher-order variables, and the symbols `A`, `B`, and `C` denote universally quantified first-order variables. The list of symbols in the first argument denote variables which Metagol will attempt to find substitutions for during the proof of a goal.
+In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` denote existentially quantified higher-order variables, and the symbols `A`, `B`, and `C` denote universally quantified first-order variables. The list of symbols in the first argument denote the existentially quantified variables which Metagol will attempt to find substitutions for during the learning.
 
-Currently, the metarules are supplied by the user. We are working on automatically identifying the necessary metarules, and preliminary work is detailed in the following paper:
+Metarules are currently supplied by the user. We are working on automatically identifying the necessary metarules, and preliminary work is detailed in the following paper:
 
-* A. Cropper and S.H. Muggleton. [Logical minimisation of meta-rules within meta-interpretive learning](http://www.andrewcropper.com/pubs/ilp2014-minmeta.pdf). In Proceedings of the 24th International Conference on Inductive Logic Programming, pages 65-78. Springer-Verlag, 2015. LNAI 9046.
+* A. Cropper and S.H. Muggleton. [Logical minimisation of meta-rules within meta-interpretive learning](http://andrewcropper.com/pubs/ilp14-minmeta.pdf). In Proceedings of the 24th International Conference on Inductive Logic Programming, pages 65-78. Springer-Verlag, 2015. LNAI 9046.
 
 Here are more metarules:
 
@@ -88,11 +86,10 @@ metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,B]])). % postcon
 The above metarules are all non-recursive.  By contrast, the following metarule is recursive.
 
 ```prolog
-% P(A,B) <- Q(A,C), A>C, P(C,B),C>B.
 metarule([P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])).
 ```
 
-The atoms `@term_gt(A,C)` and `@term_gt(C,B)` define a total ordering over the terms, which must be supplied by the user. A total order is necessary to guarantee termination of the meta-interpreter. For example, suppose you are learning robot strategies for a robot in a one-dimensional space and each term is a state (a list of Prolog facts). The following ordering ensures that the robot always moves at least one place to the right. Because the space is finite, termination is guaranteed.
+The atoms `@term_gt(A,C)` and `@term_gt(C,B)` define a total ordering over the terms, which must be supplied by the user. A total order is necessary to guarantee termination of the meta-interpreter. For instance, suppose you are learning robot strategies for a robot in a one-dimensional space and each term is a state (a list of Prolog facts). The following ordering ensures that the robot always moves at least one place to the right. Because the space is finite, termination is guaranteed.
 
 ```prolog
 term_gt(A,B):-
