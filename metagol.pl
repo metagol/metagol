@@ -28,81 +28,80 @@ default(min_clauses(1)).
 default(max_clauses(6)).
 default(metarule_next_id(1)).
 
-learn(Pos1,Neg1,G):-
+learn(Pos1,Neg1,Prog):-
   maplist(atom_to_list,Pos1,Pos2),
   maplist(atom_to_list,Neg1,Neg2),
-  proveall(Pos2,Sig,G),
-  nproveall(Neg2,Sig,G),
-  is_functional(Pos2,Sig,G).
+  proveall(Pos2,Sig,Prog),
+  nproveall(Neg2,Sig,Prog),
+  is_functional(Pos2,Sig,Prog).
 
-learn_seq(Seq,G2):-
-  maplist(learn_task,Seq,G1),
-  flatten(G1,G2).
+learn_seq(Seq,Prog):-
+  maplist(learn_task,Seq,Progs),
+  flatten(Progs,Prog).
 
-learn_task(Pos/Neg,G):-
-  learn(Pos,Neg,G),!,
-  maplist(assert_clause,G),
-  assert_prims(G).
+learn_task(Pos/Neg,Prog):-
+  learn(Pos,Neg,Prog),!,
+  maplist(assert_clause,Prog),
+  assert_prims(Prog).
 
-proveall(Atoms,Sig,G):-
+proveall(Atoms,Sig,Prog):-
   target_predicate(Atoms,P/A),
   format('% learning ~w\n',[P/A]),
   iterator(MaxN),
   format('% clauses: ~d\n',[MaxN]),
   invented_symbols(MaxN,P/A,Sig),
-  prove_examples(Atoms,Sig,_Sig,MaxN,0,_N,[],G).
+  prove_examples(Atoms,Sig,_Sig,MaxN,0,_N,[],Prog).
 
-prove_examples([],_FullSig,_Sig,_MaxN,N,N,G,G).
-prove_examples([E|Es],FullSig,Sig,MaxN,N1,N2,G1,G2):-
-  prove_deduce([E],FullSig,G1),!,
-  is_functional([E],Sig,G1),
-  prove_examples(Es,FullSig,Sig,MaxN,N1,N2,G1,G2).
-prove_examples([E|Es],FullSig,Sig,MaxN,N1,N2,G1,G2):-
-  prove([E],FullSig,Sig,MaxN,N1,N3,G1,G3),
-  prove_examples(Es,FullSig,Sig,MaxN,N3,N2,G3,G2).
+prove_examples([],_FullSig,_Sig,_MaxN,N,N,Prog,Prog).
+prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
+  prove_deduce([Atom],FullSig,Prog1),!,
+  is_functional([Atom],Sig,Prog1),
+  prove_examples(Atoms,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2).
+prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
+  prove([Atom],FullSig,Sig,MaxN,N1,N3,Prog1,Prog3),
+  prove_examples(Atoms,FullSig,Sig,MaxN,N3,N2,Prog3,Prog2).
 
-prove_deduce(Atoms,Sig,G):-
-  length(G,N),
-  prove(Atoms,Sig,_,N,N,N,G,G).
+prove_deduce(Atoms,Sig,Prog):-
+  length(Prog,N),
+  prove(Atoms,Sig,_,N,N,N,Prog,Prog).
 
-prove([],_FullSig,_Sig,_MaxN,N,N,G,G).
-prove([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,G1,G2):-
-  prove_aux(Atom,FullSig,Sig,MaxN,N1,N3,G1,G3),
-  prove(Atoms,FullSig,Sig,MaxN,N3,N2,G3,G2).
+prove([],_FullSig,_Sig,_MaxN,N,N,Prog,Prog).
+prove([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
+  prove_aux(Atom,FullSig,Sig,MaxN,N1,N3,Prog1,Prog3),
+  prove(Atoms,FullSig,Sig,MaxN,N3,N2,Prog3,Prog2).
 
 %% prove order constraint
-prove_aux('@'(Atom),_FullSig,_Sig,_MaxN,N,N,G,G):-!,
+prove_aux('@'(Atom),_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-!,
   user:call(Atom).
 
 %% prove primitive atom
-prove_aux([P|Args],_FullSig,_Sig,_MaxN,N,N,G,G):-
+prove_aux([P|Args],_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-
   (nonvar(P)-> (user:prim(P/_),!,user:primcall(P,Args)); user:primcall(P,Args)).
 
 %% use interpreted BK
-prove_aux(Atom,FullSig,Sig,MaxN,N1,N2,G1,G2):-
+prove_aux(Atom,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
   interpreted_bk(Atom,Body),
-  %% writeln(Body),
-  prove(Body,FullSig,Sig,MaxN,N1,N2,G1,G2).
+  prove(Body,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2).
 
 %% use existing abduction
-prove_aux(Atom,FullSig,Sig1,MaxN,N1,N2,G1,G2):-
+prove_aux(Atom,FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
   Atom=[P|Args],
   length(Args,A),
   select_lower(P,A,FullSig,Sig1,Sig2),
-  member(sub(Name,P,A,MetaSub),G1),
+  member(sub(Name,P,A,MetaSub),Prog1),
   user:metarule_init(Name,MetaSub,(Atom:-Body)),
-  prove(Body,FullSig,Sig2,MaxN,N1,N2,G1,G2).
+  prove(Body,FullSig,Sig2,MaxN,N1,N2,Prog1,Prog2).
 
 %% new abduction
-prove_aux(Atom,FullSig,Sig1,MaxN,N1,N2,G1,G2):-
+prove_aux(Atom,FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
   N1 < MaxN,
   Atom=[P|Args],
   length(Args,A),
   bind_lower(P,A,FullSig,Sig1,Sig2),
   user:metarule(Name,MetaSub,(Atom:-Body),FullSig),
-  check_new_metasub(Name,P,A,MetaSub,G1),
+  check_new_metasub(Name,P,A,MetaSub,Prog1),
   succ(N1,N3),
-  prove(Body,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,MetaSub)|G1],G2).
+  prove(Body,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,MetaSub)|Prog1],Prog2).
 
 select_lower(P,A,FullSig,_Sig1,Sig2):-
   nonvar(P),!,
@@ -120,16 +119,16 @@ bind_lower(P,A,_FullSig,Sig1,Sig2):-
   append(_,[sym(P,A,U)|Sig2],Sig1),
   (var(U)-> U = 1,!;true).
 
-check_new_metasub(Name,P,A,MetaSub,G):-
-  memberchk(sub(Name,P,A,_),G),!,
+check_new_metasub(Name,P,A,MetaSub,Prog):-
+  memberchk(sub(Name,P,A,_),Prog),!,
   last(MetaSub,X),
-  when(nonvar(X),\+memberchk(sub(Name,P,A,MetaSub),G)).
-check_new_metasub(_Name,_P,_A,_MetaSub,_G).
+  when(nonvar(X),\+memberchk(sub(Name,P,A,MetaSub),Prog)).
+check_new_metasub(_Name,_P,_A,_MetaSub,_Prog).
 
-nproveall([],_PS,_G):- !.
-nproveall([Atom|Atoms],PS,G):-
-  \+ prove_deduce([Atom],PS,G),
-  nproveall(Atoms,PS,G).
+nproveall([],_PS,_Prog):- !.
+nproveall([Atom|Atoms],PS,Prog):-
+  \+ prove_deduce([Atom],PS,Prog),
+  nproveall(Atoms,PS,Prog).
 
 iterator(N):-
   get_option(min_clauses(MinN)),
@@ -143,11 +142,11 @@ invented_symbols(N,P/A,[sym(P,A,_U)|Sig]):-
   succ(M,N),
   findall(sym(InvSym,_Artiy,_Used),(between(1,M,I),atomic_list_concat([P,'_',I],InvSym)),Sig).
 
-pprint(G1):-
-  map_list_to_pairs(arg(2),G1,Pairs),
+pprint(Prog1):-
+  map_list_to_pairs(arg(2),Prog1,Pairs),
   keysort(Pairs,Sorted),
-  pairs_values(Sorted,G2),
-  maplist(pprint_clause,G2).
+  pairs_values(Sorted,Prog2),
+  maplist(pprint_clause,Prog2).
 
 pprint_clause(Sub):-
   construct_clause(Sub,Clause),
@@ -182,12 +181,12 @@ list_to_atom(AtomList,Atom):-
 atom_to_list(Atom,AtomList):-
   Atom =..AtomList.
 
-is_functional(Atoms,Sig,G):-
-  (get_option(functional) -> is_functional_aux(Atoms,Sig,G); true).
-is_functional_aux([],_Sig,_G).
-is_functional_aux([Atom|Atoms],Sig,G):-
-  user:func_test(Atom,Sig,G),
-  is_functional_aux(Atoms,Sig,G).
+is_functional(Atoms,Sig,Prog):-
+  (get_option(functional) -> is_functional_aux(Atoms,Sig,Prog); true).
+is_functional_aux([],_Sig,_Prog).
+is_functional_aux([Atom|Atoms],Sig,Prog):-
+  user:func_test(Atom,Sig,Prog),
+  is_functional_aux(Atoms,Sig,Prog).
 
 get_option(Option):-call(Option), !.
 get_option(Option):-default(Option).
@@ -236,15 +235,15 @@ get_asserts(Name,MetaSub,Clause,Asserts):-
     metarule_init(AssertName,MetaSub,Clause)
   ].
 
-assert_program(G):-
-  maplist(assert_clause,G).
+assert_program(Prog):-
+  maplist(assert_clause,Prog).
 
 assert_clause(Sub):-
   construct_clause(Sub,Clause),
   assert(user:Clause).
 
-assert_prims(G):-
-  findall(P/A,(member(sub(_Name,P,A,_MetaSub),G)),Prims),!,
+assert_prims(Prog):-
+  findall(P/A,(member(sub(_Name,P,A,_MetaSub),Prog)),Prims),!,
   list_to_set(Prims,PrimSet),
   maplist(assert_prim,PrimSet).
 
