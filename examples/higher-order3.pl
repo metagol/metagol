@@ -1,34 +1,28 @@
 :-['../metagol'].
 
+%% background knowledge
+divisible5(X):-0 is X mod 5.
+divisible2(X):-0 is X mod 2.
+
+filter([],[],_F).
+filter([A|T1],[A|T2],F):-
+  call(F,A),
+  filter(T1,T2,F).
+filter([_|T1],T2,F):-
+  filter(T1,T2,F).
+
+%% tell metagol to use the BK
+prim(divisible2/1).
+prim(divisible5/1).
+interpreted(filter/3).
+
+%% metarules
+metarule([P,Q],([P,A]:-[[Q,A]])).
 metarule([P,Q,F],([P,A,B]:-[[Q,A,B,F]])).
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
-prim(my_succ/2).
-prim(my_double/2).
-prim(my_length/2).
-
-my_double(A,B):-integer(A),B is A*2.
-my_succ(A,B):-
-  integer(A),
-  (ground(B)->integer(B);true),
-  succ(A,B).
-
-my_length(A,B):-A=[_|_],length(A,B).
-
-background(([map,[],[],_F]:- [])).
-background(([map,[A|As],[B|Bs],F]:- [[F,A,B],[map,As,Bs,F]])).
-
-
 a:-
-  A=[[a],[a,a],[a,a,a],[a,a,a,a]],
-  B=[2,4,6,8],
-  learn([f(A,B)],[],G),
-  writeln('---'),
-  pprint(G).
-
-b:-
-  A=[[a],[a,a],[a,a,a],[a,a,a,a]],
-  B=[2,4,6,8],
-  learn([f(A,B),f(A,B)],[],G),
-  writeln('---'),
-  pprint(G).
+  A = [1,2,3,4,5,6,7,8,9,10],
+  B = [2,4,5,6,8,10],
+  learn([f(A,B)],[],Prog),
+  pprint(Prog).

@@ -1,6 +1,6 @@
 :- use_module('../metagol').
 
-%% FIRST-ORDER BACKGROUND KNOWLEDGE
+%% background knowledge
 parent(queen_victoria,edward_seventh).
 parent(edward_seventh,george_fifth).
 parent(george_fifth,george_sixth).
@@ -14,31 +14,18 @@ parent(princess_diana,prince_william).
 parent(princess_diana,prince_harry).
 parent(prince_william,prince_george).
 
-%% PREDICATES TO BE USED IN THE LEARNING
+%% tell metagol to use the BK
 prim(parent/2).
 
-%% METARULES
+%% metarules
 metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
 metarule([P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]])).
 
-%% LEARNING RECURSIVE ANCESTOR
 a :-
   Pos = [
     ancestor(elizabeth_second,prince_charles),
     ancestor(george_sixth,prince_harry),
     ancestor(queen_mother,prince_william)
   ],
-  learn(Pos,[],H),
-  pprint(H).
-
-b :-
-  Pos = [
-    ancestor(elizabeth_second,prince_charles),
-    ancestor(george_sixth,prince_harry),
-    ancestor(queen_mother,prince_william),
-    ancestor(elizabeth_second,prince_charles),
-    ancestor(george_sixth,prince_harry),
-    ancestor(queen_mother,prince_william)
-  ],
-  learn(Pos,[],H),
-  pprint(H).
+  learn(Pos,[],Prog),
+  pprint(Prog).

@@ -1,6 +1,6 @@
 :- use_module('../metagol').
 
-%% FIRST-ORDER BACKGROUND KNOWLEDGE
+%% background knowledge
 mother(ann,amy).
 mother(ann,andy).
 mother(amy,amelia).
@@ -11,16 +11,15 @@ father(gavin,amelia).
 father(andy,spongebob).
 father(spongebob,sally).
 
-
-%% PREDICATES TO BE USED IN THE LEARNING
+%% tell metagol to use BK
 prim(mother/2).
 prim(father/2).
 
-%% METARULES
+%% metarules
 metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
-%% LEARNING PARENT, THEN GRANDPARENT, THEN GREAT-GRANDPARENT
+%% learn parent, then grandparent, then great-grandparent
 a:-
   T1 = [
     parent(ann,andy),
@@ -41,5 +40,5 @@ a:-
     great_grandparent(steve,sally)
   ]/[],
 
-  learn_seq([T1,T2,T3],H),
-  pprint(H).
+  learn_seq([T1,T2,T3],Prog),
+  pprint(Prog).

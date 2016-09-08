@@ -1,6 +1,6 @@
 :- use_module('../metagol').
 
-%% FIRST-ORDER BACKGROUND KNOWLEDGE
+%% background knowledge
 mother(ann,amy).
 mother(ann,andy).
 mother(amy,amelia).
@@ -9,28 +9,16 @@ father(steve,amy).
 father(steve,andy).
 father(gavin,amelia).
 father(andy,spongebob).
-married(ann,steve).
-married(steve,ann).
-married(amy,gavin).
-married(gavin,amy).
-offspring(A,B):- mother(B,A).
-offspring(A,B):- father(B,A).
 
-%% METAGOL SETTINGS
-metagol:max_clauses(3). % optional
-
-%% PREDICATES TO BE USED IN THE LEARNING
-prim(offspring/2).
-prim(married/2).
+%% tell metagol to use the BK
 prim(mother/2).
 prim(father/2).
 
-%% METARULES
+%% metarules
 metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
-metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,A,B]])).
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
-%% LEARNING GRANDPARENT BY INVENTING PARENT
+%% learn grandparent by inventing parent
 a :-
   Pos = [
     grandparent(ann,amelia),
@@ -42,10 +30,10 @@ a :-
   Neg = [
     grandparent(amy,amelia)
   ],
-  learn(Pos,Neg,H),
-  pprint(H).
+  learn(Pos,Neg,Prog),
+  pprint(Prog).
 
-%% EXAMPLE OF A FAILURE
+%% example of a failure
 b :-
   Pos = [
     grandparent(ann,amelia)
@@ -53,4 +41,4 @@ b :-
   Neg = [
     grandparent(ann,amelia)
   ],
-  (learn(Pos,Neg,H) -> (pprint(H)); writeln('failed to learn a theory')).
+  (learn(Pos,Neg,_Prog) -> false; writeln('failed to learn a theory')).

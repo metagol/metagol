@@ -14,8 +14,8 @@
     min_clauses/1,
     max_clauses/1,
     metarule_next_id/1,
+    interpreted_bk/2,
     user:prim/1,
-    user:background/1,
     user:primcall/2.
 
 :- discontiguous
@@ -80,7 +80,8 @@ prove_aux([P|Args],_FullSig,_Sig,_MaxN,N,N,G,G):-
 
 %% use interpreted BK
 prove_aux(Atom,FullSig,Sig,MaxN,N1,N2,G1,G2):-
-  user:background((Atom:-Body)),
+  interpreted_bk(Atom,Body),
+  %% writeln(Body),
   prove(Body,FullSig,Sig,MaxN,N1,N2,G1,G2).
 
 %% use existing abduction
@@ -153,30 +154,33 @@ pprint_clause(Sub):-
   numbervars(Clause,0,_),
   format('~q.~n',[Clause]).
 
-construct_clause(sub(Name,_P,_A,MetaSub),AtomClause):-
-  user:metarule_init(Name,MetaSub,Clause),
-  copy_term(Clause,(ListHead:-ListBodyWithAts)),
-  Head=..ListHead,
-  convert_preds(ListBodyWithAts,AtomBodyList),
-  (AtomBodyList == []-> AtomClause = Head;
-    listtocomma(AtomBodyList,Body),
-    AtomClause = (Head:-Body) ).
+%% construct clause is horrible and needs refactoring
+construct_clause(sub(Name,_,_,MetaSub),Clause):-
+  user:metarule_init(Name,MetaSub,ClauseAsList),
+  copy_term(ClauseAsList,(HeadList:-BodyAsList)),
+  atom_to_list(Head,HeadList),
+  (BodyAsList == [] ->Clause=Head;(pprint_list_to_clause(BodyAsList,Body),Clause = (Head:-Body))).
 
-listtocomma([],true):- !.
-listtocomma([E],E):- !.
-listtocomma([H|T],(H,R)):-
-  listtocomma(T,R).
+pprint_list_to_clause(List1,Clause):-
+  atomsaslists_to_atoms(List1,List2),
+  list_to_clause(List2,Clause).
 
-convert_preds([],[]).
-convert_preds(['@'(Atom)|T],Out):- !,
-  (get_option(print_ordering) -> Out=[Atom|R]; Out=R),
-  convert_preds(T,R).
-convert_preds([List|T],[Atom|R]):-
-  Atom =.. List,
-  convert_preds(T,R).
+atomsaslists_to_atoms([],[]).
+atomsaslists_to_atoms(['@'(Atom)|T1],Out):- !,
+  (get_option(print_ordering) -> Out=[Atom|T2]; Out=T2),
+  atomsaslists_to_atoms(T1,T2).
+atomsaslists_to_atoms([AtomAsList|T1],[Atom|T2]):-
+  atom_to_list(Atom,AtomAsList),
+  atomsaslists_to_atoms(T1,T2).
 
-atom_to_list(Atom,AtomAsList):-
-  Atom =..AtomAsList.
+list_to_clause([Atom],Atom):-!.
+list_to_clause([Atom|T1],(Atom,T2)):-!,
+  list_to_clause(T1,T2).
+
+list_to_atom(AtomList,Atom):-
+  Atom =..AtomList.
+atom_to_list(Atom,AtomList):-
+  Atom =..AtomList.
 
 is_functional(Atoms,Sig,G):-
   (get_option(functional) -> is_functional_aux(Atoms,Sig,G); true).
@@ -219,6 +223,12 @@ user:term_expansion((metarule(Name,MetaSub,Clause):-Body),Asserts):-
 user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
   Asserts = [(metarule(Name,MetaSub,Clause,PS):-Body),metarule_init(Name,MetaSub,Clause)].
 
+user:term_expansion(interpreted(P/A),L2):-
+  functor(Head,P,A),
+  findall((Head:-Body),user:clause(Head,Body),L1),
+  maplist(convert_to_interpreted,L1,L2).
+  %% maplist(writeln,L2).
+
 get_asserts(Name,MetaSub,Clause,Asserts):-
   (var(Name)->gen_metarule_id(AssertName);AssertName=Name),
   Asserts = [
@@ -245,3 +255,21 @@ assert_prim(Prim):-
 prim_asserts(P/A,[user:prim(P/A), user:(primcall(P,Args):-Call)]):-
   functor(Call,P,A),
   Call =.. [P|Args].
+
+convert_to_interpreted((Head:-true),metagol:(interpreted_bk(HeadAsList,[]))):-!,
+  ho_atom_to_list(Head,HeadAsList).
+
+convert_to_interpreted((Head:-Body),metagol:(interpreted_bk(HeadAsList,BodyList2))):-
+  ho_atom_to_list(Head,HeadAsList),
+  clause_to_list(Body,BodyList1),
+  maplist(ho_atom_to_list,BodyList1,BodyList2).
+
+clause_to_list((Atom,T1),[Atom|T2]):-
+  clause_to_list(T1,T2).
+clause_to_list(Atom,[Atom]):- !.
+
+ho_atom_to_list(Atom,T):-
+  Atom=..AtomList,
+  AtomList = [call|T],!.
+ho_atom_to_list(Atom,AtomList):-
+  Atom=..AtomList.

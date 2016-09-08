@@ -1,5 +1,6 @@
 :- use_module('../metagol').
 
+%% metarules
 metarule([P,A],([P,A,_B]:-[])).
 metarule([P,B],([P,_A,B]:-[])).
 
@@ -17,5 +18,5 @@ a :-
     p(3,4),
     p(3,1)
   ],
-  learn(Pos,Neg,H),
-  pprint(H).
+  learn(Pos,Neg,Prog),
+  pprint(Prog).

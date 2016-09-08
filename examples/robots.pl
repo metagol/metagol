@@ -1,18 +1,10 @@
-%% Learning robot strategies
-%% Example taken from the following papers:
-%% * A. Cropper and S.H. Muggleton. Learning efficient logical robot strategies involving composable objects. Proceedings of the Twenty-Fourth International Joint Conference on Artificial Intelligence, IJCAI 2015.
-%% * A. Cropper and S.H. Muggleton. Logical minimisation of meta-rules within meta-interpretive learning. In Proceedings of the 24th International Conference on Inductive Logic Programming, pages 65-78. Springer-Verlag, 2015. LNAI 9046.
-%% * A. Cropper and S.H. Muggleton. Can predicate invention compensate for incomplete background knowledge?. In Proceedings of the 13th Scandinavian Conference on Artificial Intelligence, pages 27-36. IOS Press, 2015.
-
 :- use_module('../metagol').
-%% :- use_module('../metagol-old').
 
-%% METAGOL SETTINGS
-metagol:functional. % force functional solution
-
+%% metagol settings
+metagol:functional.
 metagol:max_clauses(10).
 
-%% PREDICATES TO BE USED IN THE LEARNING
+%% tell metagol to use the BK
 prim(move_left/2).
 prim(move_right/2).
 prim(move_forwards/2).
@@ -20,40 +12,38 @@ prim(move_backwards/2).
 prim(grab_ball/2).
 prim(drop_ball/2).
 
-%% METARULES
+%% metarules
 metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
-%% CUSTOM FUNCTIONAL CHECK
+%% functional check
 func_test(Atom,PS,G):-
   Atom = [P,A,B],
   Actual = [P,A,Z],
   \+ (metagol:prove_deduce([Actual],PS,G),Z \= B).
 
-%% ROBOT LEARNING TO MOVE A BALL TO A SPECIFIC POSITION
-
+%% robot learning to move a ball to a specific position
 a :-
   Pos = [f(world((1/1),(1/1),false),world((3/3),(3/3),false))],
-  learn(Pos,[],H),
-  pprint(H).
-  %% metagol:unfold(H,_).
+  learn(Pos,[],Prog),
+  pprint(Prog).
 
 b :-
   Pos = [f(world((1/1),(1/1),false),world((5/5),(5/5),false))],
-  learn(Pos,[],H),
-  pprint(H).
+  learn(Pos,[],Prog),
+  pprint(Prog).
 
 c :-
   Pos = [f(world((1/1),(1/1),false),world((6/6),(6/6),false))],
-  learn(Pos,[],H),
-  pprint(H).
+  learn(Pos,[],Prog),
+  pprint(Prog).
 
 d :-
   Pos = [f(world((1/1),(1/1),false),world((7/7),(7/7),false))],
-  learn(Pos,[],H),
-  pprint(H).
+  learn(Pos,[],Prog),
+  pprint(Prog).
 
-%% FIRST-ORDER BACKGROUND KNOWLEDGE
+%% background knowledge
 max_right(6).
 max_forwards(6).
 
@@ -96,8 +86,3 @@ move_forwards(world(X1/Y1,_,true),world(X1/Y2,X1/Y2,true)):-
   max_forwards(MAXFORWARDS),
   Y1 < MAXFORWARDS,
   Y2 is Y1+1.
-
-
-
-
-

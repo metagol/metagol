@@ -1,10 +1,13 @@
 :- use_module('../metagol').
 
-prim(num/1).
-
+%% background knowledge
 num(X):-
   between(0,inf,X).
 
+%% tell metagol to use the BK
+prim(num/1).
+
+%% metarules
 metarule([P,Q,A],([P,A,B]:-[[Q,A],[Q,B]])).
 metarule([P,Q,B],([P,A,B]:-[[Q,A],[Q,B]])).
 
@@ -22,5 +25,5 @@ a :-
    q(3,4),
    q(3,1)
   ],
-  learn(Pos,Neg,H),
-  pprint(H).
+  learn(Pos,Neg,Prog),
+  pprint(Prog).

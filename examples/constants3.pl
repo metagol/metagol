@@ -1,27 +1,17 @@
 :- use_module('../metagol').
 
-%% target theory
-%% f(andy,laura):- p(spongebob,laura).
-%% f(andy,amelia):- p(patrick,amelia).
-
-metarule([P,Q,X,Y],([P,X,A]:-[[Q,Y,A]])).
-
-prim(p/2).
-
+%% background knowledge
 p(spongebob,laura).
 p(patrick,amelia).
+
+%% tell metagol to use the BK
+prim(p/2).
+
+%% metarules
+metarule([P,Q,X,Y],([P,X,A]:-[[Q,Y,A]])).
 
 a:-
   learn([
     f(andy,laura),
-    f(andy,amelia)],[],H),
-  pprint(H).
-
-
-b:-
-  learn([
-    f(andy,laura),
-    f(andy,amelia),
-    f(andy,laura),
-    f(andy,amelia)],[],H),
-  pprint(H).
+    f(andy,amelia)],[],Prog),
+  pprint(Prog).

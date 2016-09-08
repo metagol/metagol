@@ -1,5 +1,4 @@
-%% Learning robot sorting algorithms
-%% Code and example taken from the following paper:
+%% Learning robot sorting algorithm taken from the following paper:
 %% A. Cropper and S.H. Muggleton. Learning efficient logical robot strategies involving composable objects. In Proceedings of the 24th International Joint Conference Artificial Intelligence (IJCAI 2015), pages 3423-3429. IJCAI, 2015.
 
 :- use_module('../metagol').
@@ -12,6 +11,7 @@
 %% METAGOL SETTINGS
 metagol:max_clauses(4).
 
+%% tell metagol to use the BK
 prim(comp_adjacent/2).
 prim(decrement_end/2).
 prim(go_to_start/2).
