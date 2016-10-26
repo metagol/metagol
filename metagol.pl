@@ -65,6 +65,8 @@ prove_deduce(Atoms,Sig,Prog):-
   length(Prog,N),
   prove(Atoms,Sig,_,N,N,N,Prog,Prog).
 
+
+%% MAIN PART HERE
 prove([],_FullSig,_Sig,_MaxN,N,N,Prog,Prog).
 prove([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
   prove_aux(Atom,FullSig,Sig,MaxN,N1,N3,Prog1,Prog3),
@@ -202,7 +204,7 @@ gen_metarule_id(Id):-
   succ(Id,IdNext),
   set_option(metarule_next_id(IdNext)).
 
-user:term_expansion(prim(P/A),[user:prim(P/A),user:(primcall(P,Args):-Call)]):-
+user:term_expansion(prim(P/A),[user:prim(P/A),user:(primcall(P,Args):-user:Call)]):-
   functor(Call,P,A),
   Call =.. [P|Args].
 
@@ -251,7 +253,7 @@ assert_prim(Prim):-
   prim_asserts(Prim,Asserts),
   maplist(assertz,Asserts).
 
-prim_asserts(P/A,[user:prim(P/A), user:(primcall(P,Args):-Call)]):-
+prim_asserts(P/A,[user:prim(P/A), user:(primcall(P,Args):-user:Call)]):-
   functor(Call,P,A),
   Call =.. [P|Args].
 
