@@ -2,7 +2,7 @@ Metagol is an inductive logic programming (ILP) system based on the meta-interpr
 
 #### Using Metagol
 
-Metagol is written in Prolog and runs with both Yap and SWI. To use Metagol, consult the 'metagol.pl' file. The following code demonstrates using Metagol to learn the grandparent relation given the mother and father relations as background knowledge.
+Metagol is written in Prolog and runs with both Yap and SWI. To use Metagol, consult the 'metagol.pl' file. The following code demonstrates learning the grandparent relation given the mother and father relations as background knowledge.
 
 ```prolog
 :- use_module('metagol').
@@ -17,7 +17,7 @@ father(steve,andy).
 father(gavin,amelia).
 father(andy,spongebob).
 
-%% predicates which can be used in the learning
+%% predicates that can be used in the learning
 prim(mother/2).
 prim(father/2).
 
@@ -67,7 +67,7 @@ metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
 In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` denote existentially quantified higher-order variables, and the symbols `A`, `B`, and `C` denote universally quantified first-order variables. The list of symbols in the first argument denote the existentially quantified variables which Metagol will attempt to find substitutions for during the learning.
 
-Metarules are currently supplied by the user. We are working on automatically identifying the necessary metarules, with preliminary work detailed in the following paper:
+Users need to supply Metarules. We are working on automatically identifying the necessary metarules, with preliminary work detailed in the following paper:
 
 * A. Cropper and S.H. Muggleton. [Logical minimisation of meta-rules within meta-interpretive learning](http://andrewcropper.com/pubs/ilp14-minmeta.pdf). In Proceedings of the 24th International Conference on Inductive Logic Programming, pages 65-78. Springer-Verlag, 2015. LNAI 9046.
 
@@ -87,7 +87,7 @@ The above metarules are all non-recursive. By contrast, the following metarule i
 metarule([P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]])).
 ```
 
-However, using recursive metarules can lead to infinite search spaces. To guarantee termination of Metagol, the user must define a total ordering over the terms, as follows:
+Recursive metarules can lead to infinite search spaces. To guarantee termination, users must define a total ordering over the terms, as follows:
 
 ```prolog
 metarule([P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])).
@@ -135,10 +135,16 @@ Metagol searches for a hypothesis using iterative deepening on the number of cla
 ```prolog
 metagol:min_clauses(Integer). % default 1
 ```
-The user can also specify a maximum solution length as follows.
+You can specify a maximum number of clauses as follows.
 
 ```prolog
-metagol:max_clauses(Integer). % default 6
+metagol:max_clauses(Integer). % default 10
+```
+
+You can specify a maximum number of invented predicates as follows.
+
+```prolog
+metagol:max_inv_preds(Integer). % default 10
 ```
 
 The following flag denotes whether the learned theory should be functional.

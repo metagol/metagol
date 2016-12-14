@@ -13,6 +13,7 @@
     print_ordering/0,
     min_clauses/1,
     max_clauses/1,
+    max_inv_preds/1,
     metarule_next_id/1,
     interpreted_bk/2,
     user:prim/1,
@@ -25,8 +26,9 @@
     user:primcall/2.
 
 default(min_clauses(1)).
-default(max_clauses(6)).
+default(max_clauses(10)).
 default(metarule_next_id(1)).
+default(max_inv_preds(10)).
 
 learn(Pos1,Neg1,Prog):-
   maplist(atom_to_list,Pos1,Pos2),
@@ -140,8 +142,10 @@ iterator(N):-
 target_predicate([[P|Args]|_],P/A):-
   length(Args,A).
 
-invented_symbols(N,P/A,[sym(P,A,_U)|Sig]):-
-  succ(M,N),
+invented_symbols(MaxClauses,P/A,[sym(P,A,_U)|Sig]):-
+  NumSymbols is MaxClauses-1,
+  get_option(max_inv_preds(MaxInvPreds)),
+  M is min(NumSymbols,MaxInvPreds),
   findall(sym(InvSym,_Artiy,_Used),(between(1,M,I),atomic_list_concat([P,'_',I],InvSym)),Sig).
 
 pprint(Prog1):-
