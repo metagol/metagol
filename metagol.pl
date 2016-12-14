@@ -67,8 +67,6 @@ prove_deduce(Atoms,Sig,Prog):-
   length(Prog,N),
   prove(Atoms,Sig,_,N,N,N,Prog,Prog).
 
-
-%% MAIN PART HERE
 prove([],_FullSig,_Sig,_MaxN,N,N,Prog,Prog).
 prove([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
   prove_aux(Atom,FullSig,Sig,MaxN,N1,N3,Prog1,Prog3),
@@ -107,9 +105,10 @@ prove_aux(Atom,FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
   succ(N1,N3),
   prove(Body,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,MetaSub)|Prog1],Prog2).
 
+
 select_lower(P,A,FullSig,_Sig1,Sig2):-
   nonvar(P),!,
-  ((append(_,[sym(P,A,_)|Sig2],FullSig),!);Sig2=[]).
+  append(_,[sym(P,A,_)|Sig2],FullSig),!.
 
 select_lower(P,A,_FullSig,Sig1,Sig2):-
   append(_,[sym(P,A,U)|Sig2],Sig1),
@@ -117,7 +116,7 @@ select_lower(P,A,_FullSig,Sig1,Sig2):-
 
 bind_lower(P,A,FullSig,_Sig1,Sig2):-
   nonvar(P),!,
-  ((append(_,[sym(P,A,_)|Sig2],FullSig),!);Sig2=[]).
+  append(_,[sym(P,A,_)|Sig2],FullSig),!.
 
 bind_lower(P,A,_FullSig,Sig1,Sig2):-
   append(_,[sym(P,A,U)|Sig2],Sig1),
@@ -232,7 +231,6 @@ user:term_expansion(interpreted(P/A),L2):-
   functor(Head,P,A),
   findall((Head:-Body),user:clause(Head,Body),L1),
   maplist(convert_to_interpreted,L1,L2).
-  %% maplist(writeln,L2).
 
 get_asserts(Name,MetaSub,Clause,Asserts):-
   (var(Name)->gen_metarule_id(AssertName);AssertName=Name),
