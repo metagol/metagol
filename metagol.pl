@@ -149,8 +149,9 @@ invented_symbols(MaxClauses,P/A,[sym(P,A,_U)|Sig]):-
 
 pprint(Prog1):-
   map_list_to_pairs(arg(2),Prog1,Pairs),
-  keysort(Pairs,Sorted),
-  pairs_values(Sorted,Prog2),
+  % keysort(Pairs,Sorted),
+  % pairs_values(Sorted,Prog2),
+  pairs_values(Pairs,Prog2),
   maplist(pprint_clause,Prog2).
 
 pprint_clause(Sub):-
@@ -245,6 +246,30 @@ assert_program(Prog):-
 assert_clause(Sub):-
   construct_clause(Sub,Clause),
   assert(user:Clause).
+
+list_to_set(List, Set) :-
+   number_list(List, 1, Numbered),
+   keysort(Numbered, ONum),
+   remove_dup_keys(ONum, NumSet),
+   keysort(NumSet, ONumSet),
+   pairs_keys(ONumSet, Set).
+
+number_list([], _, []).
+number_list([H|T0], N, [H-N|T]) :-
+   N1 is N+1,
+   number_list(T0, N1, T).
+
+remove_dup_keys([], []).
+remove_dup_keys([H|T0], [H|T]) :-
+   H = V-_,
+   remove_same_key(T0, V, T1),
+   remove_dup_keys(T1, T).
+
+remove_same_key([V1-_|T0], V, T) :-
+   V1 == V,
+   !,
+   remove_same_key(T0, V, T).
+   remove_same_key(L, _, L).
 
 assert_prims(Prog):-
   findall(P/A,(member(sub(_Name,P,A,_MetaSub),Prog)),Prims),!,
