@@ -248,28 +248,18 @@ assert_clause(Sub):-
   assert(user:Clause).
 
 list_to_set(List, Set) :-
-   number_list(List, 1, Numbered),
-   keysort(Numbered, ONum),
-   remove_dup_keys(ONum, NumSet),
-   keysort(NumSet, ONumSet),
-   pairs_keys(ONumSet, Set).
+ list_to_set_(List, Set0),
+ Set = Set0.
 
-number_list([], _, []).
-number_list([H|T0], N, [H-N|T]) :-
-   N1 is N+1,
-   number_list(T0, N1, T).
+list_to_set_([], R) :-
+ close_list(R).
+list_to_set_([H|T], R) :-
+ memberchk(H, R), !,
+ list_to_set_(T, R).
 
-remove_dup_keys([], []).
-remove_dup_keys([H|T0], [H|T]) :-
-   H = V-_,
-   remove_same_key(T0, V, T1),
-   remove_dup_keys(T1, T).
-
-remove_same_key([V1-_|T0], V, T) :-
-   V1 == V,
-   !,
-   remove_same_key(T0, V, T).
-   remove_same_key(L, _, L).
+close_list([]) :- !.
+close_list([_|T]) :-
+ close_list(T).
 
 assert_prims(Prog):-
   findall(P/A,(member(sub(_Name,P,A,_MetaSub),Prog)),Prims),!,
