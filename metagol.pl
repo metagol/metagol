@@ -149,8 +149,9 @@ invented_symbols(MaxClauses,P/A,[sym(P,A,_U)|Sig]):-
 
 pprint(Prog1):-
   map_list_to_pairs(arg(2),Prog1,Pairs),
-  keysort(Pairs,Sorted),
-  pairs_values(Sorted,Prog2),
+  % keysort(Pairs,Sorted),
+  % pairs_values(Sorted,Prog2),
+  pairs_values(Pairs,Prog2),
   maplist(pprint_clause,Prog2).
 
 pprint_clause(Sub):-
@@ -245,6 +246,20 @@ assert_program(Prog):-
 assert_clause(Sub):-
   construct_clause(Sub,Clause),
   assert(user:Clause).
+
+list_to_set(List, Set) :-
+ list_to_set_(List, Set0),
+ Set = Set0.
+
+list_to_set_([], R) :-
+ close_list(R).
+list_to_set_([H|T], R) :-
+ memberchk(H, R), !,
+ list_to_set_(T, R).
+
+close_list([]) :- !.
+close_list([_|T]) :-
+ close_list(T).
 
 assert_prims(Prog):-
   findall(P/A,(member(sub(_Name,P,A,_MetaSub),Prog)),Prims),!,
