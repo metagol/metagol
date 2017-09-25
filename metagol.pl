@@ -89,7 +89,7 @@ prove_aux(Atom,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
 %% use existing abduction
 prove_aux(Atom,FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
   Atom=[P|Args],
-  length(Args,A),
+  arity(Args,A),
   select_lower(P,A,FullSig,Sig1,Sig2),
   member(sub(Name,P,A,MetaSub),Prog1),
   user:metarule_init(Name,MetaSub,(Atom:-Body)),
@@ -99,13 +99,12 @@ prove_aux(Atom,FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
 prove_aux(Atom,FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
   N1 < MaxN,
   Atom=[P|Args],
-  length(Args,A),
+  arity(Args,A),
   bind_lower(P,A,FullSig,Sig1,Sig2),
   user:metarule(Name,MetaSub,(Atom:-Body),FullSig),
   check_new_metasub(Name,P,A,MetaSub,Prog1),
   succ(N1,N3),
   prove(Body,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,MetaSub)|Prog1],Prog2).
-
 
 select_lower(P,A,FullSig,_Sig1,Sig2):-
   nonvar(P),!,
@@ -140,13 +139,20 @@ iterator(N):-
   between(MinN,MaxN,N).
 
 target_predicate([[P|Args]|_],P/A):-
-  length(Args,A).
+  arity(Args,A).
 
 invented_symbols(MaxClauses,P/A,[sym(P,A,_U)|Sig]):-
   NumSymbols is MaxClauses-1,
   get_option(max_inv_preds(MaxInvPreds)),
   M is min(NumSymbols,MaxInvPreds),
   findall(sym(InvSym,_Artiy,_Used),(between(1,M,I),atomic_list_concat([P,'_',I],InvSym)),Sig).
+
+arity([],0) :-!.
+arity([_],1) :-!.
+arity([_,_],2) :-!.
+arity([_,_,_],3) :-!.
+arity(L,N):- !,
+  length(L,N).
 
 pprint(Prog1):-
   map_list_to_pairs(arg(2),Prog1,Pairs),
