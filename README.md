@@ -1,4 +1,6 @@
-Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework. Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) with any questions / bugs.
+Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework. Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) with any questions / bugs. If you use Metagol for research, please use [this citation](https://raw.githubusercontent.com/metagol/metagol/master/metagol.bib) or cite the relevant paper.
+
+
 
 #### Using Metagol
 
@@ -181,25 +183,3 @@ metagol:fold_theory. % default false
 ```
 
 (TODO) THIS IS NOT YET WORKING IN THE BETA VERSION -->
-
-#### Further details
-
-For more information on Metagol and the MIL framework, see the following papers:
-
-* A. Cropper and S.H. Muggleton. [Learning higher-order logic programs through abstraction and invention](http://www.andrewcropper.com/pubs/ijcai16-metafunc.pdf). In Proceedings of the 25th International Joint Conference Artificial Intelligence (IJCAI 2016), pages 1418-1424. IJCAI, 2016.
-
-* A. Cropper and S.H. Muggleton. [Learning efficient logical robot strategies involving composable objects](http://www.andrewcropper.com/pubs/ijcai15-metagolo.pdf). In Proceedings of the 24th International Joint Conference Artificial Intelligence (IJCAI 2015), pages 3423-3429. IJCAI, 2015.
-
-* A. Cropper and S.H. Muggleton. [Logical minimisation of meta-rules within meta-interpretive learning](http://www.andrewcropper.com/pubs/ilp14-minmeta.pdf). In Proceedings of the 24th International Conference on Inductive Logic Programming, pages 65-78. Springer-Verlag, 2015. LNAI 9046.
-
-* A. Cropper and S.H. Muggleton. [Can predicate invention compensate for incomplete background knowledge?](http://www.andrewcropper.com/pubs/scai15-incomplete.pdf). In Proceedings of the 13th Scandinavian Conference on Artificial Intelligence, pages 27-36. IOS Press, 2015.
-
-* S.H. Muggleton, D. Lin, and A. Tamaddoni-Nezhad. [Meta-interpretive learning of higher-order dyadic datalog: Predicate invention revisited](http://www.doc.ic.ac.uk/~shm/Papers/metagolD_MLJ.pdf). Machine Learning, 100(1):49-73, 2015.
-
-* S.H. Muggleton, D. Lin, N. Pahlavi, and A. Tamaddoni-Nezhad. [Meta-interpretive learning: application to grammatical inference](http://www.doc.ic.ac.uk/~shm/Papers/metagol_gram.pdf). Machine Learning, 94:25-49, 2014.
-
-* D. Lin, E. Dechter, K. Ellis, J.B. Tenenbaum, and S.H. Muggleton. [Bias reformulation for one-shot function induction](http://www.doc.ic.ac.uk/~shm/Papers/metabias.pdf). In Proceedings of the 23rd European Conference on Artificial Intelligence (ECAI 2014), pages 525-530, Amsterdam, 2014. IOS Press.
-
-* S.H. Muggleton, D. Lin, J. Chen, and A. Tamaddoni-Nezhad. [Metabayes: Bayesian meta-interpretative learning using higher-order stochastic refinement](http://www.doc.ic.ac.uk/~shm/Papers/metabayeslong07.pdf). In Gerson Zaverucha, Vitor Santos Costa, and Aline Marins Paes, editors, Proceedings of the 23rd International Conference on Inductive Logic Programming (ILP 2013), pages 1-17, Berlin, 2014. Springer-Verlag. LNAI 8812.
-
-*  S.H. Muggleton and D. Lin. [Meta-interpretive learning of higher-order dyadic datalog: Predicate invention revisited](http://www.doc.ic.ac.uk/~shm/Papers/metagol_d.pdf). In Proceedings of the 23rd International Joint Conference Artificial Intelligence (IJCAI 2013), pages 1551-1557, 2013.
