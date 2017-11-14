@@ -90,7 +90,7 @@ prove_aux(Atom-Path,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
 %% use existing abduction
 prove_aux(Atom-Path,FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     Atom=[P|Args],
-    length(Args,A),
+    size(Args,A),
     select_lower(P,A,FullSig,Sig1,Sig2),
     member(sub(Name,P,A,MetaSub),Prog1),
     user:metarule_init(Name,MetaSub,(Atom:-Body1),Recursive),
@@ -102,7 +102,7 @@ prove_aux(Atom-Path,FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
 prove_aux(Atom-Path,FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     N1 < MaxN,
     Atom=[P|Args],
-    length(Args,A),
+    size(Args,A),
     bind_lower(P,A,FullSig,Sig1,Sig2),
     user:metarule(Name,MetaSub,(Atom:-Body1),FullSig,Recursive),
     check_new_metasub(Name,P,A,MetaSub,Prog1),
@@ -144,6 +144,13 @@ check_new_metasub(Name,P,A,MetaSub,Prog):-
     last(MetaSub,X),
     when(nonvar(X),\+memberchk(sub(Name,P,A,MetaSub),Prog)).
 check_new_metasub(_Name,_P,_A,_MetaSub,_Prog).
+
+size([],0) :-!.
+size([_],1) :-!.
+size([_,_],2) :-!.
+size([_,_,_],3) :-!.
+size(L,N):- !,
+  length(L,N).
 
 nproveall([],_PS,_Prog):- !.
 nproveall([Atom|Atoms],PS,Prog):-
