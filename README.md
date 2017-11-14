@@ -1,10 +1,8 @@
-Metagol is an inductive logic programming (ILP) system based on the meta-interpretive learning framework. Please contact Andrew Cropper (a.cropper13@imperial.ac.uk) with any questions / bugs. If you use Metagol for research, please use [this citation](https://raw.githubusercontent.com/metagol/metagol/master/metagol.bib) or cite the relevant paper.
-
-
+Metagol is an inductive logic programming (ILP) system based on meta-interpretive learning. Please contact Andrew Cropper (andrew.cropper@gmail.com) with any questions / bugs. If you use Metagol for research, please use [this citation](https://raw.githubusercontent.com/metagol/metagol/master/metagol.bib) or cite the relevant paper.
 
 #### Using Metagol
 
-Metagol is written in Prolog and runs with both Yap and SWI. To use Metagol, consult the 'metagol.pl' file. The following code demonstrates learning the grandparent relation given the mother and father relations as background knowledge.
+Metagol is written in Prolog and runs with both Yap and SWI. The following code demonstrates learning the grandparent relation given the mother and father relations as background knowledge.
 
 ```prolog
 :- use_module('metagol').
@@ -42,8 +40,7 @@ a :-
   Neg = [
     grandparent(amy,amelia)
   ],
-  learn(Pos,Neg,Prog),
-  pprint(Prog).
+  learn(Pos,Neg).
 
 ```
 Running the above program will print the following output.
@@ -83,13 +80,14 @@ metarule([P,Q,R],([P,A,B]:-[[Q,A],[R,A,B]])). % precon
 metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,B]])). % postcon
 ```
 
+#### Recursion
+
 The above metarules are all non-recursive. By contrast, the following metarule is recursive.
 
 ```prolog
 metarule([P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]])).
 ```
-
-Recursive metarules can lead to infinite search spaces. To guarantee termination, users must define a total ordering over the terms, as follows:
+Recursive metarules can lead to infinite search spaces. Metagol comes with an inbuilt loop detection. However, should you wish to guarantee termination, you can define a total ordering over the terms, as follows:
 
 ```prolog
 metarule([P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])).
@@ -103,13 +101,11 @@ term_gt(A,B):-
   member(robot_position(BPos),B),
   APos < BPos.
 ```
-For more examples of learning with recursion see kinship2, sorter.pl, and strings2.pl examples.
-
-<!-- TODO METARULE CONSTRAINTS -->
+For more examples of learning with recursion see the find-duplicate, graph-reachability, kinship2, strings2, and strings3 examples.
 
 <!-- TODO Interpreted BK -->
 
-#### Sequential learning
+<!-- #### Sequential learning
 
 To learn a sequence of tasks use the following command.
 
@@ -126,7 +122,7 @@ learn_seq([T1,T2],H),
 pprint(H).
 ```
 
-In this approach, the solution to parent task (including its constituent predicates) is added to the background knowledge so that it can be used to solve the grandparent task.
+In this approach, the solution to parent task (including its constituent predicates) is added to the background knowledge so that it can be used to solve the grandparent task. -->
 
 #### Metagol settings
 
@@ -165,11 +161,11 @@ func_test(Atom,PS,G):-
 
 This func test is used in the robot examples. Here, the `Atom` variable is formed of a predicate symbol `P` and two states `A` and `B`, which represent initial and final state pairs respectively.  The func_test checks whether the learned hypothesis can be applied to the initial state to reach any state `Z` other that the expected final state `B`. For more examples of functional tests, see the robots.pl, sorter.pl, and strings2.pl files.
 
-By default, Metagol hides orderings when printing solutions. You can override this using the following flag.
+<!-- By default, Metagol hides orderings when printing solutions. You can override this using the following flag.
 
 ```prolog
 metagol:show_orderings. % default false
-```
+``` -->
 
 
 <!-- ```prolog
