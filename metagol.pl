@@ -78,7 +78,8 @@ prove_aux('@'(Atom)-_,_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-!,
 
 %% prove primitive atom
 prove_aux([P|Args]-_Path,_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-
-    (nonvar(P)-> (user:prim(P/_),!,user:primcall(P,Args)); user:primcall(P,Args)).
+    (nonvar(P)-> (user:prim(P/_),!); true),
+    user:primcall(P,Args).
 
 %% use interpreted BK
 prove_aux(Atom-Path,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
