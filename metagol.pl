@@ -253,20 +253,6 @@ assert_clause(Sub):-
   construct_clause(Sub,Clause),
   assert(user:Clause).
 
-list_to_set(List, Set) :-
- list_to_set_(List, Set0),
- Set = Set0.
-
-list_to_set_([], R) :-
- close_list(R).
-list_to_set_([H|T], R) :-
- memberchk(H, R), !,
- list_to_set_(T, R).
-
-close_list([]) :- !.
-close_list([_|T]) :-
- close_list(T).
-
 assert_prims(Prog):-
   findall(P/A,(member(sub(_Name,P,A,_MetaSub),Prog)),Prims),!,
   list_to_set(Prims,PrimSet),
