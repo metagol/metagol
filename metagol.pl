@@ -115,12 +115,6 @@ prove_aux(Atom-Path,FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     add_path_to_body(Body1,[Atom|Path],Body2),
     prove(Body2,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,MetaSub)|Prog1],Prog2).
 
-seen([],_) :- !,false.
-seen([H|_],A):-
-    H=A,!.
-seen([_|T],A):-
-    seen(T,A).
-
 add_empty_path(Atom,Atom-[]).
 
 add_path_to_body([],_Path,[]).
