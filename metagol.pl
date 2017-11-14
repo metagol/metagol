@@ -63,8 +63,9 @@ prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
     prove_deduce([Atom],FullSig,Prog1),!,
     is_functional([Atom],Sig,Prog1),
     prove_examples(Atoms,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2).
-prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
-    prove([Atom-[]],FullSig,Sig,MaxN,N1,N3,Prog1,Prog3),
+prove_examples([Atom1|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
+    add_empty_path(Atom1,Atom2),
+    prove([Atom2],FullSig,Sig,MaxN,N1,N3,Prog1,Prog3),
     prove_examples(Atoms,FullSig,Sig,MaxN,N3,N2,Prog3,Prog2).
 
 prove_deduce(Atoms1,Sig,Prog):-
@@ -73,28 +74,26 @@ prove_deduce(Atoms1,Sig,Prog):-
     prove(Atoms2,Sig,_,N,N,N,Prog,Prog).
 
 prove([],_FullSig,_Sig,_MaxN,N,N,Prog,Prog).
-prove([Atom-Path|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
-    prove_aux(Atom-Path,FullSig,Sig,MaxN,N1,N3,Prog1,Prog3),
+prove([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
+    prove_aux(Atom,FullSig,Sig,MaxN,N1,N3,Prog1,Prog3),
     prove(Atoms,FullSig,Sig,MaxN,N3,N2,Prog3,Prog2).
 
-prove_aux('@'(Atom)-_,_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-!,
+prove_aux('@'(Atom),_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-!,
     user:call(Atom).
 
 %% prove primitive atom
-prove_aux([P|Args]-_Path,_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-
+prove_aux(p(prim,P,_A,Args,_Atom,_Path),_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-
     (nonvar(P)-> (user:prim(P/_),!); true),
     user:primcall(P,Args).
 
-%% use interpreted BK
-prove_aux(Atom-Path,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
+%% use interpreted BK - can we skip this if no interpreted_bk?
+prove_aux(p(inv,_P,_A,_Args,Atom,Path),FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
     interpreted_bk(Atom,Body1),
     add_path_to_body(Body1,[Atom|Path],Body2),
     prove(Body2,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2).
 
 %% use existing abduction
-prove_aux(Atom-Path,FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
-    Atom=[P|Args],
-    size(Args,A),
+prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     select_lower(P,A,FullSig,Sig1,Sig2),
     member(sub(Name,P,A,MetaSub),Prog1),
     user:metarule_init(Name,MetaSub,(Atom:-Body1)),
@@ -103,10 +102,8 @@ prove_aux(Atom-Path,FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     prove(Body2,FullSig,Sig2,MaxN,N1,N2,Prog1,Prog2).
 
 %% new abduction
-prove_aux(Atom-Path,FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
+prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     N1 < MaxN,
-    Atom=[P|Args],
-    size(Args,A),
     bind_lower(P,A,FullSig,Sig1,Sig2),
     user:metarule(Name,MetaSub,(Atom:-Body1),FullSig),
     \+memberchk(Atom,Path),
@@ -115,10 +112,13 @@ prove_aux(Atom-Path,FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     add_path_to_body(Body1,[Atom|Path],Body2),
     prove(Body2,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,MetaSub)|Prog1],Prog2).
 
-add_empty_path(Atom,Atom-[]).
+add_empty_path([P|Args],p(inv,P,A,Args,[P|Args],[])):-
+    size(Args,A).
 
 add_path_to_body([],_Path,[]).
-add_path_to_body([Atom|Atoms],Path,[Atom-Path|Rest]):-
+add_path_to_body(['@'(Atom)|Atoms],Path,['@'(Atom)|Rest]):-
+    add_path_to_body(Atoms,Path,Rest).
+add_path_to_body([[P|Args]-A|Atoms],Path,[p(_,P,A,Args,[P|Args],Path)|Rest]):-
     add_path_to_body(Atoms,Path,Rest).
 
 select_lower(P,A,FullSig,_Sig1,Sig2):-
@@ -183,9 +183,10 @@ pprint_clause(Sub):-
 %% construct clause is horrible and needs refactoring
 construct_clause(sub(Name,_,_,MetaSub),Clause):-
     user:metarule_init(Name,MetaSub,ClauseAsList),
-    copy_term(ClauseAsList,(HeadList:-BodyAsList)),
+    copy_term(ClauseAsList,(HeadList:-BodyAsList1)),
+    maplist(remove_arity,BodyAsList1,BodyAsList2),
     atom_to_list(Head,HeadList),
-    (BodyAsList == [] ->Clause=Head;(pprint_list_to_clause(BodyAsList,Body),Clause = (Head:-Body))).
+    (BodyAsList2 == [] ->Clause=Head;(pprint_list_to_clause(BodyAsList2,Body),Clause = (Head:-Body))).
 
 pprint_list_to_clause(List1,Clause):-
     atomsaslists_to_atoms(List1,List2),
@@ -249,9 +250,18 @@ user:term_expansion((metarule(Name,MetaSub,Clause):-Body),Asserts):-
 user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
     get_asserts(Name,MetaSub,Clause,Body,PS,Asserts).
 
-get_asserts(Name,MetaSub,Clause,MetaBody,PS,[MRule,metarule_init(AssertName,MetaSub,Clause)]):-
+get_asserts(Name,MetaSub,Clause1,MetaBody,PS,[MRule,metarule_init(AssertName,MetaSub,Clause2)]):-
+    Clause1 = (Head:-Body1),
+    maplist(add_arity,Body1,Body2),
+    Clause2 = (Head:-Body2),
     (var(Name)->gen_metarule_id(AssertName);AssertName=Name),
-    (var(MetaBody) -> MRule = metarule(AssertName,MetaSub,Clause,PS); MRule = (metarule(AssertName,MetaSub,Clause,PS):-MetaBody)).
+    (var(MetaBody) -> MRule = metarule(AssertName,MetaSub,Clause2,PS); MRule = (metarule(AssertName,MetaSub,Clause2,PS):-MetaBody)).
+
+remove_arity('@'(Atom),'@'(Atom)).
+remove_arity(Atom-_,Atom).
+add_arity('@'(Atom),'@'(Atom)).
+add_arity([P|Args],[P|Args]-A):-
+    size(Args,A).
 
 assert_program(Prog):-
     maplist(assert_clause,Prog).
