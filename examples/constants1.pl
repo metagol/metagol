@@ -18,5 +18,4 @@ a :-
     p(3,4),
     p(3,1)
   ],
-  learn(Pos,Neg,Prog),
-  pprint(Prog).
+  learn(Pos,Neg).

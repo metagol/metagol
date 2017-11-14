@@ -25,23 +25,19 @@ func_test(Atom,PS,G):-
 %% robot learning to move a ball to a specific position
 a :-
   Pos = [f(world((1/1),(1/1),false),world((3/3),(3/3),false))],
-  learn(Pos,[],Prog),
-  pprint(Prog).
+  learn(Pos,[]).
 
 b :-
   Pos = [f(world((1/1),(1/1),false),world((5/5),(5/5),false))],
-  learn(Pos,[],Prog),
-  pprint(Prog).
+  learn(Pos,[]).
 
 c :-
   Pos = [f(world((1/1),(1/1),false),world((6/6),(6/6),false))],
-  learn(Pos,[],Prog),
-  pprint(Prog).
+  learn(Pos,[]).
 
 d :-
   Pos = [f(world((1/1),(1/1),false),world((7/7),(7/7),false))],
-  learn(Pos,[],Prog),
-  pprint(Prog).
+  learn(Pos,[]).
 
 %% background knowledge
 max_right(6).

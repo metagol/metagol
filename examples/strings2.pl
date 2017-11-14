@@ -1,10 +1,7 @@
 :- use_module('../metagol').
 
-%% background knowledge
-copy1([H|RestIn]/[H|RestOut],[H|RestIn]/RestOut).
-skip1([_|RestIn]/Out,RestIn/Out).
-write1(In/[H|RestOut],In/RestOut,H).
-next_empty([_]/_).
+%% metagol settings
+metagol:functional.
 
 %% tell metagol to use the BK
 prim(copy1/2).
@@ -17,11 +14,13 @@ metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 metarule([P,Q,R],([P,A,B]:-[[Q,A],[R,A,B]])).
 metarule([P,Q,X],([P,A,B]:-[[Q,A,B,X]])).
 metarule([P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])).
-
 %% SEE STRINGS3 FOR AN EXAMPLE WITHOUT AN ORDERING CONSTRAINT
 
-%% force functional
-metagol:functional.
+%% background knowledge
+copy1([H|RestIn]/[H|RestOut],[H|RestIn]/RestOut).
+skip1([_|RestIn]/Out,RestIn/Out).
+write1(In/[H|RestOut],In/RestOut,H).
+next_empty([_]/_).
 
 func_test(Atom,PS,G):-
   Atom = [P,In/B,_/[]],
@@ -42,5 +41,4 @@ a :-
     f(['a','a','c']/['a','a','c','d'],_/[]),
     f(['a','c']/['a','c','d'],_/[])
   ],
-  learn(Pos,[],Prog),
-  pprint(Prog).
+  learn(Pos,[]).

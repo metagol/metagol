@@ -1,5 +1,13 @@
 :- use_module('../metagol').
 
+%% tell metagol to use the BK
+prim(mother/2).
+prim(father/2).
+
+%% metarules
+metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
+metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
+
 %% background knowledge
 mother(ann,amy).
 mother(ann,andy).
@@ -10,13 +18,6 @@ father(steve,andy).
 father(gavin,amelia).
 father(andy,spongebob).
 
-%% tell metagol to use the BK
-prim(mother/2).
-prim(father/2).
-
-%% metarules
-metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
-metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
 %% learn grandparent by inventing parent
 a :-
@@ -27,18 +28,11 @@ a :-
     grandparent(steve,spongebob),
     grandparent(linda,amelia)
   ],
-  Neg = [
-    grandparent(amy,amelia)
-  ],
-  learn(Pos,Neg,Prog),
-  pprint(Prog).
+  Neg = [grandparent(amy,amelia)],
+  learn(Pos,Neg).
 
 %% example of a failure
 b :-
-  Pos = [
-    grandparent(ann,amelia)
-  ],
-  Neg = [
-    grandparent(ann,amelia)
-  ],
-  (learn(Pos,Neg,_Prog) -> false; writeln('failed to learn a theory')).
+  Pos = [grandparent(ann,amelia)],
+  Neg = [grandparent(ann,amelia)],
+  (learn(Pos,Neg) -> false; writeln('failed to learn a theory')).

@@ -1,28 +1,32 @@
 :- use_module('../metagol').
 
+%% metagol settings
 metagol:functional.
 metagol:max_clauses(4).
 
-metarule(dident,[P,Q,R],([P,A,B]:-[[Q,A,B],[R,A,B]])):-freeze(Q,freeze(R,Q\=R)).
-metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
-metarule(tailrec,[P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]])).
-
+%% tell metagol to use the BK
 prim(mergesort/2).
 prim(tail/2).
 prim(head/2).
 prim(element/2).
 
-mergesort([H|T],B):-
-    A=[H|T],
-    msort(A,B),
-    A\=B.
+%% metarules
+metarule(dident,[P,Q,R],([P,A,B]:-[[Q,A,B],[R,A,B]])).
+metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
+metarule(tailrec,[P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]])).
 
+%% background knowledge
 head([H|_],H).
 tail([_|T],T).
 element([X|_T],X).
 element([_|T],X):-element(T,X).
+mergesort([H|T],B):-A=[H|T],msort(A,B),A\=B.
 
-%% background knowledge
+%% functional test
+func_test(Atom,PS,G):-
+  Atom = [P,A,B],
+  Actual = [P,A,Z],
+  \+ (metagol :prove_deduce([Actual],PS,G),Z \= B).
 
 a :-
     Pos = [
@@ -32,10 +36,4 @@ a :-
         f([6,5,7,8,4,2,1,3,7],7),
         f([14,4,13,6,12,1,9,2,10,8,15,5,7,14,3,11],14)
     ],
-    learn(Pos,[],Prog),
-    pprint(Prog).
-
-func_test(Atom,PS,G):-
-  Atom = [P,A,B],
-  Actual = [P,A,Z],
-  \+ (metagol :prove_deduce([Actual],PS,G),Z \= B).
+    learn(Pos,[]).

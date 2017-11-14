@@ -2,13 +2,11 @@
 %% A. Cropper and S.H. Muggleton. Learning efficient logical robot strategies involving composable objects. In Proceedings of the 24th International Joint Conference Artificial Intelligence (IJCAI 2015), pages 3423-3429. IJCAI, 2015.
 
 :- use_module('../metagol').
-
 :- dynamic(energy_bound/1).
-
 :- use_module(library(random)).
 :- use_module(library(system)).
 
-%% METAGOL SETTINGS
+%% metagol settings
 metagol:max_clauses(4).
 
 %% tell metagol to use the BK
@@ -19,6 +17,7 @@ prim(pick_up_left/2).
 prim(split/2).
 prim(combine/2).
 
+%% metarules
 metarule(tailrec,[P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])).
 metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 

@@ -1,6 +1,6 @@
 %% This is a copyrighted file under the BSD 3-clause licence, details of which can be found in the root directory.
 
-:- module(metagol,[learn/3,learn_seq/2,pprint/1,op(950,fx,'@')]).
+:- module(metagol,[learn/2,learn/3,learn_seq/2,pprint/1,op(950,fx,'@')]).
 
 :- user:use_module(library(lists)).
 
@@ -30,6 +30,10 @@ default(max_clauses(6)).
 default(metarule_next_id(1)).
 default(max_inv_preds(10)).
 
+learn(Pos1,Neg1):-
+    learn(Pos1,Neg1,Prog),
+    pprint(Prog).
+
 learn(Pos1,Neg1,Prog):-
     maplist(atom_to_list,Pos1,Pos2),
     maplist(atom_to_list,Neg1,Neg2),
@@ -56,8 +60,8 @@ proveall(Atoms,Sig,Prog):-
 
 prove_examples([],_FullSig,_Sig,_MaxN,N,N,Prog,Prog).
 prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
-    prove_deduce([Atom],FullSig,Prog1),
-    is_functional([Atom],Sig,Prog1),!,
+    prove_deduce([Atom],FullSig,Prog1),!,
+    is_functional([Atom],Sig,Prog1),
     prove_examples(Atoms,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2).
 prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
     prove([Atom-[]],FullSig,Sig,MaxN,N1,N3,Prog1,Prog3),
