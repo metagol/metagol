@@ -176,7 +176,7 @@ pprint_clause(Sub):-
 %% construct clause is horrible and needs refactoring
 construct_clause(sub(Name,_,_,MetaSub),Clause):-
     user:metarule_init(Name,MetaSub,(HeadList:-BodyAsList1),_,_),
-    remove_path_to_body(BodyAsList2,_,BodyAsList1),
+    add_path_to_body(BodyAsList2,_,BodyAsList1),
     atom_to_list(Head,HeadList),
     (BodyAsList2 == [] ->Clause=Head;(pprint_list_to_clause(BodyAsList2,Body),Clause = (Head:-Body))).
 
@@ -265,12 +265,6 @@ is_recursive([[Q|_]|_],P,true):-
     Q==P,!.
 is_recursive([_|T],P,Res):-
     is_recursive(T,P,Res).
-
-remove_path_to_body([],_Path,[]).
-remove_path_to_body(['@'(Atom)|Atoms],Path,['@'(Atom)|Rest]):-
-    remove_path_to_body(Atoms,Path,Rest).
-remove_path_to_body([[P|Args]|Atoms],Path,[p(_,P,_A,Args,[P|Args],Path)|Rest]):-
-    remove_path_to_body(Atoms,Path,Rest).
 
 add_path_to_body([],_Path,[]).
 add_path_to_body(['@'(Atom)|Atoms],Path,['@'(Atom)|Rest]):-
