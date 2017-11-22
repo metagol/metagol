@@ -20,8 +20,8 @@
     user:primcall/2.
 
 :- discontiguous
-    user:metarule/6,
-    user:metarule_init/5,
+    user:metarule/7,
+    user:metarule_init/6,
     user:prim/1,
     user:primcall/2.
 
@@ -82,34 +82,33 @@ prove_aux('@'(Atom),_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-!,
     user:call(Atom).
 
 %% prove primitive atom
-prove_aux(p(prim,P,_A,Args,_Atom,_Path),_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-
-    (nonvar(P)-> (user:prim(P/_),!); true),
+prove_aux(p(prim,P,_A,Args,_,_Path),_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-
     user:primcall(P,Args).
 
 %% use interpreted BK - can we skip this if no interpreted_bk?
 %% only works if interpreted/2 is below the corresponding definition
 prove_aux(p(inv,_P,_A,_Args,Atom,Path),FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
     interpreted_bk(Atom,Body1),
-    add_path_to_body(Body1,[Atom|Path],Body2),
+    add_path_to_body(Body1,[Atom|Path],Body2,_),
     prove(Body2,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2).
 
 %% use existing abduction
 prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     select_lower(P,A,FullSig,Sig1,Sig2),
-    member(sub(Name,P,A,MetaSub),Prog1),
-    user:metarule_init(Name,MetaSub,(Atom:-Body1),Recursive,[Atom|Path]),
+    member(sub(Name,P,A,MetaSub,PredTypes),Prog1),
+    user:metarule_init(Name,MetaSub,PredTypes,(Atom:-Body1),Recursive,[Atom|Path]),
     (Recursive==true -> \+memberchk(Atom,Path); true),
     prove(Body1,FullSig,Sig2,MaxN,N1,N2,Prog1,Prog2).
 
 %% new abduction
 prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
-    N1 < MaxN,
+    (N1 == MaxN -> fail; true),
     bind_lower(P,A,FullSig,Sig1,Sig2),
-    user:metarule(Name,MetaSub,(Atom:-Body1),FullSig,Recursive,[Atom|Path]),
+    user:metarule(Name,MetaSub,PredTypes,(Atom:-Body1),FullSig,Recursive,[Atom|Path]),
     (Recursive==true -> \+memberchk(Atom,Path); true),
     check_new_metasub(Name,P,A,MetaSub,Prog1),
     succ(N1,N3),
-    prove(Body1,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,MetaSub)|Prog1],Prog2).
+    prove(Body1,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,MetaSub,PredTypes)|Prog1],Prog2).
 
 add_empty_path([P|Args],p(inv,P,A,Args,[P|Args],[])):-
     size(Args,A).
@@ -131,9 +130,9 @@ bind_lower(P,A,_FullSig,Sig1,Sig2):-
     (var(U)-> U = 1,!;true).
 
 check_new_metasub(Name,P,A,MetaSub,Prog):-
-    memberchk(sub(Name,P,A,_),Prog),!,
+    memberchk(sub(Name,P,A,_,_),Prog),!,
     last(MetaSub,X),
-    when(nonvar(X),\+memberchk(sub(Name,P,A,MetaSub),Prog)).
+    when(nonvar(X),\+memberchk(sub(Name,P,A,MetaSub,_),Prog)).
 check_new_metasub(_Name,_P,_A,_MetaSub,_Prog).
 
 size([],0) :-!.
@@ -174,9 +173,9 @@ pprint_clause(Sub):-
     format('~q.~n',[Clause]).
 
 %% construct clause is horrible and needs refactoring
-construct_clause(sub(Name,_,_,MetaSub),Clause):-
-    user:metarule_init(Name,MetaSub,(HeadList:-BodyAsList1),_,_),
-    add_path_to_body(BodyAsList2,_,BodyAsList1),
+construct_clause(sub(Name,_,_,MetaSub,_),Clause):-
+    user:metarule_init(Name,MetaSub,_,(HeadList:-BodyAsList1),_,_),
+    add_path_to_body(BodyAsList2,_,BodyAsList1,_),
     atom_to_list(Head,HeadList),
     (BodyAsList2 == [] ->Clause=Head;(pprint_list_to_clause(BodyAsList2,Body),Clause = (Head:-Body))).
 
@@ -249,16 +248,16 @@ user:term_expansion((metarule(Name,MetaSub,Clause):-Body),Asserts):-
 user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
     get_asserts(Name,MetaSub,Clause,Body,PS,Asserts).
 
-get_asserts(Name,MetaSub,Clause1,MetaBody,PS,[MRule,metarule_init(AssertName,MetaSub,Clause2,Recursive,Path)]):-
+get_asserts(Name,MetaSub,Clause1,MetaBody,PS,[MRule,metarule_init(AssertName,MetaSub,PredTypes,Clause2,Recursive,Path)]):-
     Clause1 = (Head:-Body1),
     Head = [P|_],
     is_recursive(Body1,P,Recursive),
-    add_path_to_body(Body1,Path,Body3),
+    add_path_to_body(Body1,Path,Body3,PredTypes),
     Clause2 = (Head:-Body3),
     (var(Name)->gen_metarule_id(AssertName);AssertName=Name),
     (var(MetaBody) ->
-        MRule = metarule(AssertName,MetaSub,Clause2,PS,Recursive,Path);
-        MRule = (metarule(AssertName,MetaSub,Clause2,PS,Recursive,Path):-MetaBody)).
+        MRule = metarule(AssertName,MetaSub,PredTypes,Clause2,PS,Recursive,Path);
+        MRule = (metarule(AssertName,MetaSub,PredTypes,Clause2,PS,Recursive,Path):-MetaBody)).
 
 is_recursive([],_,false).
 is_recursive([[Q|_]|_],P,true):-
@@ -266,12 +265,12 @@ is_recursive([[Q|_]|_],P,true):-
 is_recursive([_|T],P,Res):-
     is_recursive(T,P,Res).
 
-add_path_to_body([],_Path,[]).
-add_path_to_body(['@'(Atom)|Atoms],Path,['@'(Atom)|Rest]):-
-    add_path_to_body(Atoms,Path,Rest).
-add_path_to_body([[P|Args]|Atoms],Path,[p(_,P,A,Args,[P|Args],Path)|Rest]):-
+add_path_to_body([],_Path,[],[]).
+add_path_to_body(['@'(Atom)|Atoms],Path,['@'(Atom)|Rest],Out):-
+    add_path_to_body(Atoms,Path,Rest,Out).
+add_path_to_body([[P|Args]|Atoms],Path,[p(PType,P,A,Args,[P|Args],Path)|Rest],[PType|Out]):-
     size(Args,A),
-    add_path_to_body(Atoms,Path,Rest).
+    add_path_to_body(Atoms,Path,Rest,Out).
 
 assert_program(Prog):-
     maplist(assert_clause,Prog).
