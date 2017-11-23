@@ -87,7 +87,7 @@ The above metarules are all non-recursive. By contrast, this metarule is recursi
 ```prolog
 metarule([P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]])).
 ```
-Recursive metarules can lead to infinite search spaces. Metagol comes with an inbuilt loop detection. However, should you wish to guarantee termination, you can define a total ordering over the terms:
+<!-- Recursive metarules can lead to infinite search spaces. Metagol comes with an inbuilt loop detection. However, should you wish to guarantee termination, you can define a total ordering over the terms:
 
 ```prolog
 metarule([P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])).
@@ -101,7 +101,7 @@ term_gt(A,B):-
   member(robot_position(BPos),B),
   APos < BPos.
 ```
-For more examples of learning with recursion see the find-duplicate, graph-reachability, kinship2, strings2, and strings3 examples.
+For more examples of learning with recursion see the find-duplicate, graph-reachability, kinship2, strings2, and strings3 examples. -->
 
 <!-- TODO Interpreted BK -->
 
@@ -126,23 +126,21 @@ In this approach, the solution to parent task (including its constituent predica
 
 #### Metagol settings
 
-The following settings are all optional.
+<!-- The following settings are all optional. -->
 
-Metagol searches for a hypothesis using iterative deepening on the number of clauses in the solution. The starting depth can be adjusted as follows:
-
-```prolog
+Metagol searches for a hypothesis using iterative deepening on the number of clauses in the solution. You can specify a maximum number of clauses:
+<!-- The starting depth can be adjusted as follows: -->
+<!-- ```prolog
 metagol:min_clauses(Integer). % default 1
-```
-You can specify a maximum number of clauses:
-
+``` -->
 ```prolog
 metagol:max_clauses(Integer). % default 10
 ```
 
-You can specify a maximum number of invented predicates:
+<!-- You can specify a maximum number of invented predicates:
 
 ```prolog
-metagol:max_inv_preds(Integer). % default 10
+metagol:max_inv_preds(Integer). % default 10 -->
 ```
 
 The following flag denotes whether the learned theory should be functional:
