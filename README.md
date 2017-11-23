@@ -87,60 +87,14 @@ The above metarules are all non-recursive. By contrast, this metarule is recursi
 ```prolog
 metarule([P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]])).
 ```
-<!-- Recursive metarules can lead to infinite search spaces. Metagol comes with an inbuilt loop detection. However, should you wish to guarantee termination, you can define a total ordering over the terms:
-
-```prolog
-metarule([P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])).
-```
-
-The atoms `@term_gt(A,C)` and `@term_gt(C,B)` must be supplied by the user. For instance, suppose you are learning robot strategies for a robot in a one-dimensional space where each term is a world state (a list of Prolog facts). Then the following ordering ensures that the robot always moves at least one place to the right. Because the space is finite, termination is guaranteed:
-
-```prolog
-term_gt(A,B):-
-  member(robot_position(APos),A),
-  member(robot_position(BPos),B),
-  APos < BPos.
-```
-For more examples of learning with recursion see the find-duplicate, graph-reachability, kinship2, strings2, and strings3 examples. -->
-
-<!-- TODO Interpreted BK -->
-
-<!-- #### Sequential learning
-
-To learn a sequence of tasks use the following command.
-
-```prolog
-T1 = [
-  parent(ann,andy),
-  parent(steve,andy),
-  parent(ann,amy)]/[],
-T2 = [
-  grandparent(ann,amelia),
-  grandparent(steve,amelia)
-  ]/[],
-learn_seq([T1,T2],H),
-pprint(H).
-```
-
-In this approach, the solution to parent task (including its constituent predicates) is added to the background knowledge so that it can be used to solve the grandparent task. -->
 
 #### Metagol settings
 
-<!-- The following settings are all optional. -->
 
 Metagol searches for a hypothesis using iterative deepening on the number of clauses in the solution. You can specify a maximum number of clauses:
-<!-- The starting depth can be adjusted as follows: -->
-<!-- ```prolog
-metagol:min_clauses(Integer). % default 1
-``` -->
+
 ```prolog
 metagol:max_clauses(Integer). % default 10
-```
-
-<!-- You can specify a maximum number of invented predicates:
-
-```prolog
-metagol:max_inv_preds(Integer). % default 10 -->
 ```
 
 The following flag denotes whether the learned theory should be functional:
@@ -158,22 +112,3 @@ func_test(Atom,PS,G):-
 ```
 
 This func test is used in the robot examples. Here, the `Atom` variable is formed of a predicate symbol `P` and two states `A` and `B`, which represent initial and final state pairs respectively.  The func_test checks whether the learned hypothesis can be applied to the initial state to reach any state `Z` other that the expected final state `B`. For more examples of functional tests, see the robots.pl, sorter.pl, and strings2.pl files.
-
-<!-- By default, Metagol hides orderings when printing solutions. You can override this using the following flag.
-
-```prolog
-metagol:show_orderings. % default false
-``` -->
-
-
-<!-- ```prolog
-metagol:limit_recursion. % default false
-```
-
-(TODO) THIS IS NOT YET WORKING IN THE BETA VERSION
-
-```prolog
-metagol:fold_theory. % default false
-```
-
-(TODO) THIS IS NOT YET WORKING IN THE BETA VERSION -->
