@@ -280,7 +280,7 @@ assert_clause(Sub):-
     assert(user:Clause).
 
 assert_prims(Prog):-
-    findall(P/A,(member(sub(_Name,P,A,_MetaSub),Prog)),Prims),!,
+    findall(P/A,(member(sub(_Name,P,A,_MetaSub,_PredTypes),Prog)),Prims),!,
     list_to_set(Prims,PrimSet),
     maplist(assert_prim,PrimSet).
 
