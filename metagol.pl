@@ -10,6 +10,7 @@
 
 :- dynamic
     functional/0,
+    fold_program/0,
     print_ordering/0,
     min_clauses/1,
     max_clauses/1,
@@ -165,31 +166,25 @@ pprint(Prog1):-
     map_list_to_pairs(arg(2),Prog1,Pairs),
     keysort(Pairs,Sorted),
     pairs_values(Sorted,Prog2),
-    maplist(pprint_clause,Prog2).
+    maplist(metasub_to_clause_list,Prog2,Prog3),
+    (get_option(fold_program) -> fold_program(Prog3,Prog4); Prog3=Prog4),
+    maplist(clause_list_to_clause,Prog4,Prog5),
+    maplist(pprint_clause,Prog5).
 
-pprint_clause(Sub):-
-    construct_clause(Sub,Clause),
+pprint_clause(Clause):-
     numbervars(Clause,0,_),
     format('~q.~n',[Clause]).
 
+clause_list_to_clause([H|B1],Clause):-
+    list_to_atom(H,Head),
+    maplist(list_to_atom,B1,B2),
+    list_to_clause(B2,B3),
+    (B3 == [] ->Clause=Head;Clause = (Head:-B3)).
+
 %% construct clause is horrible and needs refactoring
-construct_clause(sub(Name,_,_,MetaSub,_),Clause):-
+metasub_to_clause_list(sub(Name,_,_,MetaSub,_),[HeadList|BodyAsList2]):-
     user:metarule_init(Name,MetaSub,_,(HeadList:-BodyAsList1),_,_),
-    add_path_to_body(BodyAsList2,_,BodyAsList1,_),
-    atom_to_list(Head,HeadList),
-    (BodyAsList2 == [] ->Clause=Head;(pprint_list_to_clause(BodyAsList2,Body),Clause = (Head:-Body))).
-
-pprint_list_to_clause(List1,Clause):-
-    atomsaslists_to_atoms(List1,List2),
-    list_to_clause(List2,Clause).
-
-atomsaslists_to_atoms([],[]).
-atomsaslists_to_atoms(['@'(Atom)|T1],Out):- !,
-    (get_option(print_ordering) -> Out=[Atom|T2]; Out=T2),
-    atomsaslists_to_atoms(T1,T2).
-atomsaslists_to_atoms([AtomAsList|T1],[Atom|T2]):-
-    atom_to_list(Atom,AtomAsList),
-    atomsaslists_to_atoms(T1,T2).
+    add_path_to_body(BodyAsList2,_,BodyAsList1,_).
 
 list_to_clause([Atom],Atom):-!.
 list_to_clause([Atom|T1],(Atom,T2)):-!,
@@ -301,3 +296,25 @@ ho_atom_to_list(Atom,T):-
     AtomList = [call|T],!.
 ho_atom_to_list(Atom,AtomList):-
     Atom=..AtomList.
+
+unique_body_pred([[P|_]|B1],Q):-
+    select([Q|_],B1,B2),
+    P\=Q,
+    \+ memberchk([Q|_],B2).
+unique_head_pred([[P|_]|B],P):-
+    \+ memberchk([P|_],B).
+
+fold_clause(C1,[[P|Args]|C2],P,D):-
+    append(Pre,[[P|Args]|Post],C1),
+    append(Pre,C2,C_),
+    append(C_,Post,D).
+
+fold_program(Prog1,Prog2):-
+    select(C1,Prog1,Prog3),
+    unique_body_pred(C1,P),
+    select(C2,Prog3,Prog4),
+    unique_head_pred(C2,P),
+    \+ (member(C3,Prog4),unique_body_pred(C3,P)),
+    fold_clause(C1,C2,P,D),
+    fold_program([D|Prog4],Prog2).
+fold_program(Prog,Prog).

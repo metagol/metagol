@@ -2,6 +2,7 @@
 
 %% metagol settings
 metagol:functional.
+metagol:fold_program.
 metagol:max_clauses(4).
 
 %% tell metagol to use the BK

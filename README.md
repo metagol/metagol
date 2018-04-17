@@ -97,6 +97,25 @@ Metagol searches for a hypothesis using iterative deepening on the number of cla
 metagol:max_clauses(Integer). % default 10
 ```
 
+The following flag denotes whether the learned program should be folded (i.e. remove unnecessary invented predicates):
+
+```prolog
+metagol:folded. % default false
+```
+
+For instance, with the flag set to false, Metagol would learn this great-grandmother theory:
+
+```prolog
+ggmother(A,B):-mother(A,C),ggmother_1(C,B).
+ggmother_1(A,B):-mother(A,C),mother(C,B).
+```
+
+With the flag set to true, Metagol would learn this great-grandmother theory:
+
+```prolog
+ggparent(A,B):-mother(A,C),mother(C,D),mother(D,B).
+```
+
 The following flag denotes whether the learned theory should be functional:
 
 ```prolog
