@@ -177,9 +177,11 @@ pprint_clause(Clause):-
 
 clause_list_to_clause([H|B1],Clause):-
     list_to_atom(H,Head),
-    maplist(list_to_atom,B1,B2),
-    list_to_clause(B2,B3),
-    (B3 == [] ->Clause=Head;Clause = (Head:-B3)).
+    (B1 = [] ->Clause=Head;(
+        maplist(list_to_atom,B1,B2),
+        list_to_clause(B2,B3),
+        Clause = (Head:-B3))).
+
 
 %% construct clause is horrible and needs refactoring
 metasub_to_clause_list(sub(Name,_,_,MetaSub,_),[HeadList|BodyAsList2]):-
