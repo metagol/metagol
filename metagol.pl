@@ -10,7 +10,7 @@
 
 :- dynamic
     functional/0,
-    fold_program/0,
+    unfold_program/0,
     print_ordering/0,
     min_clauses/1,
     max_clauses/1,
@@ -167,7 +167,7 @@ pprint(Prog1):-
     keysort(Pairs,Sorted),
     pairs_values(Sorted,Prog2),
     maplist(metasub_to_clause_list,Prog2,Prog3),
-    (get_option(fold_program) -> fold_program(Prog3,Prog4); Prog3=Prog4),
+    (get_option(unfold_program) -> unfold_program(Prog3,Prog4); Prog3=Prog4),
     maplist(clause_list_to_clause,Prog4,Prog5),
     maplist(pprint_clause,Prog5).
 
@@ -306,17 +306,37 @@ unique_body_pred([[P|_]|B1],Q):-
 unique_head_pred([[P|_]|B],P):-
     \+ memberchk([P|_],B).
 
-fold_clause(C1,[[P|Args]|C2],P,D):-
+unfold_clause(C1,[[P|Args]|C2],P,D):-
     append(Pre,[[P|Args]|Post],C1),
     append(Pre,C2,C_),
     append(C_,Post,D).
 
-fold_program(Prog1,Prog2):-
+head([H|_],H).
+head_pred([[P|_]|_],P).
+body_preds([_|T],Ps):-
+    findall(P,(member(X,T),head(X,P)),Ps).
+
+does_not_appear_twice(P,Prog):-
+    findall(Q,(
+        member(C,Prog),
+        body_preds(C,Cs),
+        member(Q,Cs)),Qs1),
+    select(P,Qs1,Qs2),
+    \+ member(P,Qs2).
+
+
+unfold_program(Prog1,Prog2):-
     select(C1,Prog1,Prog3),
-    unique_body_pred(C1,P),
+    head_pred(C1,P),
+    % check that the head pred does not appear in a head elsewhere in the program
+    \+ (member(X,Prog3),head_pred(X,P)),
+    % check that the head pred does not appear in the body
+    \+ (body_preds(C1,Ps),member(P,Ps)),
+    % check that that head pred does not appear twice in the program
+    does_not_appear_twice(P,Prog3),
     select(C2,Prog3,Prog4),
-    unique_head_pred(C2,P),
-    \+ (member(C3,Prog4),unique_body_pred(C3,P)),
-    fold_clause(C1,C2,P,D),
-    fold_program([D|Prog4],Prog2).
-fold_program(Prog,Prog).
+    body_preds(C2,C2Body),
+    member(P,C2Body),
+    unfold_clause(C2,C1,P,D),
+    unfold_program([D|Prog4],Prog2).
+unfold_program(Prog,Prog):-!.
