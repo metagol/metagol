@@ -273,7 +273,8 @@ assert_program(Prog):-
     maplist(assert_clause,Prog).
 
 assert_clause(Sub):-
-    construct_clause(Sub,Clause),
+    metasub_to_clause_list(Sub,ClauseAsList),
+    clause_list_to_clause(ClauseAsList,Clause),
     assert(user:Clause).
 
 assert_prims(Prog):-
