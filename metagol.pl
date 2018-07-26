@@ -168,8 +168,15 @@ pprint(Prog1):-
     pairs_values(Sorted,Prog2),
     maplist(metasub_to_clause_list,Prog2,Prog3),
     (get_option(unfold_program) -> unfold_program(Prog3,Prog4); Prog3=Prog4),
-    maplist(clause_list_to_clause,Prog4,Prog5),
-    maplist(pprint_clause,Prog5).
+    maplist(remove_orderings,Prog4,Prog5),
+    maplist(clause_list_to_clause,Prog5,Prog6),
+    maplist(pprint_clause,Prog6).
+
+remove_orderings([],[]).
+remove_orderings(['@'(_H)|T],Out):-!,
+    remove_orderings(T,Out).
+remove_orderings([H|T],[H|Out]):-
+    remove_orderings(T,Out).
 
 pprint_clause(Clause):-
     numbervars(Clause,0,_),
