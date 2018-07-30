@@ -37,8 +37,7 @@ learn(Pos1,Neg1,Prog):-
     maplist(atom_to_list,Pos1,Pos2),
     maplist(atom_to_list,Neg1,Neg2),
     proveall(Pos2,Sig,Prog),
-    nproveall(Neg2,Sig,Prog),
-    is_functional(Pos2,Sig,Prog).
+    nproveall(Neg2,Sig,Prog).
 
 learn_seq(Seq,Prog):-
     maplist(learn_task,Seq,Progs),
@@ -65,11 +64,12 @@ assert_sig(Sig):-
 prove_examples([],_FullSig,_Sig,_MaxN,N,N,Prog,Prog).
 prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
     prove_deduce([Atom],FullSig,Prog1),!,
-    is_functional([Atom],Sig,Prog1),
+    %% is_functional([Atom],Sig,Prog1),
     prove_examples(Atoms,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2).
 prove_examples([Atom1|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
     add_empty_path(Atom1,Atom2),
     prove([Atom2],FullSig,Sig,MaxN,N1,N3,Prog1,Prog3),
+    is_functional([Atom1],Sig,Prog3),
     prove_examples(Atoms,FullSig,Sig,MaxN,N3,N2,Prog3,Prog2).
 
 prove_deduce(Atoms1,Sig,Prog):-
@@ -183,7 +183,6 @@ clause_list_to_clause([H|B1],Clause):-
         maplist(list_to_atom,B1,B2),
         list_to_clause(B2,B3),
         Clause = (Head:-B3))).
-
 
 %% construct clause is horrible and needs refactoring
 metasub_to_clause_list(sub(Name,_,_,MetaSub,_),[HeadList|BodyAsList2]):-
