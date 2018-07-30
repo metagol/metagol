@@ -55,7 +55,12 @@ proveall(Atoms,Sig,Prog):-
     iterator(MaxN),
     format('% clauses: ~d\n',[MaxN]),
     invented_symbols(MaxN,P/A,Sig),
+    assert_sig(Sig),
     prove_examples(Atoms,Sig,_Sig,MaxN,0,_N,[],Prog).
+
+assert_sig(Sig):-
+    retractall(lower_sig(_,_,_)),
+    forall(append(_,[sym(P,A,_)|LowerSig],Sig),assert(lower_sig(P,A,LowerSig))).
 
 prove_examples([],_FullSig,_Sig,_MaxN,N,N,Prog,Prog).
 prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
@@ -93,7 +98,7 @@ prove_aux(p(inv,_P,_A,_Args,Atom,Path),FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
 
 %% use existing abduction
 prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
-    select_lower(P,A,FullSig,Sig1,Sig2),
+    (nonvar(P) -> lower_sig(P,A,Sig2); select_lower(P,A,Sig1,Sig2)),
     member(sub(Name,P,A,MetaSub,PredTypes),Prog1),
     user:metarule_init(Name,MetaSub,PredTypes,(Atom:-Body1),Recursive,[Atom|Path]),
     (Recursive==true -> \+memberchk(Atom,Path); true),
@@ -102,7 +107,7 @@ prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
 %% new abduction
 prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     (N1 == MaxN -> fail; true),
-    bind_lower(P,A,FullSig,Sig1,Sig2),
+    (nonvar(P) -> lower_sig(P,A,Sig2); bind_lower(P,A,Sig1,Sig2)),
     user:metarule(Name,MetaSub,PredTypes,(Atom:-Body1),FullSig,Recursive,[Atom|Path]),
     (Recursive==true -> \+memberchk(Atom,Path); true),
     check_new_metasub(Name,P,A,MetaSub,Prog1),
@@ -112,19 +117,11 @@ prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
 add_empty_path([P|Args],p(inv,P,A,Args,[P|Args],[])):-
     size(Args,A).
 
-select_lower(P,A,FullSig,_Sig1,Sig2):-
-    nonvar(P),!,
-    append(_,[sym(P,A,_)|Sig2],FullSig),!.
-
-select_lower(P,A,_FullSig,Sig1,Sig2):-
+select_lower(P,A,Sig1,Sig2):-
     append(_,[sym(P,A,U)|Sig2],Sig1),
     (var(U)-> !,fail;true ).
 
-bind_lower(P,A,FullSig,_Sig1,Sig2):-
-    nonvar(P),!,
-    append(_,[sym(P,A,_)|Sig2],FullSig),!.
-
-bind_lower(P,A,_FullSig,Sig1,Sig2):-
+bind_lower(P,A,Sig1,Sig2):-
     append(_,[sym(P,A,U)|Sig2],Sig1),
     (var(U)-> U = 1,!;true).
 
@@ -335,7 +332,6 @@ does_not_appear_twice(P,Prog):-
         member(Q,Cs)),Qs1),
     select(P,Qs1,Qs2),
     \+ member(P,Qs2).
-
 
 unfold_program(Prog1,Prog2):-
     select(C1,Prog1,Prog3),
