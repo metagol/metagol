@@ -46,7 +46,7 @@ learn_seq(Seq,Prog):-
 learn_task(Pos/Neg,Prog):-
     learn(Pos,Neg,Prog),!,
     maplist(assert_clause,Prog),
-    assert_prims(Prog).
+    assert_prog_prims(Prog).
 
 proveall(Atoms,Sig,Prog):-
     target_predicate(Atoms,P/A),
@@ -270,15 +270,28 @@ add_path_to_body([[P|Args]|Atoms],Path,[p(PType,P,A,Args,[P|Args],Path)|Rest],[P
     size(Args,A),
     add_path_to_body(Atoms,Path,Rest,Out).
 
-assert_program(Prog):-
+clause_to_list((Atom,T1),[Atom|T2]):-
+    clause_to_list(T1,T2).
+clause_to_list(Atom,[Atom]):- !.
+
+ho_atom_to_list(Atom,T):-
+    Atom=..AtomList,
+    AtomList = [call|T],!.
+ho_atom_to_list(Atom,AtomList):-
+    Atom=..AtomList.
+
+%% CODE TO ASSERT AND RETRACT PRIMS AND PROGRAMS
+
+assert_prog(Prog):-
     maplist(assert_clause,Prog).
 
+%% user could call this many times on the same clause
 assert_clause(Sub):-
     metasub_to_clause_list(Sub,ClauseAsList),
     clause_list_to_clause(ClauseAsList,Clause),
     assert(user:Clause).
 
-assert_prims(Prog):-
+assert_prog_prims(Prog):-
     findall(P/A,(member(sub(_Name,P,A,_MetaSub,_PredTypes),Prog)),Prims),!,
     list_to_set(Prims,PrimSet),
     maplist(assert_prim,PrimSet).
@@ -297,15 +310,8 @@ prim_asserts(P/A,[user:prim(P/A), user:(primcall(P,Args):-user:Call)]):-
     functor(Call,P,A),
     Call =.. [P|Args].
 
-clause_to_list((Atom,T1),[Atom|T2]):-
-    clause_to_list(T1,T2).
-clause_to_list(Atom,[Atom]):- !.
 
-ho_atom_to_list(Atom,T):-
-    Atom=..AtomList,
-    AtomList = [call|T],!.
-ho_atom_to_list(Atom,AtomList):-
-    Atom=..AtomList.
+
 
 unique_body_pred([[P|_]|B1],Q):-
     select([Q|_],B1,B2),
