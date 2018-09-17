@@ -39,6 +39,7 @@ learn(Pos1,Neg1,Prog):-
     maplist(atom_to_list,Pos1,Pos2),
     maplist(atom_to_list,Neg1,Neg2),
     proveall(Pos2,Sig,Prog),
+    is_functional(Pos2,Sig,Prog),
     nproveall(Neg2,Sig,Prog).
 
 learn_seq(Seq,Prog):-
@@ -66,7 +67,7 @@ assert_sig(Sig):-
 prove_examples([],_FullSig,_Sig,_MaxN,N,N,Prog,Prog).
 prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
     prove_deduce([Atom],FullSig,Prog1),!,
-    %% is_functional([Atom],Sig,Prog1),
+    is_functional([Atom],Sig,Prog1),
     prove_examples(Atoms,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2).
 prove_examples([Atom1|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
     add_empty_path(Atom1,Atom2),
