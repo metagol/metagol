@@ -16,9 +16,7 @@
     max_clauses/1,
     max_inv_preds/1,
     metarule_next_id/1,
-    interpreted_bk/2,
-    user:prim/1,
-    user:primcall/2.
+    interpreted_bk/2.
 
 :- discontiguous
     user:metarule/7,
@@ -39,8 +37,8 @@ learn(Pos1,Neg1,Prog):-
     maplist(atom_to_list,Pos1,Pos2),
     maplist(atom_to_list,Neg1,Neg2),
     proveall(Pos2,Sig,Prog),
-    is_functional(Pos2,Sig,Prog),
-    nproveall(Neg2,Sig,Prog).
+    nproveall(Neg2,Sig,Prog),
+    is_functional(Pos2,Sig,Prog).
 
 learn_seq(Seq,Prog):-
     maplist(learn_task,Seq,Progs),
@@ -49,7 +47,7 @@ learn_seq(Seq,Prog):-
 learn_task(Pos/Neg,Prog):-
     learn(Pos,Neg,Prog),!,
     maplist(assert_clause,Prog),
-    assert_prog_prims(Prog).
+    assert_prims(Prog).
 
 proveall(Atoms,Sig,Prog):-
     target_predicate(Atoms,P/A),
@@ -57,12 +55,7 @@ proveall(Atoms,Sig,Prog):-
     iterator(MaxN),
     format('% clauses: ~d\n',[MaxN]),
     invented_symbols(MaxN,P/A,Sig),
-    assert_sig(Sig),
     prove_examples(Atoms,Sig,_Sig,MaxN,0,_N,[],Prog).
-
-assert_sig(Sig):-
-    retractall(lower_sig(_,_,_)),
-    forall(append(_,[sym(P,A,_)|LowerSig],Sig),assert(lower_sig(P,A,LowerSig))).
 
 prove_examples([],_FullSig,_Sig,_MaxN,N,N,Prog,Prog).
 prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
@@ -72,7 +65,6 @@ prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
 prove_examples([Atom1|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
     add_empty_path(Atom1,Atom2),
     prove([Atom2],FullSig,Sig,MaxN,N1,N3,Prog1,Prog3),
-    is_functional([Atom1],Sig,Prog3),
     prove_examples(Atoms,FullSig,Sig,MaxN,N3,N2,Prog3,Prog2).
 
 prove_deduce(Atoms1,Sig,Prog):-
@@ -101,7 +93,7 @@ prove_aux(p(inv,_P,_A,_Args,Atom,Path),FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
 
 %% use existing abduction
 prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
-    (nonvar(P) -> lower_sig(P,A,Sig2); select_lower(P,A,Sig1,Sig2)),
+    select_lower(P,A,FullSig,Sig1,Sig2),
     member(sub(Name,P,A,MetaSub,PredTypes),Prog1),
     user:metarule_init(Name,MetaSub,PredTypes,(Atom:-Body1),Recursive,[Atom|Path]),
     (Recursive==true -> \+memberchk(Atom,Path); true),
@@ -110,7 +102,7 @@ prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
 %% new abduction
 prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     (N1 == MaxN -> fail; true),
-    (nonvar(P) -> lower_sig(P,A,Sig2); bind_lower(P,A,Sig1,Sig2)),
+    bind_lower(P,A,FullSig,Sig1,Sig2),
     user:metarule(Name,MetaSub,PredTypes,(Atom:-Body1),FullSig,Recursive,[Atom|Path]),
     (Recursive==true -> \+memberchk(Atom,Path); true),
     check_new_metasub(Name,P,A,MetaSub,Prog1),
@@ -120,11 +112,19 @@ prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
 add_empty_path([P|Args],p(inv,P,A,Args,[P|Args],[])):-
     size(Args,A).
 
-select_lower(P,A,Sig1,Sig2):-
+select_lower(P,A,FullSig,_Sig1,Sig2):-
+    nonvar(P),!,
+    append(_,[sym(P,A,_)|Sig2],FullSig),!.
+
+select_lower(P,A,_FullSig,Sig1,Sig2):-
     append(_,[sym(P,A,U)|Sig2],Sig1),
     (var(U)-> !,fail;true ).
 
-bind_lower(P,A,Sig1,Sig2):-
+bind_lower(P,A,FullSig,_Sig1,Sig2):-
+    nonvar(P),!,
+    append(_,[sym(P,A,_)|Sig2],FullSig),!.
+
+bind_lower(P,A,_FullSig,Sig1,Sig2):-
     append(_,[sym(P,A,U)|Sig2],Sig1),
     (var(U)-> U = 1,!;true).
 
@@ -186,6 +186,7 @@ clause_list_to_clause([H|B1],Clause):-
         maplist(list_to_atom,B1,B2),
         list_to_clause(B2,B3),
         Clause = (Head:-B3))).
+
 
 %% construct clause is horrible and needs refactoring
 metasub_to_clause_list(sub(Name,_,_,MetaSub,_),[HeadList|BodyAsList2]):-
@@ -273,28 +274,15 @@ add_path_to_body([[P|Args]|Atoms],Path,[p(PType,P,A,Args,[P|Args],Path)|Rest],[P
     size(Args,A),
     add_path_to_body(Atoms,Path,Rest,Out).
 
-clause_to_list((Atom,T1),[Atom|T2]):-
-    clause_to_list(T1,T2).
-clause_to_list(Atom,[Atom]):- !.
-
-ho_atom_to_list(Atom,T):-
-    Atom=..AtomList,
-    AtomList = [call|T],!.
-ho_atom_to_list(Atom,AtomList):-
-    Atom=..AtomList.
-
-%% CODE TO ASSERT AND RETRACT PRIMS AND PROGRAMS
-
-assert_prog(Prog):-
+assert_program(Prog):-
     maplist(assert_clause,Prog).
 
-%% user could call this many times on the same clause
 assert_clause(Sub):-
     metasub_to_clause_list(Sub,ClauseAsList),
     clause_list_to_clause(ClauseAsList,Clause),
     assert(user:Clause).
 
-assert_prog_prims(Prog):-
+assert_prims(Prog):-
     findall(P/A,(member(sub(_Name,P,A,_MetaSub,_PredTypes),Prog)),Prims),!,
     list_to_set(Prims,PrimSet),
     maplist(assert_prim,PrimSet).
@@ -304,16 +292,24 @@ assert_prim(Prim):-
     maplist(assertz,Asserts).
 
 retract_prim(Prim):-
-    Prim = P/_,
+    Prim = P/A,
     retractall(user:prim(Prim)),
-    retractall(user:primcall(P,_)).
+    length(Args,A),
+    primcall(P,Args).
 
 prim_asserts(P/A,[user:prim(P/A), user:(primcall(P,Args):-user:Call)]):-
     functor(Call,P,A),
     Call =.. [P|Args].
 
+clause_to_list((Atom,T1),[Atom|T2]):-
+    clause_to_list(T1,T2).
+clause_to_list(Atom,[Atom]):- !.
 
-
+ho_atom_to_list(Atom,T):-
+    Atom=..AtomList,
+    AtomList = [call|T],!.
+ho_atom_to_list(Atom,AtomList):-
+    Atom=..AtomList.
 
 unique_body_pred([[P|_]|B1],Q):-
     select([Q|_],B1,B2),
@@ -339,6 +335,7 @@ does_not_appear_twice(P,Prog):-
         member(Q,Cs)),Qs1),
     select(P,Qs1,Qs2),
     \+ member(P,Qs2).
+
 
 unfold_program(Prog1,Prog2):-
     select(C1,Prog1,Prog3),
