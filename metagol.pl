@@ -294,10 +294,9 @@ assert_prim(Prim):-
     maplist(assertz,Asserts).
 
 retract_prim(Prim):-
-    Prim = P/A,
+    Prim = P/_,
     retractall(user:prim(Prim)),
-    length(Args,A),
-    primcall(P,Args).
+    retractall(user:primcall(P,_)).
 
 prim_asserts(P/A,[user:prim(P/A), user:(primcall(P,Args):-user:Call)]):-
     functor(Call,P,A),
