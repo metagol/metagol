@@ -16,7 +16,9 @@
     max_clauses/1,
     max_inv_preds/1,
     metarule_next_id/1,
-    interpreted_bk/2.
+    interpreted_bk/2,
+    user:prim/1,
+    user:primcall/2.
 
 :- discontiguous
     user:metarule/7,
