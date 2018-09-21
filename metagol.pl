@@ -133,7 +133,7 @@ bind_lower(P,A,_FullSig,Sig1,Sig2):-
 check_new_metasub(Name,P,A,MetaSub,Prog):-
     memberchk(sub(Name,P,A,_,_),Prog),!,
     last(MetaSub,X),
-    when(nonvar(X),\+memberchk(sub(Name,P,A,MetaSub,_),Prog)).
+    when(ground(X),\+memberchk(sub(Name,P,A,MetaSub,_),Prog)).
 check_new_metasub(_Name,_P,_A,_MetaSub,_Prog).
 
 size([],0) :-!.
