@@ -47,7 +47,7 @@ learn_seq(Seq,Prog):-
 learn_task(Pos/Neg,Prog):-
     learn(Pos,Neg,Prog),!,
     maplist(assert_clause,Prog),
-    assert_prims(Prog).
+    assert_prog_prims(Prog).
 
 proveall(Atoms,Sig,Prog):-
     target_predicate(Atoms,P/A),
@@ -282,7 +282,7 @@ assert_clause(Sub):-
     clause_list_to_clause(ClauseAsList,Clause),
     assert(user:Clause).
 
-assert_prims(Prog):-
+assert_prog_prims(Prog):-
     findall(P/A,(member(sub(_Name,P,A,_MetaSub,_PredTypes),Prog)),Prims),!,
     list_to_set(Prims,PrimSet),
     maplist(assert_prim,PrimSet).
