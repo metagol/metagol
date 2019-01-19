@@ -31,25 +31,18 @@ default(max_clauses(6)).
 default(metarule_next_id(1)).
 default(max_inv_preds(10)).
 
+%% learn a program from pos and neg examples
 learn(Pos1,Neg1):-
     learn(Pos1,Neg1,Prog),
     pprint(Prog).
 
+%% same as above but also returns the program as a list of metasubs
 learn(Pos1,Neg1,Prog):-
     maplist(atom_to_list,Pos1,Pos2),
     maplist(atom_to_list,Neg1,Neg2),
     proveall(Pos2,Sig,Prog),
     nproveall(Neg2,Sig,Prog),
     is_functional(Pos2,Sig,Prog).
-
-learn_seq(Seq,Prog):-
-    maplist(learn_task,Seq,Progs),
-    flatten(Progs,Prog).
-
-learn_task(Pos/Neg,Prog):-
-    learn(Pos,Neg,Prog),!,
-    maplist(assert_clause,Prog),
-    assert_prog_prims(Prog).
 
 proveall(Atoms,Sig,Prog):-
     target_predicate(Atoms,P/A),
@@ -162,6 +155,22 @@ invented_symbols(MaxClauses,P/A,[sym(P,A,_U)|Sig]):-
     M is min(NumSymbols,MaxInvPreds),
     findall(sym(InvSym,_Artiy,_Used),(between(1,M,I),atomic_list_concat([P,'_',I],InvSym)),Sig).
 
+%% learns a sequence of programs and asserts each program that it learns
+learn_seq(Seq,Prog):-
+    maplist(learn_task,Seq,Progs),
+    flatten(Progs,Prog).
+
+learn_task(Pos/Neg,Prog1):-
+    learn(Pos,Neg,Prog1),!,
+    maplist(metasub_to_clause_list,Prog1,Prog3),
+    maplist(remove_orderings,Prog3,Prog4),
+    maplist(clause_list_to_clause,Prog4,Prog2),
+    foreach(memberchk(Clause,Prog2),assert(user:Clause)),
+    findall(P/A,(member(sub(_Name,P,A,_MetaSub,_PredTypes),Prog2)),Prims),!,
+    list_to_set(Prims,PrimSet),
+    maplist(assert_prim,PrimSet).
+learn_task(_,[]).
+
 pprint(Prog1):-
     map_list_to_pairs(arg(2),Prog1,Pairs),
     keysort(Pairs,Sorted),
@@ -188,7 +197,6 @@ clause_list_to_clause([H|B1],Clause):-
         maplist(list_to_atom,B1,B2),
         list_to_clause(B2,B3),
         Clause = (Head:-B3))).
-
 
 %% construct clause is horrible and needs refactoring
 metasub_to_clause_list(sub(Name,_,_,MetaSub,_),[HeadList|BodyAsList2]):-
@@ -276,19 +284,6 @@ add_path_to_body([[P|Args]|Atoms],Path,[p(PType,P,A,Args,[P|Args],Path)|Rest],[P
     size(Args,A),
     add_path_to_body(Atoms,Path,Rest,Out).
 
-assert_program(Prog):-
-    maplist(assert_clause,Prog).
-
-assert_clause(Sub):-
-    metasub_to_clause_list(Sub,ClauseAsList),
-    clause_list_to_clause(ClauseAsList,Clause),
-    assert(user:Clause).
-
-assert_prog_prims(Prog):-
-    findall(P/A,(member(sub(_Name,P,A,_MetaSub,_PredTypes),Prog)),Prims),!,
-    list_to_set(Prims,PrimSet),
-    maplist(assert_prim,PrimSet).
-
 assert_prim(Prim):-
     prim_asserts(Prim,Asserts),
     maplist(assertz,Asserts).
@@ -311,13 +306,6 @@ ho_atom_to_list(Atom,T):-
     AtomList = [call|T],!.
 ho_atom_to_list(Atom,AtomList):-
     Atom=..AtomList.
-
-unique_body_pred([[P|_]|B1],Q):-
-    select([Q|_],B1,B2),
-    P\=Q,
-    \+ memberchk([Q|_],B2).
-unique_head_pred([[P|_]|B],P):-
-    \+ memberchk([P|_],B).
 
 unfold_clause(C1,[[P|Args]|C2],P,D):-
     append(Pre,[[P|Args]|Post],C1),
