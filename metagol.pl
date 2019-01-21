@@ -16,7 +16,7 @@
     max_clauses/1,
     max_inv_preds/1,
     metarule_next_id/1,
-    interpreted_bk/2,
+    user:interpreted_bk/2,
     user:prim/1,
     user:primcall/2.
 
@@ -82,7 +82,7 @@ prove_aux(p(prim,P,_A,Args,_,_Path),_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-
 %% use interpreted BK - can we skip this if no interpreted_bk?
 %% only works if interpreted/2 is below the corresponding definition
 prove_aux(p(inv,_P,_A,_Args,Atom,Path),FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
-    interpreted_bk(Atom,Body1),
+    user:interpreted_bk(Atom,Body1),
     add_path_to_body(Body1,[Atom|Path],Body2,_),
     prove(Body2,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2).
 
@@ -233,17 +233,17 @@ gen_metarule_id(Id):-
     succ(Id,IdNext),
     set_option(metarule_next_id(IdNext)).
 
-user:term_expansion(interpreted(P/A),L2):-
-    functor(Head,P,A),
-    findall((Head:-Body),user:clause(Head,Body),L1),
-    maplist(convert_to_interpreted,L1,L2).
+%% user:term_expansion(interpreted(P/A),L2):-
+%%     functor(Head,P,A),
+%%     findall((Head:-Body),user:clause(Head,Body),L1),
+%%     maplist(convert_to_interpreted,L1,L2).
 
-convert_to_interpreted((Head:-true),metagol:(interpreted_bk(HeadAsList,[]))):-!,
-    ho_atom_to_list(Head,HeadAsList).
-convert_to_interpreted((Head:-Body),metagol:(interpreted_bk(HeadAsList,BodyList2))):-
-    ho_atom_to_list(Head,HeadAsList),
-    clause_to_list(Body,BodyList1),
-    maplist(ho_atom_to_list,BodyList1,BodyList2).
+%% convert_to_interpreted((Head:-true),metagol:(interpreted_bk(HeadAsList,[]))):-!,
+%%     ho_atom_to_list(Head,HeadAsList).
+%% convert_to_interpreted((Head:-Body),metagol:(interpreted_bk(HeadAsList,BodyList2))):-
+%%     ho_atom_to_list(Head,HeadAsList),
+%%     clause_to_list(Body,BodyList1),
+%%     maplist(ho_atom_to_list,BodyList1,BodyList2).
 
 user:term_expansion(prim(P/A),[user:prim(P/A),user:(primcall(P,Args):-user:Call)]):-
     functor(Call,P,A),

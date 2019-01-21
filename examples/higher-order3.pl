@@ -19,7 +19,10 @@ filter([_|T1],T2,F):-
 %% tell metagol to use the BK
 prim(divisible2/1).
 prim(divisible5/1).
-interpreted(filter/3).
+
+interpreted_bk([filter,[],[],_],[]).
+interpreted_bk([filter,[A|T1],[A|T2],F],[[F,A],[filter,T1,T2,F]]).
+interpreted_bk([filter,[_|T1],T2,F],[[filter,T1,T2,F]]).
 
 a:-
   A = [1,2,3,4,5,6,7,8,9,10],

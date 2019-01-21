@@ -1,4 +1,4 @@
-:-['../metagol'].
+:- use_module('../metagol').
 
 %% background knowledge
 my_double(A,B):-integer(A),B is A*2.
@@ -20,6 +20,9 @@ interpreted(map/3).
 metarule([P,Q,F],([P,A,B]:-[[Q,A,B,F]])).
 metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
+%% interpreted BK
+interpreted_bk([map,[],[],_],[]).
+interpreted_bk([map,[A|As],[B|Bs],F],[[F,A,B],[map,As,Bs,F]]).
 
 a:-
   A=[[a],[a,a],[a,a,a],[a,a,a,a]],
