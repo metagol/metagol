@@ -16,7 +16,7 @@
     max_clauses/1,
     max_inv_preds/1,
     metarule_next_id/1,
-    user:interpreted_bk/2,
+    user:ibk/3,
     user:prim/1,
     user:primcall/2.
 
@@ -41,7 +41,9 @@ learn(Pos1,Neg1,Prog):-
     maplist(atom_to_list,Pos1,Pos2),
     maplist(atom_to_list,Neg1,Neg2),
     proveall(Pos2,Sig,Prog),
+    %% ground(Prog),
     nproveall(Neg2,Sig,Prog),
+
     is_functional(Pos2,Sig,Prog).
 
 proveall(Atoms,Sig,Prog):-
@@ -79,12 +81,11 @@ prove_aux('@'(Atom),_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-!,
 prove_aux(p(prim,P,_A,Args,_,_Path),_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-
     user:primcall(P,Args).
 
-%% use interpreted BK - can we skip this if no interpreted_bk?
-%% only works if interpreted/2 is below the corresponding definition
+%% can we skip this if no inter?
+%% can add a check in setup to skip if not used - I am unsure how to retract this specific clause %% could retract if I add some name to the clause %% only works if inter/2 is below the corresponding definition
 prove_aux(p(inv,_P,_A,_Args,Atom,Path),FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
-    user:interpreted_bk(Atom,Body1),
-    add_path_to_body(Body1,[Atom|Path],Body2,_),
-    prove(Body2,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2).
+    user:ibk(Atom,Body,Path),
+    prove(Body,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2).
 
 %% use existing abduction
 prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
@@ -228,9 +229,14 @@ set_option(Option):-
     retractall(Retract),
     assert(Option).
 
+%% expand user prims
 user:term_expansion(prim(P/A),[user:prim(P/A),user:(primcall(P,Args):-user:Call)]):-
     functor(Call,P,A),
     Call =.. [P|Args].
+
+%% expand user IBK
+user:term_expansion(ibk(Head,Body1),user:ibk(Head,Body2,Path)):-
+    add_path_to_body(Body1,Path,Body2,_).
 
 %% legacy clauses
 user:term_expansion(metarule(Subs,(Head:-Body)),Asserts):-
