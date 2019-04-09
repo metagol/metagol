@@ -62,6 +62,7 @@ prove_examples([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
 prove_examples([Atom1|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
     add_empty_path(Atom1,Atom2),
     prove([Atom2],FullSig,Sig,MaxN,N1,N3,Prog1,Prog3),
+    is_functional([Atom1],Sig,Prog3),
     prove_examples(Atoms,FullSig,Sig,MaxN,N3,N2,Prog3,Prog2).
 
 prove_deduce(Atoms1,Sig,Prog):-
@@ -182,43 +183,30 @@ learn_task(Pos/Neg,Prog1):-
 learn_task(_,[]).
 
 pprint(Prog1):-
-    map_list_to_pairs(arg(2),Prog1,Pairs),
-    keysort(Pairs,Sorted),
-    pairs_values(Sorted,Prog2),
-    maplist(metasub_to_clause_list,Prog2,Prog3),
-    (get_option(unfold_program) -> unfold_program(Prog3,Prog4); Prog3=Prog4),
-    maplist(remove_orderings,Prog4,Prog5),
-    maplist(clause_list_to_clause,Prog5,Prog6),
-    maplist(pprint_clause,Prog6).
+    reverse(Prog1,Prog3),
+    maplist(metasub_to_clause_list,Prog3,Prog4),
+    (get_option(unfold_program) -> unfold_program(Prog4,Prog2); Prog2=Prog4),
+    maplist(pprint_clause,Prog2).
 
-remove_orderings([],[]).
-remove_orderings(['@'(_H)|T],Out):-!,
-    remove_orderings(T,Out).
-remove_orderings([H|T],[H|Out]):-
-    remove_orderings(T,Out).
-
-pprint_clause(Clause):-
-    numbervars(Clause,0,_),
+pprint_clause(L1):-
+    maplist(atom_to_list,L3,L1),
+    numbervars(L3,0,_),
+    list_to_clause(L3,L2),
+    (L2 = (H,T) -> Clause=(H:-T); Clause=L2),
     format('~q.~n',[Clause]).
 
-clause_list_to_clause([H|B1],Clause):-
-    list_to_atom(H,Head),
-    (B1 = [] ->Clause=Head;(
-        maplist(list_to_atom,B1,B2),
-        list_to_clause(B2,B3),
-        Clause = (Head:-B3))).
-
-%% construct clause is horrible and needs refactoring
 metasub_to_clause_list(sub(Name,_,_,Subs,_),[HeadList|BodyAsList2]):-
     user:metarule_init(Name,Subs,_,HeadList,BodyAsList1,_,_),
-    add_path_to_body(BodyAsList2,_,BodyAsList1,_).
+    add_path_to_body(BodyAsList3,_,BodyAsList1,_),
+    filter(no_ordering,BodyAsList3,BodyAsList2).
+
+no_ordering(H):-
+    H\='@'(_).
 
 list_to_clause([Atom],Atom):-!.
 list_to_clause([Atom|T1],(Atom,T2)):-!,
     list_to_clause(T1,T2).
 
-list_to_atom(AtomList,Atom):-
-    Atom =..AtomList.
 atom_to_list(Atom,AtomList):-
     Atom =..AtomList.
 
@@ -352,3 +340,10 @@ unfold_program(Prog1,Prog2):-
     unfold_clause(C2,C1,P,D),
     unfold_program([D|Prog4],Prog2).
 unfold_program(Prog,Prog):-!.
+
+filter(_F,[],[]).
+filter(F,[H|T],[H|Out]):-
+    call(F,H),!,
+    filter(F,T,Out).
+filter(F,[_H|T],Out):-
+    filter(F,T,Out).
