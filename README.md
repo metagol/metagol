@@ -173,11 +173,12 @@ Here are some publications on MIL and Metagol.
 * Stephen Muggleton, Wang-Zhou Dai, Claude Sammut, Alireza Tamaddoni-Nezhad, Jing Wen, Zhi-Hua Zhou:
 Meta-Interpretive Learning from noisy images. Machine Learning 107(7): 1097-1118 (2018)
 
-* Dianhuan Lin, Eyal Dechter, Kevin Ellis, Joshua B. Tenenbaum, Stephen Muggleton: Bias reformulation for one-shot function induction. ECAI 2014: 525-530
-
 * Colin Farquhar, Gudmund Grov, Andrew Cropper, Stephen Muggleton, Alan Bundy: Typed meta-interpretive learning for proof strategies. ILP (Late Breaking Papers) 2015: 17-32
 
 * Andrew Cropper, Alireza Tamaddoni-Nezhad, Stephen H. Muggleton: Meta-Interpretive Learning of Data Transformation Programs. ILP 2015: 46-59
+
+* Dianhuan Lin, Eyal Dechter, Kevin Ellis, Joshua B. Tenenbaum, Stephen Muggleton: Bias reformulation for one-shot function induction. ECAI 2014: 525-530
+
 
 ## Theses
 
