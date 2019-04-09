@@ -211,11 +211,7 @@ atom_to_list(Atom,AtomList):-
     Atom =..AtomList.
 
 is_functional(Atoms,Sig,Prog):-
-    (get_option(functional) -> is_functional_aux(Atoms,Sig,Prog); true).
-is_functional_aux([],_Sig,_Prog).
-is_functional_aux([Atom|Atoms],Sig,Prog):-
-    user:func_test(Atom,Sig,Prog),
-    is_functional_aux(Atoms,Sig,Prog).
+    (get_option(functional) -> forall(member(Atom,Atoms), user:func_test(Atom,Sig,Prog)); true).
 
 get_option(Option):-call(Option), !.
 get_option(Option):-default(Option).
