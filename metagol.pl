@@ -38,12 +38,12 @@ learn(Pos1,Neg1):-
 
 %% same as above but also returns the program as a list of metasubs
 learn(Pos1,Neg1,Prog):-
+    setup,
     maplist(atom_to_list,Pos1,Pos2),
     maplist(atom_to_list,Neg1,Neg2),
     proveall(Pos2,Sig,Prog),
-    %% ground(Prog),
     nproveall(Neg2,Sig,Prog),
-
+    ground(Prog),
     is_functional(Pos2,Sig,Prog).
 
 proveall(Atoms,Sig,Prog):-
@@ -92,21 +92,26 @@ prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     select_lower(P,A,FullSig,Sig1,Sig2),
     member(sub(Name,P,A,Subs,PredTypes),Prog1),
     user:metarule_init(Name,Subs,PredTypes,Atom,Body1,Recursive,[Atom|Path]),
-    (Recursive==true -> \+memberchk(Atom,Path); true),
+    check_recursion(Recursive, MaxN, Atom, Path),
     prove(Body1,FullSig,Sig2,MaxN,N1,N2,Prog1,Prog2).
 
 %% new abduction
 prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
-    (N1 == MaxN -> fail; true),
+    N1 < MaxN,
     bind_lower(P,A,FullSig,Sig1,Sig2),
     user:metarule(Name,Subs,PredTypes,Atom,Body1,FullSig,Recursive,[Atom|Path]),
-    (Recursive==true -> \+memberchk(Atom,Path); true),
-    check_new_metasub(Name,P,A,Subs,Prog1),
+    check_recursion(Recursive, MaxN, Atom, Path),
+    check_new_metasub(Name, P, A, Subs, Prog1),
     succ(N1,N3),
     prove(Body1,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,Subs,PredTypes)|Prog1],Prog2).
 
+check_recursion(false, _MaxN, _Atom, _Path).
+check_recursion(true, MaxN, Atom, Path):-
+    MaxN \== 1,
+    \+memberchk(Atom,Path).
+
 add_empty_path([P|Args],p(inv,P,A,Args,[P|Args],[])):-
-    size(Args,A).
+    length(Args,A).
 
 select_lower(P,A,FullSig,_Sig1,Sig2):-
     nonvar(P),!,
@@ -130,12 +135,16 @@ check_new_metasub(Name,P,A,Subs,Prog):-
     when(ground(X),\+memberchk(sub(Name,P,A,Subs,_),Prog)).
 check_new_metasub(_Name,_P,_A,_Subs,_Prog).
 
-size([],0) :-!.
-size([_],1) :-!.
-size([_,_],2) :-!.
-size([_,_,_],3) :-!.
-size(L,N):- !,
-  length(L,N).
+check_prim_exists(P/A):-
+    functor(Atom,P,A),
+    current_predicate(_,user:Atom),!.
+check_prim_exists(P/A):-
+    retractall(user:prim(P/A)),
+    length(Args,A),!,
+    retractall(user:primcall(P,Args)).
+
+setup:-
+    forall(user:prim(P/A),check_prim_exists(P/A)).
 
 nproveall([],_PS,_Prog):- !.
 nproveall([Atom|Atoms],PS,Prog):-
@@ -276,7 +285,7 @@ add_path_to_body([],_Path,[],[]).
 add_path_to_body(['@'(Atom)|Atoms],Path,['@'(Atom)|Rest],Out):-
     add_path_to_body(Atoms,Path,Rest,Out).
 add_path_to_body([[P|Args]|Atoms],Path,[p(PType,P,A,Args,[P|Args],Path)|Rest],[PType|Out]):-
-    size(Args,A),
+    length(Args,A),
     add_path_to_body(Atoms,Path,Rest,Out).
 
 gen_metarule_id(Name,Name):-
