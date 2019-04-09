@@ -83,21 +83,12 @@ test_robotsb:-
     test(Name,Pos,[],Prog).
 
 
-%% robot learning to move a ball to a specific position %% a :-
-%%   Pos = [f(world((1/1),(1/1),false),world((3/3),(3/3),false))],
-%%   learn(Pos,[]).
-
-%% b :-
-%%   Pos = [f(world((1/1),(1/1),false),world((5/5),(5/5),false))],
-%%   learn(Pos,[]).
-
-%% c :-
-%%   Pos = [f(world((1/1),(1/1),false),world((6/6),(6/6),false))],
-%%   learn(Pos,[]).
-
-%% d :-
-%%   Pos = [f(world((1/1),(1/1),false),world((7/7),(7/7),false))],
-%%   learn(Pos,[]).
+test_trains:-
+    Name='trains',
+    Pos = [e(east1),e(east2),e(east3),e(east4),e(east5)],
+    Neg = [e(west6),e(west7),e(west8),e(west9),e(west10)],
+    Prog = [sub(2,e_1,1,[e_1,short,closed],[prim,prim]),sub(3,e,1,[e,has_car,e_1],[prim,inv])],
+    test(Name,Pos,Neg,Prog).
 
 
 %%
@@ -111,5 +102,6 @@ t:-
     test_kinship1b,
     test_robotsa,
     test_robotsb,
+    test_trains,
     writeln('TESTS PASSED'),
     halt.
