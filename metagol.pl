@@ -21,14 +21,14 @@
     user:primcall/2.
 
 :- discontiguous
-    user:metarule/7,
-    user:metarule_init/6,
+    user:metarule/8,
+    user:metarule_init/7,
     user:prim/1,
     user:primcall/2.
 
 default(min_clauses(1)).
 default(max_clauses(6)).
-default(metarule_next_id(1)).
+default(metarule_next_id(0)).
 default(max_inv_preds(10)).
 
 %% learn a program from pos and neg examples
@@ -89,8 +89,8 @@ prove_aux(p(inv,_P,_A,_Args,Atom,Path),FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
 %% use existing abduction
 prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     select_lower(P,A,FullSig,Sig1,Sig2),
-    member(sub(Name,P,A,MetaSub,PredTypes),Prog1),
-    user:metarule_init(Name,MetaSub,PredTypes,(Atom:-Body1),Recursive,[Atom|Path]),
+    member(sub(Name,P,A,Subs,PredTypes),Prog1),
+    user:metarule_init(Name,Subs,PredTypes,Atom,Body1,Recursive,[Atom|Path]),
     (Recursive==true -> \+memberchk(Atom,Path); true),
     prove(Body1,FullSig,Sig2,MaxN,N1,N2,Prog1,Prog2).
 
@@ -98,11 +98,11 @@ prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
 prove_aux(p(inv,P,A,_Args,Atom,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     (N1 == MaxN -> fail; true),
     bind_lower(P,A,FullSig,Sig1,Sig2),
-    user:metarule(Name,MetaSub,PredTypes,(Atom:-Body1),FullSig,Recursive,[Atom|Path]),
+    user:metarule(Name,Subs,PredTypes,Atom,Body1,FullSig,Recursive,[Atom|Path]),
     (Recursive==true -> \+memberchk(Atom,Path); true),
-    check_new_metasub(Name,P,A,MetaSub,Prog1),
+    check_new_metasub(Name,P,A,Subs,Prog1),
     succ(N1,N3),
-    prove(Body1,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,MetaSub,PredTypes)|Prog1],Prog2).
+    prove(Body1,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,Subs,PredTypes)|Prog1],Prog2).
 
 add_empty_path([P|Args],p(inv,P,A,Args,[P|Args],[])):-
     size(Args,A).
@@ -123,11 +123,11 @@ bind_lower(P,A,_FullSig,Sig1,Sig2):-
     append(_,[sym(P,A,U)|Sig2],Sig1),
     (var(U)-> U = 1,!;true).
 
-check_new_metasub(Name,P,A,MetaSub,Prog):-
+check_new_metasub(Name,P,A,Subs,Prog):-
     memberchk(sub(Name,P,A,_,_),Prog),!,
-    last(MetaSub,X),
-    when(ground(X),\+memberchk(sub(Name,P,A,MetaSub,_),Prog)).
-check_new_metasub(_Name,_P,_A,_MetaSub,_Prog).
+    last(Subs,X),
+    when(ground(X),\+memberchk(sub(Name,P,A,Subs,_),Prog)).
+check_new_metasub(_Name,_P,_A,_Subs,_Prog).
 
 size([],0) :-!.
 size([_],1) :-!.
@@ -166,7 +166,7 @@ learn_task(Pos/Neg,Prog1):-
     maplist(remove_orderings,Prog3,Prog4),
     maplist(clause_list_to_clause,Prog4,Prog2),
     foreach(memberchk(Clause,Prog2),assert(user:Clause)),
-    findall(P/A,(member(sub(_Name,P,A,_MetaSub,_PredTypes),Prog2)),Prims),!,
+    findall(P/A,(member(sub(_Name,P,A,_Subs,_PredTypes),Prog2)),Prims),!,
     list_to_set(Prims,PrimSet),
     maplist(assert_prim,PrimSet).
 learn_task(_,[]).
@@ -199,8 +199,8 @@ clause_list_to_clause([H|B1],Clause):-
         Clause = (Head:-B3))).
 
 %% construct clause is horrible and needs refactoring
-metasub_to_clause_list(sub(Name,_,_,MetaSub,_),[HeadList|BodyAsList2]):-
-    user:metarule_init(Name,MetaSub,_,(HeadList:-BodyAsList1),_,_),
+metasub_to_clause_list(sub(Name,_,_,Subs,_),[HeadList|BodyAsList2]):-
+    user:metarule_init(Name,Subs,_,HeadList,BodyAsList1,_,_),
     add_path_to_body(BodyAsList2,_,BodyAsList1,_).
 
 list_to_clause([Atom],Atom):-!.
@@ -228,48 +228,37 @@ set_option(Option):-
     retractall(Retract),
     assert(Option).
 
-gen_metarule_id(Id):-
-    get_option(metarule_next_id(Id)),
-    succ(Id,IdNext),
-    set_option(metarule_next_id(IdNext)).
-
-%% user:term_expansion(interpreted(P/A),L2):-
-%%     functor(Head,P,A),
-%%     findall((Head:-Body),user:clause(Head,Body),L1),
-%%     maplist(convert_to_interpreted,L1,L2).
-
-%% convert_to_interpreted((Head:-true),metagol:(interpreted_bk(HeadAsList,[]))):-!,
-%%     ho_atom_to_list(Head,HeadAsList).
-%% convert_to_interpreted((Head:-Body),metagol:(interpreted_bk(HeadAsList,BodyList2))):-
-%%     ho_atom_to_list(Head,HeadAsList),
-%%     clause_to_list(Body,BodyList1),
-%%     maplist(ho_atom_to_list,BodyList1,BodyList2).
-
 user:term_expansion(prim(P/A),[user:prim(P/A),user:(primcall(P,Args):-user:Call)]):-
     functor(Call,P,A),
     Call =.. [P|Args].
 
-user:term_expansion(metarule(MetaSub,Clause),Asserts):-
-    get_asserts(_Name,MetaSub,Clause,_,_PS,Asserts).
-user:term_expansion(metarule(Name,MetaSub,Clause),Asserts):-
-    get_asserts(Name,MetaSub,Clause,_,_PS,Asserts).
-user:term_expansion((metarule(MetaSub,Clause):-Body),Asserts):-
-    get_asserts(_Name,MetaSub,Clause,Body,_PS,Asserts).
-user:term_expansion((metarule(Name,MetaSub,Clause):-Body),Asserts):-
-    get_asserts(Name,MetaSub,Clause,Body,_PS,Asserts).
-user:term_expansion((metarule(Name,MetaSub,Clause,PS):-Body),Asserts):-
-    get_asserts(Name,MetaSub,Clause,Body,PS,Asserts).
+%% legacy clauses
+user:term_expansion(metarule(Subs,(Head:-Body)),Asserts):-
+    get_asserts(_Name,Subs,Head,Body,_,_PS,Asserts).
+user:term_expansion(metarule(Name,Subs,(Head:-Body)),Asserts):-
+    get_asserts(Name,Subs,Head,Body,_,_PS,Asserts).
 
-get_asserts(Name,MetaSub,Clause1,MetaBody,PS,[MRule,metarule_init(AssertName,MetaSub,PredTypes,Clause2,Recursive,Path)]):-
-    Clause1 = (Head:-Body1),
+%% new ones
+user:term_expansion(metarule(Subs,Head,Body),Asserts):-
+    get_asserts(_Name,Subs,Head,Body,_,_PS,Asserts).
+user:term_expansion(metarule(Name,Subs,Head,Body),Asserts):-
+    get_asserts(Name,Subs,Head,Body,_,_PS,Asserts).
+user:term_expansion((metarule(Subs,Head,Body):-MetaBody),Asserts):-
+    get_asserts(_Name,Subs,Head,Body,MetaBody,_PS,Asserts).
+user:term_expansion((metarule(Name,Subs,Head,Body):-MetaBody),Asserts):-
+    get_asserts(Name,Subs,Head,Body,MetaBody,_PS,Asserts).
+user:term_expansion((metarule(Name,Subs,Head,Body,PS):-MetaBody),Asserts):-
+    get_asserts(Name,Subs,Head,Body,MetaBody,PS,Asserts).
+
+%% build the internal metarule clauses
+get_asserts(Name,Subs,Head,Body1,MetaBody,PS,[MRule,metarule_init(AssertName,Subs,PredTypes,Head,Body2,Recursive,Path)]):-
     Head = [P|_],
     is_recursive(Body1,P,Recursive),
-    add_path_to_body(Body1,Path,Body3,PredTypes),
-    Clause2 = (Head:-Body3),
-    (var(Name)->gen_metarule_id(AssertName);AssertName=Name),
+    add_path_to_body(Body1,Path,Body2,PredTypes),
+    gen_metarule_id(Name,AssertName),
     (var(MetaBody) ->
-        MRule = metarule(AssertName,MetaSub,PredTypes,Clause2,PS,Recursive,Path);
-        MRule = (metarule(AssertName,MetaSub,PredTypes,Clause2,PS,Recursive,Path):-MetaBody)).
+        MRule = metarule(AssertName,Subs,PredTypes,Head,Body2,PS,Recursive,Path);
+        MRule = (metarule(AssertName,Subs,PredTypes,Head,Body2,PS,Recursive,Path):-MetaBody)).
 
 is_recursive([],_,false).
 is_recursive([[Q|_]|_],P,true):-
@@ -283,6 +272,13 @@ add_path_to_body(['@'(Atom)|Atoms],Path,['@'(Atom)|Rest],Out):-
 add_path_to_body([[P|Args]|Atoms],Path,[p(PType,P,A,Args,[P|Args],Path)|Rest],[PType|Out]):-
     size(Args,A),
     add_path_to_body(Atoms,Path,Rest,Out).
+
+gen_metarule_id(Name,Name):-
+    ground(Name),!.
+gen_metarule_id(_Name,IdNext):-
+    get_option(metarule_next_id(Id)),
+    succ(Id,IdNext),
+    set_option(metarule_next_id(IdNext)).
 
 assert_prim(Prim):-
     prim_asserts(Prim,Asserts),
