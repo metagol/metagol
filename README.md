@@ -68,17 +68,21 @@ In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` den
 
 Users need to supply Metarules. We are working on automatically identifying the necessary metarules, with preliminary work detailed in the paper:
 
-* A. Cropper and S.H. Muggleton. [Logical minimisation of meta-rules within meta-interpretive learning](http://andrewcropper.com/pubs/ilp14-minmeta.pdf). In Proceedings of the 24th International Conference on Inductive Logic Programming, pages 65-78. Springer-Verlag, 2015. LNAI 9046.
+* Cropper, A. and Muggleton S.H. [Logical minimisation of meta-rules within meta-interpretive learning](http://andrewcropper.com/pubs/ilp14-minmeta.pdf). ILP 2014.
 
-Here are more metarules:
+* Cropper, A., and Tourret, S. [Derivation reduction of metarules in meta-interpretive learning](http://andrewcropper.com/pubs/ilp18-dreduce.pdf). ILP 2018.
+
+For learning dyadic programs without constant symbols, we recommend using these metarules:
 
 ```prolog
 metarule([P,Q],([P,A,B]:-[[Q,A,B]])). % identity
 metarule([P,Q],([P,A,B]:-[[Q,B,A]])). % inverse
-metarule([P,Q,X],([P,A,B]:-[[Q,A,B,X]])). % curry
 metarule([P,Q,R],([P,A,B]:-[[Q,A],[R,A,B]])). % precon
 metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,B]])). % postcon
+metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])). % chain
 ```
+
+Please look at the examples to see how metarules are used.
 
 #### Recursion
 
@@ -87,6 +91,8 @@ The above metarules are all non-recursive. By contrast, this metarule is recursi
 ```prolog
 metarule([P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]])).
 ```
+
+The find-duplicate, sorrter, and string examples illustrate learning recursive programs.
 
 #### Metagol settings
 
