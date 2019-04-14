@@ -24,10 +24,10 @@ element([_|T],X):-element(T,X).
 mergesort([H|T],B):-A=[H|T],msort(A,B),A\=B.
 
 %% functional test
-func_test(Atom,PS,G):-
-  Atom = [P,A,B],
-  Actual = [P,A,Z],
-  \+ (metagol :prove_deduce([Actual],PS,G),Z \= B).
+func_test(Atom1,Atom2,Condition):-
+  Atom1 = [P,A,B],
+  Atom2 = [P,A,Z],
+  Condition = (Z \= B).
 
 a :-
     Pos = [

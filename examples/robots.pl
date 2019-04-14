@@ -20,10 +20,11 @@ metarule(ident,[P,Q],([P,A,B]:-[[Q,A,B]])).
 metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
 
 %% functional check
-func_test(Atom,PS,G):-
-  Atom = [P,A,B],
-  Actual = [P,A,Z],
-  \+ (metagol:prove_deduce([Actual],PS,G),Z \= B).
+func_test(Atom1,Atom2,Condition):-
+  Atom1 = [P,A,B],
+  Atom2 = [P,A,Z],
+  Condition = (Z \= B).
+  %% \+ (metagol:prove_deduce([Actual],PS,G),Z \= B).
 
 %% robot learning to move a ball to a specific position
 a :-

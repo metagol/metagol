@@ -127,24 +127,24 @@ The following flag denotes whether the learned theory should be functional:
 ```prolog
 metagol:functional. % default false
 ```
-If the functional flag is enabled, then the must define a func_test predicate. An example func test is:
+If the functional flag is enabled, then you must define a func_test predicate. An example func test is:
 
 ```prolog
-func_test(Atom,PS,G):-
-  Atom = [P,A,B],
-  Actual = [P,A,Z],
-  \+ (metagol:prove_deduce([Actual],PS,G),Z \= B).
+func_test(Atom1,Atom2,Condition):-
+  Atom1 = [P,A,B],
+  Atom2 = [P,A,Z],
+  Condition = (B\=Z).
 ```
 
 This func test is used in the robot examples. Here, the `Atom` variable is formed of a predicate symbol `P` and two states `A` and `B`, which represent initial and final state pairs respectively.  The func_test checks whether the learned hypothesis can be applied to the initial state to reach any state `Z` other that the expected final state `B`. For more examples of functional tests, see the robots.pl, sorter.pl, and strings2.pl files.
 
 
-# Publications
+### Publications
 
 Here are some publications on MIL and Metagol.
 
 
-## Key papers
+#### Key papers
 
 * Andrew Cropper, Stephen H. Muggleton: Learning efficient logic programs. Machine learning (2018). https://doi.org/10.1007/s10994-018-5712-6.
 
@@ -154,7 +154,7 @@ Here are some publications on MIL and Metagol.
 
 * Stephen H. Muggleton, Dianhuan Lin, Niels Pahlavi, Alireza Tamaddoni-Nezhad: Meta-interpretive learning: application to grammatical inference. Machine Learning 94(1): 25-49 (2014)
 
-## Theory and Implementation
+#### Theory and Implementation
 
 * Andrew Cropper, Sophie Tourret: Derivation Reduction of Metarules in Meta-interpretive Learning. ILP 2018: 1-21
 
@@ -166,7 +166,7 @@ Here are some publications on MIL and Metagol.
 
 * Stephen H. Muggleton, Dianhuan Lin, Jianzhong Chen, Alireza Tamaddoni-Nezhad: MetaBayes: Bayesian Meta-Interpretative Learning Using Higher-Order Stochastic Refinement. ILP 2013: 1-17
 
-## Applications
+#### Applications
 
 * Stephen H. Muggleton, Ute Schmid, Christina Zeller, Alireza Tamaddoni-Nezhad, Tarek R. Besold: Ultra-Strong Machine Learning: comprehensibility of programs learned with ILP. Machine Learning 107(7): 1119-1140 (2018)
 
@@ -179,8 +179,7 @@ Meta-Interpretive Learning from noisy images. Machine Learning 107(7): 1097-1118
 
 * Dianhuan Lin, Eyal Dechter, Kevin Ellis, Joshua B. Tenenbaum, Stephen Muggleton: Bias reformulation for one-shot function induction. ECAI 2014: 525-530
 
-
-## Theses
+#### Theses
 
 * Andrew Cropper: Efficiently learning efficient programs. Imperial College London, UK 2017
 
