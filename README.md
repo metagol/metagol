@@ -136,13 +136,13 @@ Here are some publications on MIL and Metagol.
 
 #### Key papers
 
-* Andrew Cropper, Stephen H. Muggleton: [Learning efficient logic programs](http://andrewcropper.com/pubs/mlj19-metaopt.pdf). Machine learning (2018). https://doi.org/10.1007/s10994-018-5712-6.
+* Andrew Cropper, Stephen H. Muggleton: [Learning efficient logic programs](http://andrewcropper.com/pubs/mlj18-metaopt.pdf). Machine learning (2018). https://doi.org/10.1007/s10994-018-5712-6.
 
 * Andrew Cropper, Stephen H. Muggleton: [Learning Higher-Order Logic Programs through Abstraction and Invention](http://andrewcropper.com/pubs/ijcai16-metafunc.pdf). IJCAI 2016: 1418-1424
 
-* Stephen H. Muggleton, Dianhuan Lin, Alireza Tamaddoni-Nezhad: Meta-interpretive learning of higher-order dyadic datalog: predicate invention revisited. Machine Learning 100(1): 49-73 (2015)
+* Stephen H. Muggleton, Dianhuan Lin, Alireza Tamaddoni-Nezhad: [Meta-interpretive learning of higher-order dyadic datalog: predicate invention revisited](https://link.springer.com/article/10.1007/s10994-014-5471-y). Machine Learning 100(1): 49-73 (2015)
 
-* Stephen H. Muggleton, Dianhuan Lin, Niels Pahlavi, Alireza Tamaddoni-Nezhad: Meta-interpretive learning: application to grammatical inference. Machine Learning 94(1): 25-49 (2014)
+* Stephen H. Muggleton, Dianhuan Lin, Niels Pahlavi, Alireza Tamaddoni-Nezhad: [Meta-interpretive learning: application to grammatical inference](https://link.springer.com/article/10.1007/s10994-013-5358-3). Machine Learning 94(1): 25-49 (2014)
 
 #### Theory and Implementation
 
@@ -150,13 +150,11 @@ Here are some publications on MIL and Metagol.
 
 * Andrew Cropper, Stephen H. Muggleton: [Learning Efficient Logical Robot Strategies Involving Composable Objects](http://andrewcropper.com/pubs/ijcai15-metagolo.pdf). IJCAI 2015: 3423-3429
 
-* Andrew Cropper, Stephen Muggleton: Can predicate invention compensate for incomplete background knowledge? SCAI 2015: 27-36
-
 * Andrew Cropper, Stephen H. Muggleton: [Logical Minimisation of Meta-Rules Within Meta-Interpretive Learning](http://andrewcropper.com/pubs/ilp14-minmeta.pdf). ILP 2014: 62-75
 
 * Stephen H. Muggleton, Dianhuan Lin, Jianzhong Chen, Alireza Tamaddoni-Nezhad: MetaBayes: Bayesian Meta-Interpretative Learning Using Higher-Order Stochastic Refinement. ILP 2013: 1-17
 
-#### Applications
+#### Applications / other
 
 * Stephen H. Muggleton, Ute Schmid, Christina Zeller, Alireza Tamaddoni-Nezhad, Tarek R. Besold: Ultra-Strong Machine Learning: comprehensibility of programs learned with ILP. Machine Learning 107(7): 1119-1140 (2018)
 
@@ -165,7 +163,9 @@ Meta-Interpretive Learning from noisy images. Machine Learning 107(7): 1097-1118
 
 * Colin Farquhar, Gudmund Grov, Andrew Cropper, Stephen Muggleton, Alan Bundy: Typed meta-interpretive learning for proof strategies. ILP (Late Breaking Papers) 2015: 17-32
 
-* Andrew Cropper, Alireza Tamaddoni-Nezhad, Stephen H. Muggleton: Meta-Interpretive Learning of Data Transformation Programs. ILP 2015: 46-59
+* Andrew Cropper, Alireza Tamaddoni-Nezhad, Stephen H. Muggleton: [Meta-Interpretive Learning of Data Transformation Programs](http://andrewcropper.com/pubs/ilp15-datacurate.pdf). ILP 2015: 46-59
+
+* Andrew Cropper, Stephen Muggleton: [Can predicate invention compensate for incomplete background knowledge?](http://andrewcropper.com/pubs/scai15-incomplete.pdf) SCAI 2015: 27-36
 
 * Dianhuan Lin, Eyal Dechter, Kevin Ellis, Joshua B. Tenenbaum, Stephen Muggleton: Bias reformulation for one-shot function induction. ECAI 2014: 525-530
 
