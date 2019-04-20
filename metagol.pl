@@ -187,21 +187,26 @@ invented_symbols(MaxClauses,P/A,[sym(P,A,_U)|Sig]):-
 
 pprint(Prog1):-
     reverse(Prog1,Prog3),
-    maplist(metasub_to_clause_list,Prog3,Prog4),
-    (get_option(unfold_program) -> unfold_program(Prog4,Prog2); Prog2=Prog4),
+    maplist(metasub_to_clause,Prog3,Prog2),
     maplist(pprint_clause,Prog2).
 
-pprint_clause(L1):-
-    maplist(atom_to_list,L3,L1),
-    numbervars(L3,0,_),
-    list_to_clause(L3,L2),
-    (L2 = (H,T) -> Clause=(H:-T); Clause=L2),
-    format('~q.~n',[Clause]).
+pprint_clause(C):-
+    numbervars(C,0,_),
+    format('~q.~n',[C]).
 
-metasub_to_clause_list(sub(Name,_,_,Subs,_),[HeadList|BodyAsList2]):-
+metasub_to_clause(sub(Name,_,_,Subs,_),Clause2):-
     user:metarule_init(Name,Subs,_,HeadList,BodyAsList1,_,_),
     add_path_to_body(BodyAsList3,_,BodyAsList1,_),
-    filter(no_ordering,BodyAsList3,BodyAsList2).
+    filter(no_ordering,BodyAsList3,BodyAsList2),
+    maplist(atom_to_list,ClauseAsList,[HeadList|BodyAsList2]),
+    list_to_clause(ClauseAsList,Clause1),
+    (Clause1 = (H,T) -> Clause2=(H:-T); Clause2=Clause1).
+
+
+%% metasub_to_clause_list(sub(Name,_,_,Subs,_),[HeadList|BodyAsList2]):-
+%%     user:metarule_init(Name,Subs,_,HeadList,BodyAsList1,_,_),
+%%     add_path_to_body(BodyAsList3,_,BodyAsList1,_),
+%%     filter(no_ordering,BodyAsList3,BodyAsList2).
 
 no_ordering(H):-
     H\='@'(_).
@@ -305,12 +310,11 @@ learn_seq(Seq,Prog):-
 
 learn_task(Pos/Neg,Prog1):-
     learn(Pos,Neg,Prog1),!,
-    maplist(metasub_to_clause_list,Prog1,Prog3),
-    maplist(remove_orderings,Prog3,Prog4),
-    maplist(clause_list_to_clause,Prog4,Prog2),
-    foreach(memberchk(Clause,Prog2),assert(user:Clause)),
-    findall(P/A,(member(sub(_Name,P,A,_Subs,_PredTypes),Prog2)),Prims),!,
+    maplist(metasub_to_clause,Prog1,Prog2),
+    forall(member(Clause,Prog2),assert(user:Clause)),
+    findall(P/A,(member(sub(_Name,P,A,_Subs,_PredTypes),Prog1)),Prims),!,
     list_to_set(Prims,PrimSet),
+    maplist(writeln,PrimSet),
     maplist(assert_prim,PrimSet).
 learn_task(_,[]).
 

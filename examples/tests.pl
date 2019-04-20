@@ -234,6 +234,35 @@ test_robotsb:-
     Prog = [sub(chain,f_4,2,[f_4,move_right,move_forwards],[prim,prim]),sub(chain,f_3,2,[f_3,f_4,f_4],[inv,inv]),sub(chain,f_2,2,[f_2,f_3,f_3],[inv,inv]),sub(chain,f_1,2,[f_1,f_2,drop_ball],[inv,prim]),sub(chain,f,2,[f,grab_ball,f_1],[prim,inv])],
     test(Name,Pos,[],Prog).
 
+test_sequential1:-
+    Name = 'sequential',
+    consult(Name),
+
+    T1 = [
+    parent(ann,andy),
+    parent(steve,andy),
+    parent(ann,amy),
+    parent(ann,andy)
+  ]/[],
+
+  T2 = [
+    grandparent(steve,amelia),
+    grandparent(ann,amelia),
+    grandparent(linda,amelia),
+    grandparent(ann,spongebob)
+  ]/[],
+
+  T3 = [
+    great_grandparent(ann,sally),
+    great_grandparent(steve,sally)
+  ]/[],
+
+      learn_seq([T1,T2,T3],Prog),
+      Prog=[sub(ident,parent,2,[parent,father],[prim]),sub(ident,parent,2,[parent,mother],[prim]),sub(chain,grandparent,2,[grandparent,parent,parent],[prim,prim]),sub(chain,great_grandparent,2,[great_grandparent,parent,grandparent],[prim,prim])],
+      unload_file(Name).
+
+
+
 test_strings1:-
     Name='strings1',
     Pos = [
@@ -274,7 +303,7 @@ test_trains :-
 
 
 %%
-t:-
+t :-
     test_adjred,
     test_constants1,
     test_constants2,
@@ -298,5 +327,9 @@ t:-
     test_strings2,
     test_strings3,
     test_trains,
+    %% THIS TEST MUST GO AT THE END
+    test_sequential1,
     writeln('TESTS PASSED').
-    %% halt.
+
+:-
+    time(t).

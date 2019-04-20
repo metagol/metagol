@@ -28,5 +28,4 @@ edge(b,a).
   ],
   Neg = [
   ],
-  learn(Pos,Neg,Prog),
-  writeln(Prog).
+  learn(Pos,Neg).
