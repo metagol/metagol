@@ -12,9 +12,9 @@ prim(head/2).
 prim(element/2).
 
 %% metarules
-metarule(dident,[P,Q,R],([P,A,B]:-[[Q,A,B],[R,A,B]])).
-metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
-metarule(tailrec,[P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]])).
+metarule(dident, [P,Q,R], [P,A,B], [[Q,A,B],[R,A,B]]).
+metarule(chain, [P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).
+metarule(tailrec, [P,Q], [P,A,B], [[Q,A,C],[P,C,B]]).
 
 %% background knowledge
 head([H|_],H).
@@ -29,7 +29,7 @@ func_test(Atom1,Atom2,Condition):-
   Atom2 = [P,A,Z],
   Condition = (Z \= B).
 
-a :-
+:-
     Pos = [
         f([1,3,3,4,2,5],3),
         f([6,4,2,5,3,5,1],5),

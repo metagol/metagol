@@ -4,8 +4,8 @@
 prim(parent/2).
 
 %% metarules
-metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
-metarule([P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]])).
+metarule([P,Q], [P,A,B], [[Q,A,B]]).
+metarule([P,Q], [P,A,B], [[Q,A,C],[P,C,B]]).
 
 %% background knowledge
 parent(queen_victoria,edward_seventh).
@@ -21,7 +21,7 @@ parent(princess_diana,prince_william).
 parent(princess_diana,prince_harry).
 parent(prince_william,prince_george).
 
-a :-
+:-
   Pos = [
     ancestor(elizabeth_second,prince_charles),
     ancestor(george_sixth,prince_harry),

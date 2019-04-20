@@ -15,15 +15,16 @@ prim(double/1).
 prim(jagged/1).
 
 %% metarules
-metarule([P,Q],([P,A]:-[[Q,A]])).
-metarule([P,Q,R],([P,A]:-[[Q,A],[R,A]])).
-metarule([P,Q,R],([P,A]:-[[Q,A,B],[R,B]])).
-metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
-metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,B]])).
-metarule([P,Q,X],([P,A]:-[[Q,A,X]])).
-metarule([P,Q,X],([P,A,B]:-[[Q,A,B,X]])).
+metarule([P,Q], [P,A],[[Q,A]]).
+metarule([P,Q,R], [P,A], [[Q,A],[R,A]]).
+metarule([P,Q,R], [P,A], [[Q,A,B],[R,B]]).
+metarule([P,Q], [P,A,B], [[Q,A,B]]).
+metarule([P,Q,R], [P,A,B], [[Q,A,B],[R,B]]).
+metarule([P,Q,X], [P,A], [[Q,A,X]]).
+metarule([P,Q,X], [P,A,B], [[Q,A,B,X]]).
 
-a:-
+
+a :-
     Pos = [
         e(east1),
         e(east2),

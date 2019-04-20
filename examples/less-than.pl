@@ -7,10 +7,10 @@ metagol:unfold_program.
 prim(succ/2).
 
 %% metarules
-metarule(ident,[P,Q],([P,A,B]:-[[Q,A,B]])).
-metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
+metarule(ident, [P,Q], [P,A,B], [[Q,A,B]]).
+metarule(chain, [P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).
 
-a :-
+:-
   Pos = [
     target(1,3),
     target(2,5),

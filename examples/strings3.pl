@@ -10,10 +10,10 @@ prim(write1/3).
 prim(next_empty/1).
 
 %% metarules
-metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
-metarule([P,Q,R],([P,A,B]:-[[Q,A],[R,A,B]])).
-metarule([P,Q,X],([P,A,B]:-[[Q,A,B,X]])).
-metarule([P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]])).
+metarule([P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).
+metarule([P,Q,R], [P,A,B], [[Q,A],[R,A,B]]).
+metarule([P,Q,X], [P,A,B], [[Q,A,B,X]]).
+metarule([P,Q], [P,A,B], [[Q,A,C],[P,C,B]]).
 
 %% background knowledge
 copy1([H|RestIn]/[H|RestOut],[H|RestIn]/RestOut).
@@ -26,7 +26,7 @@ func_test(Atom1,Atom2,Condition):-
   Atom2 = [P,In/Z,_/[]],
   Condition = (Z \= B).
 
-a :-
+:-
   Pos = [
     f(['a','b','c']/['a','b','c','d'],_/[]),
     f(['a','a','c']/['a','a','c','d'],_/[]),

@@ -1,9 +1,9 @@
 :-['../metagol'].
 
 %% metarules
-metarule([P,Q],([P,A]:-[[Q,A]])).
-metarule([P,Q,F],([P,A,B]:-[[Q,A,B,F]])).
-metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
+metarule([P,Q], [P,A], [[Q,A]]).
+metarule([P,Q,F], [P,A,B], [[Q,A,B,F]]).
+metarule([P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).
 
 %% background knowledge
 divisible5(X):-0 is X mod 5.
@@ -24,7 +24,7 @@ ibk([filter,[],[],_],[]).
 ibk([filter,[A|T1],[A|T2],F],[[F,A],[filter,T1,T2,F]]).
 ibk([filter,[_|T1],T2,F],[[filter,T1,T2,F]]).
 
-a:-
+:-
   A = [1,2,3,4,5,6,7,8,9,10],
   B = [2,4,5,6,8,10],
   learn([f(A,B)],[]).

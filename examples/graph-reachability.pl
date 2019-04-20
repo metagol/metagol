@@ -7,8 +7,8 @@ metagol:max_clauses(2).
 prim(edge/2).
 
 %% metarules
-metarule([P, Q], ([P, A, B]:-[[Q, A, B]])).
-metarule([P, Q], ([P, A, B]:-[[Q, A, C], [P, C, B]])).
+metarule([P,Q], [P,A,B], [[Q,A,B]]).
+metarule([P,Q], [P,A,B], [[Q,A,C], [P,C,B]]).
 
 %% background knowledge
 edge(a, b).
@@ -18,6 +18,6 @@ edge(a, d).
 
 
 
-a :-
+:-
   Pos = [p(a, b), p(a, c), p(a, a)],
   learn(Pos,[]).

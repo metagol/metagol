@@ -22,12 +22,12 @@ prim(mother/2).
 prim(father/2).
 
 %% metarules
-metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
-metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,A,B]])).
-metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
+metarule([P,Q],[P,A,B],[[Q,A,B]]).
+metarule([P,Q,R],[P,A,B],[[Q,A,B],[R,A,B]]).
+metarule([P,Q,R],[P,A,B],[[Q,A,C],[R,C,B]]).
 
 %% learning task
-a :-
+:-
   %% positive examples
   Pos = [
     grandparent(ann,amelia),
@@ -58,68 +58,54 @@ where the predicate `grandparent_1/2` is invented and corresponds to the parent 
 
 #### Metarules
 
-Metagol requires higher-order metarules to define the form of clauses permitted in a hypothesis. An example metarule is:
+Metagol requires metarules to define the form of clauses permitted in a hypothesis. An example metarule is:
 
 ```prolog
-metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
+metarule([P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).
 ```
+Metarules are of the form metarule(Subs, Head, Body).
 
-In this metarule, known as the chain metarule, the symbols `P`, `Q`, and `R` denote existentially quantified higher-order variables, and the symbols `A`, `B`, and `C` denote universally quantified first-order variables. The list of symbols in the first argument denote the existentially quantified variables which Metagol will attempt to find substitutions for during the learning.
+In the aforementioned metarule, known as the *chain* metarule, the symbols `P`, `Q`, and `R` denote second-order variables.
+The symbols `A`, `B`, and `C` denote first-order variables.
+The list of symbols in the first argument denote the variables that will try to find substitutions for during the learning.
 
-Users need to supply Metarules. We are working on automatically identifying the necessary metarules, with preliminary work detailed in the paper:
+Users must supply metarules.
+We are working on automatically identifying the necessary metarules, with preliminary work detailed in the below papers:
+
+* Cropper, A., and Tourret, S. [Derivation reduction of metarules in meta-interpretive learning](http://andrewcropper.com/pubs/ilp18-dreduce.pdf). ILP 2018.
 
 * Cropper, A. and Muggleton S.H. [Logical minimisation of meta-rules within meta-interpretive learning](http://andrewcropper.com/pubs/ilp14-minmeta.pdf). ILP 2014.
 
-* Cropper, A., and Tourret, S. [Derivation reduction of metarules in meta-interpretive learning](http://andrewcropper.com/pubs/ilp18-dreduce.pdf). ILP 2018.
 
 For learning dyadic programs without constant symbols, we recommend using these metarules:
 
 ```prolog
-metarule([P,Q],([P,A,B]:-[[Q,A,B]])). % identity
-metarule([P,Q],([P,A,B]:-[[Q,B,A]])). % inverse
-metarule([P,Q,R],([P,A,B]:-[[Q,A],[R,A,B]])). % precon
-metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,B]])). % postcon
-metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])). % chain
+metarule([P,Q], [P,A,B], [[Q,A,B]]). % identity
+metarule([P,Q], [P,A,B], [[Q,B,A]]). % inverse
+metarule([P,Q,R], [P,A,B], [[Q,A],[R,A,B]]). % precon
+metarule([P,Q,R], [P,A,B], [[Q,A,B],[R,B]]). % postcon
+metarule([P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]). % chain
 ```
 
 Please look at the examples to see how metarules are used.
 
 #### Recursion
 
-The above metarules are all non-recursive. By contrast, this metarule is recursive:
+The above metarules are all non-recursive.
+By contrast, this metarule is recursive:
 
 ```prolog
-metarule([P,Q],([P,A,B]:-[[Q,A,C],[P,C,B]])).
+metarule([P,Q], [P,A,B], [[Q,A,C],[P,C,B]]).
 ```
 
-The find-duplicate, sorrter, and string examples illustrate learning recursive programs.
+The find-duplicate, sorter, and string examples illustrate learning recursive programs.
 
 #### Metagol settings
-
 
 Metagol searches for a hypothesis using iterative deepening on the number of clauses in the solution. You can specify a maximum number of clauses:
 
 ```prolog
 metagol:max_clauses(Integer). % default 10
-```
-
-The following flag denotes whether the learned program should be unfolded to remove unnecessary invented predicates:
-
-```prolog
-metagol:unfold_program. % default false
-```
-
-For instance, with the flag set to false, Metagol would learn this great-grandmother theory:
-
-```prolog
-ggmother(A,B):-mother(A,C),ggmother_1(C,B).
-ggmother_1(A,B):-mother(A,C),mother(C,B).
-```
-
-With the flag set to true, Metagol would learn this great-grandmother theory:
-
-```prolog
-ggparent(A,B):-mother(A,C),mother(C,D),mother(D,B).
 ```
 
 The following flag denotes whether the learned theory should be functional:
@@ -136,7 +122,11 @@ func_test(Atom1,Atom2,Condition):-
   Condition = (B\=Z).
 ```
 
-This func test is used in the robot examples. Here, the `Atom` variable is formed of a predicate symbol `P` and two states `A` and `B`, which represent initial and final state pairs respectively.  The func_test checks whether the learned hypothesis can be applied to the initial state to reach any state `Z` other that the expected final state `B`. For more examples of functional tests, see the robots.pl, sorter.pl, and strings2.pl files.
+This func test is used in the robot examples.
+The idea is to provide two atoms to Metagol.
+Metagol will try to prove both atoms using the learned program.
+Metagol then checks the given functional condition.
+In this example `Atom1` is formed of a predicate symbol `P` and two states `A` and `B`, which represent initial and final state pairs respectively. Likewise, `Atom2` is formed of a predicate symbol `P` and two states `A` and `Z`. The func_test checks whether the learned program can be applied to the initial state to reach any state `Z` other that the expected final state `B`. For more examples of functional tests, see the robots.pl, sorter.pl, and strings2.pl files.
 
 
 ### Publications
@@ -146,9 +136,9 @@ Here are some publications on MIL and Metagol.
 
 #### Key papers
 
-* Andrew Cropper, Stephen H. Muggleton: Learning efficient logic programs. Machine learning (2018). https://doi.org/10.1007/s10994-018-5712-6.
+* Andrew Cropper, Stephen H. Muggleton: [Learning efficient logic programs](http://andrewcropper.com/pubs/mlj19-metaopt.pdf). Machine learning (2018). https://doi.org/10.1007/s10994-018-5712-6.
 
-* Andrew Cropper, Stephen H. Muggleton: Learning Higher-Order Logic Programs through Abstraction and Invention. IJCAI 2016: 1418-1424
+* Andrew Cropper, Stephen H. Muggleton: [Learning Higher-Order Logic Programs through Abstraction and Invention](http://andrewcropper.com/pubs/ijcai16-metafunc.pdf). IJCAI 2016: 1418-1424
 
 * Stephen H. Muggleton, Dianhuan Lin, Alireza Tamaddoni-Nezhad: Meta-interpretive learning of higher-order dyadic datalog: predicate invention revisited. Machine Learning 100(1): 49-73 (2015)
 
@@ -156,13 +146,13 @@ Here are some publications on MIL and Metagol.
 
 #### Theory and Implementation
 
-* Andrew Cropper, Sophie Tourret: Derivation Reduction of Metarules in Meta-interpretive Learning. ILP 2018: 1-21
+* Andrew Cropper, Sophie Tourret: [Derivation Reduction of Metarules in Meta-interpretive Learning](http://andrewcropper.com/pubs/ilp18-dreduce.pdf). ILP 2018: 1-21
 
-* Andrew Cropper, Stephen H. Muggleton: Learning Efficient Logical Robot Strategies Involving Composable Objects. IJCAI 2015: 3423-3429
+* Andrew Cropper, Stephen H. Muggleton: [Learning Efficient Logical Robot Strategies Involving Composable Objects](http://andrewcropper.com/pubs/ijcai15-metagolo.pdf). IJCAI 2015: 3423-3429
 
 * Andrew Cropper, Stephen Muggleton: Can predicate invention compensate for incomplete background knowledge? SCAI 2015: 27-36
 
-* Andrew Cropper, Stephen H. Muggleton: Logical Minimisation of Meta-Rules Within Meta-Interpretive Learning. ILP 2014: 62-75
+* Andrew Cropper, Stephen H. Muggleton: [Logical Minimisation of Meta-Rules Within Meta-Interpretive Learning](http://andrewcropper.com/pubs/ilp14-minmeta.pdf). ILP 2014: 62-75
 
 * Stephen H. Muggleton, Dianhuan Lin, Jianzhong Chen, Alireza Tamaddoni-Nezhad: MetaBayes: Bayesian Meta-Interpretative Learning Using Higher-Order Stochastic Refinement. ILP 2013: 1-17
 

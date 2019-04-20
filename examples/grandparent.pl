@@ -5,8 +5,8 @@ prim(father/2).
 prim(mother/2).
 
 %% metarules
-metarule([P,Q],([P,A,B]:-[[Q,A,B]])).
-metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
+metarule([P,Q], [P,A,B], [[Q,A,B]]).
+metarule([P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).
 
 %% background knowledge
 mother(i,a).
@@ -18,7 +18,7 @@ father(a,c).
 father(b,d).
 father(b,e).
 
-a :-
+:-
  Pos = [
     target(i,b),
     target(i,c),

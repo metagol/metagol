@@ -4,9 +4,9 @@
 prim(succ/2).
 
 %% metarules
-metarule([P,Q],([P,A,B]:-[[Q,B,A]])).
+metarule([P,Q], [P,A,B], [[Q,B,A]]).
 
-a :-
+:-
   Pos = [
     target(1,0),
     target(2,1),
@@ -29,6 +29,6 @@ a :-
     target(4,0),
     target(4,10),
     target(5,5),
-    target(5,6)  
+    target(5,6)
   ],
   learn(Pos,Neg).

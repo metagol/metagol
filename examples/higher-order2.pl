@@ -17,14 +17,14 @@ prim(my_length/2).
 interpreted(map/3).
 
 %% metarules
-metarule([P,Q,F],([P,A,B]:-[[Q,A,B,F]])).
-metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
+metarule([P,Q,F], [P,A,B], [[Q,A,B,F]]).
+metarule([P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).
 
 %% interpreted BK
 ibk([map,[],[],_],[]).
 ibk([map,[A|As],[B|Bs],F],[[F,A,B],[map,As,Bs,F]]).
 
-a:-
+:-
   A=[[a],[a,a],[a,a,a],[a,a,a,a]],
   B=[2,4,6,8],
   learn([f(A,B)],[]).

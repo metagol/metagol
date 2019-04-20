@@ -18,8 +18,8 @@ prim(split/2).
 prim(combine/2).
 
 %% metarules
-metarule(tailrec,[P,Q],([P,A,B]:-[[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)])).
-metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
+metarule(tailrec, [P,Q], [P,A,B], [[Q,A,C],@term_gt(A,C),[P,C,B],@term_gt(C,B)]).
+metarule(chain, [P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).
 
 a:-
   examples(10,TrainExamples),!,

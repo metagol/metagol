@@ -10,20 +10,20 @@ prim(green/1).
 metarule([P,Q,R],([P,A]:-[[Q,A,B],[R,B]])).
 
 %% background knowledge
-edge(a,b). 
-edge(b,a). 
-edge(c,d). 
-edge(c,e). 
+edge(a,b).
+edge(b,a).
+edge(c,d).
+edge(c,e).
 edge(d,e).
 colour(a,red).
-colour(b,green). 
+colour(b,green).
 colour(c,red).
-colour(d,red). 
+colour(d,red).
 colour(e,green).
 red(red).
 green(green).
 
-a :-
+:-
  Pos = [
     target(b),
     target(c)

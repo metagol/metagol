@@ -186,6 +186,42 @@ test_lessthan:-
     Prog=[sub(chain,target_2,2,[target_2,succ,succ],[prim,prim]),sub(chain,target_1,2,[target_1,succ,target_2],[prim,inv]),sub(ident,target,2,[target,target_1],[inv]),sub(ident,target_1,2,[target_1,succ],[prim]),sub(chain,target,2,[target,target_1,target_1],[inv,inv])],
     test(Name,Pos,Neg,Prog).
 
+test_member:-
+    Name = 'member',
+    Pos = [
+    target(4,[4,3,2,1]),
+    target(3,[4,3,2,1]),
+    target(2,[4,3,2,1]),
+    target(1,[4,3,2,1]),
+    target(3,[3,2,1]),
+    target(2,[3,2,1]),
+    target(1,[3,2,1]),
+    target(2,[2,1]),
+    target(1,[2,1]),
+    target(1,[1])
+  ],
+  Neg = [
+    target(5,[4,3,2,1]),
+    target(6,[4,3,2,1]),
+    target(7,[4,3,2,1]),
+    target(8,[4,3,2,1]),
+    target(4,[3,2,1]),
+    target(5,[3,2,1]),
+    target(6,[3,2,1]),
+    target(3,[2,1]),
+    target(4,[2,1]),
+    target(2,[1])
+  ],
+  Prog = [sub(2,target,2,[target,cons],[prim,inv]),sub(1,target,2,[target,value],[prim])],
+  test(Name,Pos,Neg,Prog).
+
+test_mutual_recursion:-
+    Name = 'mutual-recursion',
+    Pos = [even(10),even(8),even(6),even(4),even(2)],
+    Neg = [even(3)],
+    Prog=[sub(base,even,1,[even,0],[]),sub(mutual,even_1,1,[even_1,s,even],[prim,inv]),sub(mutual,even,1,[even,s,even_1],[prim,inv])],
+    test(Name,Pos,Neg,Prog).
+
 test_robotsa:-
     Name='robots',
     Pos = [f(world((1/1),(1/1),false),world((3/3),(3/3),false))],
@@ -254,6 +290,8 @@ t:-
     test_kinship1a,
     test_kinship1b,
     test_lessthan,
+    test_member,
+    test_mutual_recursion,
     test_robotsa,
     test_robotsb,
     test_strings1,

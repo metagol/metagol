@@ -1,10 +1,10 @@
 :- use_module('../metagol').
 
 %% metarules
-metarule([P,A],([P,A,_B]:-[])).
-metarule([P,B],([P,_A,B]:-[])).
+metarule([P,A], [P,A,_B], []).
+metarule([P,B], [P,_A,B], []).
 
-a :-
+:-
   Pos = [
     p(1,2),
     p(1,3),

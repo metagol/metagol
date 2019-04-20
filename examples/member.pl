@@ -5,8 +5,8 @@ prim(cons/2).
 prim(value/2).
 
 %% metarules
-metarule([P,Q],([P,A,B]:-[[Q,B,A]])).
-metarule([P,Q,R],([P,A,B]:-[[Q,B,C],[P,A,C]])).
+metarule([P,Q], [P,A,B], [[Q,B,A]]).
+metarule([P,Q], [P,A,B], [[Q,B,C],[P,A,C]]).
 
 %% background knowledge
 cons([4,3,2,1],[3,2,1]).
@@ -18,7 +18,7 @@ value([3,2,1],3).
 value([2,1],2).
 value([1],1).
 
-a :-
+:-
  Pos = [
     target(4,[4,3,2,1]),
     target(3,[4,3,2,1]),

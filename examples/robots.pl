@@ -12,12 +12,9 @@ prim(move_backwards/2).
 prim(grab_ball/2).
 prim(drop_ball/2).
 
-
-metagol:unfold_program.
-
 %% metarules
-metarule(ident,[P,Q],([P,A,B]:-[[Q,A,B]])).
-metarule(chain,[P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).
+metarule(ident, [P,Q], [P,A,B], [[Q,A,B]]).
+metarule(chain, [P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).
 
 %% functional check
 func_test(Atom1,Atom2,Condition):-
