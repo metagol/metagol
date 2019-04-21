@@ -8,6 +8,7 @@ check_same(Prog1,Prog2):-
     false.
 
 test(Name,Pos,Neg,Prog1):-
+    writeln(Name),
     consult(Name),
     metagol:set_option(metarule_next_id(0)),
     learn(Pos,Neg,Prog2),!,

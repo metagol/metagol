@@ -1,7 +1,7 @@
 :- use_module('../metagol').
 
 %% metagol settings
-metagol:functional.
+%% metagol:functional.
 metagol:max_clauses(10).
 
 %% tell metagol to use the BK
@@ -20,7 +20,7 @@ metarule(chain, [P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).
 func_test(Atom1,Atom2,Condition):-
   Atom1 = [P,A,B],
   Atom2 = [P,A,Z],
-  Condition = (Z \= B).
+  Condition = (Z = B).
   %% \+ (metagol:prove_deduce([Actual],PS,G),Z \= B).
 
 %% robot learning to move a ball to a specific position

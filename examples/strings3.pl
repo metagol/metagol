@@ -24,7 +24,7 @@ next_empty([_]/_).
 func_test(Atom1,Atom2,Condition):-
   Atom1 = [P,In/B,_/[]],
   Atom2 = [P,In/Z,_/[]],
-  Condition = (Z \= B).
+  Condition = (Z = B).
 
 :-
   Pos = [

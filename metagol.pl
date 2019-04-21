@@ -1,5 +1,4 @@
-%% more refactoring
-%% This is a copyrighted file under the BSD 3-clause licence, details of which can be found in the root directory.
+%% This file is a copyrighted under the BSD 3-clause licence, details of which can be found in the root directory.
 
 :- module(metagol,[learn/2,learn/3,learn_seq/2,pprint/1,op(950,fx,'@')]).
 
@@ -75,7 +74,6 @@ deduce_atom(Atom,Sig,Prog):-
 prove([],_FullSig,_Sig,_MaxN,N,N,Prog,Prog).
 prove([Atom|Atoms],FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
     prove_aux(Atom,FullSig,Sig,MaxN,N1,N3,Prog1,Prog3),
-
     prove(Atoms,FullSig,Sig,MaxN,N3,N2,Prog3,Prog2).
 
 %% used when the user gives an ordering over the herbrand base prove_aux('@'(Atom),_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-!,
@@ -127,7 +125,7 @@ check_functional(Atoms,Sig,Prog):-
             user:func_test(Atom2,TestAtom2,Condition),
             make_atom(TestAtom2,TestAtom1),
             deduce_atom(TestAtom1,Sig,Prog),
-            call(Condition)));
+            \+ call(Condition)));
         true).
 
 %% if not recursive continue as normal
@@ -201,12 +199,6 @@ metasub_to_clause(sub(Name,_,_,Subs,_),Clause2):-
     maplist(atom_to_list,ClauseAsList,[HeadList|BodyAsList2]),
     list_to_clause(ClauseAsList,Clause1),
     (Clause1 = (H,T) -> Clause2=(H:-T); Clause2=Clause1).
-
-
-%% metasub_to_clause_list(sub(Name,_,_,Subs,_),[HeadList|BodyAsList2]):-
-%%     user:metarule_init(Name,Subs,_,HeadList,BodyAsList1,_,_),
-%%     add_path_to_body(BodyAsList3,_,BodyAsList1,_),
-%%     filter(no_ordering,BodyAsList3,BodyAsList2).
 
 no_ordering(H):-
     H\='@'(_).
@@ -314,7 +306,6 @@ learn_task(Pos/Neg,Prog1):-
     forall(member(Clause,Prog2),assert(user:Clause)),
     findall(P/A,(member(sub(_Name,P,A,_Subs,_PredTypes),Prog1)),Prims),!,
     list_to_set(Prims,PrimSet),
-    maplist(writeln,PrimSet),
     maplist(assert_prim,PrimSet).
 learn_task(_,[]).
 

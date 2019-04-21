@@ -27,7 +27,7 @@ mergesort([H|T],B):-A=[H|T],msort(A,B),A\=B.
 func_test(Atom1,Atom2,Condition):-
   Atom1 = [P,A,B],
   Atom2 = [P,A,Z],
-  Condition = (Z \= B).
+  Condition = (Z = B).
 
 :-
     Pos = [

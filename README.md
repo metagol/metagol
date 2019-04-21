@@ -117,15 +117,14 @@ If the functional flag is enabled, then you must define a func_test predicate. A
 
 ```prolog
 func_test(Atom1,Atom2,Condition):-
-  Atom1 = [P,A,B],
-  Atom2 = [P,A,Z],
-  Condition = (B\=Z).
+  Atom1 = [P,A,X],
+  Atom2 = [P,A,Y],
+  Condition = (X=Y).
 ```
 
 This func test is used in the robot examples.
-The idea is to provide two atoms to Metagol.
-Metagol will try to prove both atoms using the learned program.
-Metagol then checks the given functional condition.
+Metagol will first try to prove Atom1 using the learned program.
+Metagol will then check all other consequences of the program.
 In this example `Atom1` is formed of a predicate symbol `P` and two states `A` and `B`, which represent initial and final state pairs respectively. Likewise, `Atom2` is formed of a predicate symbol `P` and two states `A` and `Z`. The func_test checks whether the learned program can be applied to the initial state to reach any state `Z` other that the expected final state `B`. For more examples of functional tests, see the robots.pl, sorter.pl, and strings2.pl files.
 
 
@@ -171,6 +170,6 @@ Meta-Interpretive Learning from noisy images. Machine Learning 107(7): 1097-1118
 
 #### Theses
 
-* Andrew Cropper: Efficiently learning efficient programs. Imperial College London, UK 2017
+* Andrew Cropper: [Efficiently learning efficient programs](http://andrewcropper.com/pubs/phd-thesis.pdf). Imperial College London, UK 2017
 
 * Dianhuan Lin: Logic programs as declarative and procedural bias in inductive logic programming. Imperial College London, UK 2013
