@@ -105,7 +105,7 @@ By contrast, this metarule is recursive:
 metarule([P,Q], [P,A,B], [[Q,A,C],[P,C,B]]).
 ```
 
-The find-duplicate, sorter, and string examples illustrate learning recursive programs.
+See the find-duplicate, sorter, member, and string examples.
 
 
 #### Interpreted background knowledge
@@ -121,7 +121,7 @@ ibk([map,[A|As],[B|Bs],F],[[F,A,B],[map,As,Bs,F]]).
 
 Given this IBK, Metagol will try to prove it through meta-interpretation, and will also try to learn a sub-program for the atom `[F,A,B]`.
 
-See the higher-order and ibk examples.
+See the droplast, higher-order, and ibk examples.
 
 #### Metagol settings
 
