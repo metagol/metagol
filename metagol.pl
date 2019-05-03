@@ -150,10 +150,7 @@ check_new_metasub(Name,P,A,Subs,Prog):-
 check_new_metasub(_Name,_P,_A,_Subs,_Prog).
 
 assert_sig_types(Sig):-
-    findall(P/A, (type(P,A,head_pred); member(sym(P,A,_),Sig)), S0),
-    list_to_set(S0,S1),
-    forall(member(P/A,S1),
-        (type(P,A,head_pred) -> true; assert(type(P,A,head_pred)))).
+    forall((member(sym(P,A,_),Sig),\+type(P,A,head_pred)),assert(type(P,A,head_pred))).
 
 body_preds:-
     findall(P/A,user:body_pred(P/A),S0),
