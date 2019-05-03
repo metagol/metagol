@@ -9,6 +9,9 @@ check_same(Prog1,Prog2):-
 
 load_example(Name):-
     writeln(Name),
+
+    %% (current_predicate(metagol:max_clauses/1) -> retractall(metagol:max_clauses(_)); true),
+
     retractall(user:body_pred(_)),
     retractall(user:head_pred(_)),
     retractall(metagol:ibk(_,_,_)),

@@ -1,9 +1,10 @@
 :- use_module('../metagol').
 
+metagol:max_clauses(6).
+
 %% preds that metagol can use in the body of a clause
 body_pred(mother/2).
 body_pred(father/2).
-
 body_pred(shoe/1).
 
 %% metarules

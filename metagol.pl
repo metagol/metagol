@@ -10,39 +10,35 @@
     user:head_pred/1,
     user:body_pred/1,
     functional/0,
-    min_clauses/1,
-    max_clauses/1,
-    max_inv_preds/1,
-    metarule_next_id/1,
-    ibk/3,
     body_pred_call/2,
+    ibk/3,
     ibk_body_pred_call/2.
 
 :- discontiguous
     metarule/7,
     metarule_init/6.
 
-default(min_clauses(1)).
-default(max_clauses(6)).
-default(metarule_next_id(0)).
-default(max_inv_preds(10)).
+default(max_clauses(10)).
+default(timeout(600)). % 10 minutes
 
-learn(Pos1,Neg1):-
-    learn(Pos1,Neg1,Prog),
+learn(Pos,Neg):-
+    learn(Pos,Neg,Prog),
     pprint(Prog).
-
-learn(_,_):-
-    writeln('% unable to learn a solution'),
-    false.
-
-learn(Pos1,Neg1,Prog):-
+learn(Pos,Neg,Prog):-
     setup,
+    timeout(Time),
+    call_with_time_limit(Time,learn_(Pos,Neg,Prog)).
+
+learn_(Pos1,Neg1,Prog):-
     make_atoms(Pos1,Pos2),
     make_atoms(Neg1,Neg2),
     proveall(Pos2,Sig,Prog),
     nproveall(Neg2,Sig,Prog),
     ground(Prog),
     check_functional(Pos2,Sig,Prog).
+learn_(_,_,_):-!,
+    writeln('% unable to learn a solution'),
+    false.
 
 proveall(Atoms,Sig,Prog):-
     target_predicate(Atoms,P/A),
@@ -118,7 +114,7 @@ make_atom([P|Args],p(P,A,Args,[])):-
     length(Args,A).
 
 check_functional(Atoms,Sig,Prog):-
-    (get_option(functional) ->
+    (functional ->
         forall(member(Atom1,Atoms),
         \+ (
             make_atom(Atom2,Atom1),
@@ -171,7 +167,7 @@ assert_body_preds(S0):-
         retractall(body_pred_call(P,_)),
         functor(Atom,P,A),
         Atom =.. [P|Args],
-        (current_predicate(_,user:Atom) -> (
+        (current_predicate(P/A) -> (
             assert(user:body_pred(P/A)),
             assert(type(P,A,body_pred)),
             assert((body_pred_call(P,Args):-user:Atom))
@@ -211,14 +207,27 @@ ibk_body_preds:-
         assert((ibk_body_pred_call(P,Args):-user:Atom))
     )).
 
+options:-
+    (current_predicate(timeout/1) -> true; (default(timeout(Time)),set_option(timeout(Time)))),
+    (current_predicate(min_clauses/1) -> true; (set_option(min_clauses(1)))),
+    (current_predicate(max_clauses/1) -> true; (default(max_clauses(MaxN)),set_option(max_clauses(MaxN)))),
+    (current_predicate(max_inv_preds/1) -> true; (max_clauses(MaxN),succ(MaxInv,MaxN),set_option(max_inv_preds(MaxInv)))).
+
+set_option(Option):-
+    functor(Option,Name,Arity),
+    functor(Retract,Name,Arity),
+    retractall(Retract),
+    assert(Option).
+
 setup:-
+    options,
     body_preds,
     head_preds,
     ibk.
 
 iterator(N):-
-    get_option(min_clauses(MinN)),
-    get_option(max_clauses(MaxN)),
+    min_clauses(MinN),
+    max_clauses(MaxN),
     between(MinN,MaxN,N).
 
 target_predicate([p(P,A,_Args,[])|_],P/A).
@@ -229,7 +238,7 @@ target_predicate([p(P,A,_Args,[])|_],P/A).
 
 invented_symbols(MaxClauses,P/A,[sym(P,A,_U)|Sig]):-
     NumSymbols is MaxClauses-1,
-    get_option(max_inv_preds(MaxInvPreds)),
+    max_inv_preds(MaxInvPreds),
     M is min(NumSymbols,MaxInvPreds),
     findall(sym(Sym1,_Artiy,_Used1),(between(1,M,I),atomic_list_concat([P,'_',I],Sym1)),Sig1),
     findall(sym(Sym2,Arity2,_Used2),head_pred(Sym2/Arity2),Sig2),
@@ -261,18 +270,6 @@ list_to_clause([Atom|T1],(Atom,T2)):-!,
 
 atom_to_list(Atom,AtomList):-
     Atom =..AtomList.
-
-get_option(Option):-
-    call(Option), !.
-
-get_option(Option):-
-    default(Option).
-
-set_option(Option):-
-    functor(Option,Name,Arity),
-    functor(Retract,Name,Arity),
-    retractall(Retract),
-    assert(Option).
 
 %% build the internal metarule clauses
 user:term_expansion(metarule(Subs,Head,Body),Asserts):-
@@ -326,9 +323,12 @@ add_path_to_body([[P|Args]|Atoms],Path,[p(P,A,Args,Path)|Rest]):-
 gen_metarule_id(Name,Name):-
     ground(Name),!.
 gen_metarule_id(_Name,IdNext):-
-    get_option(metarule_next_id(Id)),
+    current_predicate(metarule_next_id/1),!,
+    metarule_next_id(Id),
     succ(Id,IdNext),
     set_option(metarule_next_id(IdNext)).
+gen_metarule_id(_Name,1):-
+    set_option(metarule_next_id(2)).
 
 learn_seq(Seq,Prog):-
     maplist(learn_task,Seq,Progs),

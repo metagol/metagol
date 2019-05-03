@@ -125,6 +125,12 @@ See the higher-order and ibk examples.
 
 #### Metagol settings
 
+You can specify a maximum timeout (in seconds) for Metagol as follows:
+
+```prolog
+metagol:timeout(600). % default 10 minutes
+```
+
 Metagol searches for a hypothesis using iterative deepening on the number of clauses in the solution.
 You can specify a maximum number of clauses:
 
