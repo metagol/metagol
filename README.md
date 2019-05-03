@@ -173,7 +173,7 @@ Here are some publications on MIL and Metagol.
 
 #### Theory and Implementation
 
-R. Morel, A. Cropper, and L. Ong. [Typed meta-interpretive learning of logic programs](http://andrewcropper.com/pubs/jelia19-typed.pdf). JELIA 2019.
+* R. Morel, A. Cropper, and L. Ong. [Typed meta-interpretive learning of logic programs](http://andrewcropper.com/pubs/jelia19-typed.pdf). JELIA 2019.
 
 * A. Cropper and S. Tourret: [Derivation Reduction of Metarules in Meta-interpretive Learning](http://A.cropper.com/pubs/ilp18-dreduce.pdf). ILP 2018.
 
