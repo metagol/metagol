@@ -175,11 +175,7 @@ assert_body_preds(S0):-
 
 head_preds:-
     retractall(type(_,_,head_pred)),
-    findall(P/A,user:head_pred(P/A),S0),
-    list_to_set(S0,S1),
-    forall(member(P/A,S1),(
-        assert(type(P,A,head_pred))
-    )).
+    forall((user:head_pred(P/A),\+type(P,A,head_pred)), assert(type(P,A,head_pred))).
 
 ibk:-
     ibk_head_preds,
@@ -302,7 +298,7 @@ ibk_asserts(Head,Body1,IbkBody,[]):-
     assert(type(P0,A0,ibk_head_pred)),
     add_path_to_body(Body1,Path,Body2),
     (IbkBody == false -> assert(ibk(Head,Body2,Path)); assert((ibk(Head,Body2,Path):-IbkBody))),
-    forall(member(p(P1,A1,_,_),Body2),((ground(P1) -> assert(type(P1,A1,ibk_body_pred)); true))).
+    forall((member(p(P1,A1,_,_),Body2), ground(P1)), assert(type(P1,A1,ibk_body_pred))).
 
 is_recursive([],_,false).
 is_recursive([[Q|_]|_],P,true):-
