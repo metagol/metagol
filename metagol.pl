@@ -247,7 +247,7 @@ pprint_clause(C):-
 metasub_to_clause(sub(Name,_,_,Subs),Clause2):-
     metarule_init(Name,Subs,HeadList,BodyAsList1,_,_),
     add_path_to_body(BodyAsList3,_,BodyAsList1),
-    filter(no_ordering,BodyAsList3,BodyAsList2),
+    include(no_ordering,BodyAsList3,BodyAsList2),
     maplist(atom_to_list,ClauseAsList,[HeadList|BodyAsList2]),
     list_to_clause(ClauseAsList,Clause1),
     (Clause1 = (H,T) -> Clause2=(H:-T); Clause2=Clause1).
@@ -341,10 +341,3 @@ learn_task(Pos/Neg,Prog1):-
     findall(P/A,(member(sub(_Name,P,A,_Subs),Prog1)),Preds),!,
     assert_body_preds(Preds).
 learn_task(_,[]).
-
-filter(_F,[],[]).
-filter(F,[H|T],[H|Out]):-
-    call(F,H),!,
-    filter(F,T,Out).
-filter(F,[_H|T],Out):-
-    filter(F,T,Out).
