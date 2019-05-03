@@ -1,8 +1,10 @@
 :- use_module('../metagol').
 
-%% tell metagol to use the BK
-prim(mother/2).
-prim(father/2).
+%% preds that metagol can use in the body of a clause
+body_pred(mother/2).
+body_pred(father/2).
+
+body_pred(shoe/1).
 
 %% metarules
 metarule([P,Q], [P,A,B], [[Q,A,B]]).
@@ -20,7 +22,7 @@ father(andy,spongebob).
 
 
 %% learn grandparent by inventing parent
-:-
+a:-
   Pos = [
     grandparent(ann,amelia),
     grandparent(steve,amelia),
@@ -36,3 +38,6 @@ b :-
   Pos = [grandparent(ann,amelia)],
   Neg = [grandparent(ann,amelia)],
   (learn(Pos,Neg) -> false; writeln('failed to learn a theory')).
+
+%% :-
+  %% time(a).

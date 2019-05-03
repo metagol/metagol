@@ -1,7 +1,7 @@
 :- use_module('../metagol').
 
 %% tell Metagol to use the BK
-prim(edge/2).
+body_pred(edge/2).
 
 %% metarules
 metarule([P,Q], [P,A,B], [[Q,A,B]]).

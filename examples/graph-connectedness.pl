@@ -1,11 +1,12 @@
 :- use_module('../metagol').
 
 %% tell Metagol to use the BK
-prim(edge/2).
+body_pred(edge/2).
 
 %% metarules
-metarule([P,Q], [P,A,B], [[Q,A,B]]).
-metarule([P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).
+metarule(ident, [P,Q], [P,A,B], [[Q,A,B]]).
+metarule(chain, [P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).
+metarule(tailrec, [P,Q], [P,A,B], [[Q,A,C],[P,C,B]]).
 
 %% background knowledge
 edge(a,b).

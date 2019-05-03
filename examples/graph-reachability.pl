@@ -4,7 +4,7 @@
 metagol:max_clauses(2).
 
 %% tell metagol to use the BK
-prim(edge/2).
+body_pred(edge/2).
 
 %% metarules
 metarule([P,Q], [P,A,B], [[Q,A,B]]).

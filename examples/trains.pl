@@ -1,18 +1,18 @@
 :- use_module('../metagol').
 
 %% tell metagol to use the BK
-prim(car/1).
-prim(shape/1).
-prim(train/1).
-prim(short/1).
-prim(closed/1).
-prim(long/1).
-prim(open_car/1).
-prim(load/3).
-prim(wheels/2).
-prim(has_car/2).
-prim(double/1).
-prim(jagged/1).
+body_pred(car/1).
+body_pred(shape/1).
+body_pred(train/1).
+body_pred(short/1).
+body_pred(closed/1).
+body_pred(long/1).
+body_pred(open_car/1).
+body_pred(load/3).
+body_pred(wheels/2).
+body_pred(has_car/2).
+body_pred(double/1).
+body_pred(jagged/1).
 
 %% metarules
 metarule([P,Q], [P,A],[[Q,A]]).

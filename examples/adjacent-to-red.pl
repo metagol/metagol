@@ -1,13 +1,13 @@
 :- use_module('../metagol').
 
 %% tell Metagol to use the BK
-prim(edge/2).
-prim(colour/2).
-prim(red/1).
-prim(green/1).
+body_pred(edge/2).
+body_pred(colour/2).
+body_pred(red/1).
+body_pred(green/1).
 
 %% metarules
-metarule([P,Q,R],([P,A]:-[[Q,A,B],[R,B]])).
+metarule([P,Q,R], [P,A], [[Q,A,B],[R,B]]).
 
 %% background knowledge
 edge(a,b).
@@ -23,7 +23,7 @@ colour(e,green).
 red(red).
 green(green).
 
-:-
+a:-
  Pos = [
     target(b),
     target(c)
@@ -34,3 +34,12 @@ green(green).
     target(e)
   ],
   learn(Pos,Neg).
+
+%% body_pred(mother/2).
+%% body_pred(father/2).
+
+%% body_pred(shoe/1).
+
+%% %% metarules
+%% metarule([P,Q], [P,A,B], [[Q,A,B]]).
+%% metarule([P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).

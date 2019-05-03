@@ -4,7 +4,7 @@
 metagol:unfold_program.
 
 %% tell Metagol to use the BK
-prim(succ/2).
+body_pred(succ/2).
 
 %% metarules
 metarule(ident, [P,Q], [P,A,B], [[Q,A,B]]).

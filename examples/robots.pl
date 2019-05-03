@@ -1,19 +1,24 @@
 :- use_module('../metagol').
+%% Examples taken from these papers:
+%% A. Cropper and S.H. Muggleton. Can predicate invention compensate for incomplete background knowledge? SCAI 2015.
+%% A. Cropper and S.H. Muggleton. Logical minimisation of meta-rules within meta-interpretive learning. ILP 2014.
 
 %% metagol settings
-%% metagol:functional.
-metagol:max_clauses(10).
+metagol:functional.
+metagol:max_clauses(6).
 
 %% tell metagol to use the BK
-prim(move_left/2).
-prim(move_right/2).
-prim(move_forwards/2).
-prim(move_backwards/2).
-prim(grab_ball/2).
-prim(drop_ball/2).
+body_pred(move_left/2).
+body_pred(move_right/2).
+body_pred(move_forwards/2).
+body_pred(move_backwards/2).
+body_pred(grab_ball/2).
+body_pred(drop_ball/2).
 
 %% metarules
 metarule(ident, [P,Q], [P,A,B], [[Q,A,B]]).
+metarule(precon, [P,Q,R], [P,A,B], [[Q,A,B],[R,A]]).
+metarule(postcon, [P,Q,R], [P,A,B], [[Q,A,B],[R,B]]).
 metarule(chain, [P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).
 
 %% functional check
@@ -21,7 +26,6 @@ func_test(Atom1,Atom2,Condition):-
   Atom1 = [P,A,B],
   Atom2 = [P,A,Z],
   Condition = (Z = B).
-  %% \+ (metagol:prove_deduce([Actual],PS,G),Z \= B).
 
 %% robot learning to move a ball to a specific position
 a :-

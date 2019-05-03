@@ -7,10 +7,19 @@ check_same(Prog1,Prog2):-
     format('actual: ~w\n',[Prog2]),
     false.
 
-test(Name,Pos,Neg,Prog1):-
+load_example(Name):-
     writeln(Name),
+    retractall(user:body_pred(_)),
+    retractall(user:head_pred(_)),
+    retractall(metagol:ibk(_,_,_)),
+    retractall(metagol:type(_,_)),
+    retractall(metagol:body_pred_call(_,_)),
+    retractall(metagol:ibk_body_pred_call(_,_)),
     consult(Name),
-    metagol:set_option(metarule_next_id(0)),
+    metagol:set_option(metarule_next_id(0)).
+
+test(Name,Pos,Neg,Prog1):-
+    load_example(Name),
     learn(Pos,Neg,Prog2),!,
     (check_same(Prog1,Prog2) -> unload_file(Name); (format('FAILED: ~w\n', [Name]),false)).
 
@@ -22,28 +31,42 @@ test_adjred:-
     Name='adjacent-to-red',
     Pos = [target(b),target(c)],
     Neg = [target(a),target(d),target(e)],
-    Prog = [sub(1,target_1,1,[target_1,colour,red],[prim,prim]),sub(1,target,1,[target,edge,target_1],[prim,inv])],
+    Prog = [
+    sub(1,target_1,1,[target_1,colour,red]),
+    sub(1,target,1,[target,edge,target_1])
+    ],
     test(Name,Pos,Neg,Prog).
 
 test_constants1:-
     Name='constants1',
     Pos = [p(1,2),p(1,3),p(1,4),p(1,1),p(2,2),p(4,4)],
     Neg = [p(2,4),p(3,4),p(3,1)],
-    Prog = [sub(1,p,2,[p,4],[]),sub(2,p,2,[p,2],[]),sub(1,p,2,[p,1],[])],
+    Prog = [
+    sub(1,p,2,[p,4]),
+    sub(2,p,2,[p,2]),
+    sub(1,p,2,[p,1])
+    ],
     test(Name,Pos,Neg,Prog).
 
 test_constants2:-
     Name='constants2',
     Pos = [q(1,2),q(1,3),q(1,4),q(1,1),q(2,2),q(4,4)],
     Neg = [q(2,4),q(3,4),q(3,1)],
-    Prog = [sub(1,q,2,[q,num,4],[prim,prim]),sub(2,q,2,[q,num,2],[prim,prim]),sub(1,q,2,[q,num,1],[prim,prim])],
+    Prog = [
+    sub(1,q,2,[q,num,4]),
+    sub(2,q,2,[q,num,2]),
+    sub(1,q,2,[q,num,1])
+    ],
     test(Name,Pos,Neg,Prog).
 
 test_constants3:-
     Name='constants3',
     Pos = [f(andy,laura),f(andy,amelia)],
     Neg = [],
-    Prog = [sub(1,f,2,[f,p,andy,patrick],[prim]),sub(1,f,2,[f,p,andy,spongebob],[prim])],
+    Prog = [
+    sub(1,f,2,[f,p,andy,patrick]),
+    sub(1,f,2,[f,p,andy,spongebob])
+    ],
     test(Name,Pos,Neg,Prog).
 
 test_finddup:-
@@ -56,7 +79,11 @@ test_finddup:-
         f([14,4,13,6,12,1,9,2,10,8,15,5,7,14,3,11],14)
     ],
     Neg = [],
-    Prog = [sub(chain,f_1,2,[f_1,tail,element],[prim,prim]),sub(dident,f,2,[f,head,f_1],[prim,inv]),sub(tailrec,f,2,[f,tail],[prim,inv])],
+    Prog = [
+    sub(chain,f_1,2,[f_1,tail,element]),
+    sub(dident,f,2,[f,head,f_1]),
+    sub(tailrec,f,2,[f,tail])
+    ],
     test(Name,Pos,Neg,Prog).
 
 test_grandparent:-
@@ -80,7 +107,10 @@ test_grandparent:-
         target(g,h),
         target(h,i)
     ],
-    Prog=[sub(1,target_1,2,[target_1,father],[prim]),sub(1,target_1,2,[target_1,mother],[prim]),sub(2,target,2,[target,target_1,target_1],[inv,inv])],
+    Prog=[
+    sub(1,target_1,2,[target_1,father]),
+    sub(1,target_1,2,[target_1,mother]),
+    sub(2,target,2,[target,target_1,target_1])],
     test(Name,Pos,Neg,Prog).
 
 test_graph_colouring:-
@@ -95,7 +125,10 @@ test_graph_colouring:-
     target(d),
     target(f)
     ],
-    Prog=[sub(2,target_1,2,[target_1,colour,colour],[prim,prim]),sub(1,target,1,[target,edge,target_1],[prim,inv])],
+    Prog=[
+    sub(2,target_1,2,[target_1,colour,colour]),
+    sub(1,target,1,[target,edge,target_1])
+    ],
     test(Name,Pos,Neg,Prog).
 
 test_graph_connectedness:-
@@ -114,46 +147,62 @@ test_graph_connectedness:-
       ],
       Neg = [
       ],
-    Prog=[sub(2,target,2,[target,edge,target_1],[prim,inv]),sub(2,target_1,2,[target_1,edge,edge],[prim,prim]),sub(1,target,2,[target,target_1],[inv]),sub(1,target,2,[target,edge],[prim])],
+    Prog=[sub(tailrec,target,2,[target,edge]),sub(ident,target,2,[target,edge])],
     test(Name,Pos,Neg,Prog).
 
 test_graph_reachability:-
     Name='graph-reachability',
     Pos = [p(a, b), p(a, c), p(a, a)],
-    Prog=[sub(2,p,2,[p,edge],[prim,inv]),sub(1,p,2,[p,edge],[prim])],
+    Prog=[sub(2,p,2,[p,edge]),sub(1,p,2,[p,edge])],
     test(Name,Pos,[],Prog).
 
 test_ho1:-
     Name='higher-order1',
-    Pos = [f([1,2,3],[2,3,4])],
+    Pos = [
+        f([1,2,3],[3,4,5]),
+        f([10,12,33,3,2,1],[12,14,35,5,4,3])
+    ],
     Neg = [],
-    Prog = [sub(1,f,2,[f,map,my_succ],[inv])],
+    Prog = [sub(3,f_1,2,[f_1,my_succ,my_succ]),sub(2,f,2,[f,map,f_1])],
     test(Name,Pos,Neg,Prog).
 
 test_ho2:-
     Name='higher-order2',
-    Pos = [f([[a],[a,a],[a,a,a],[a,a,a,a]],[2,4,6,8])],
+    Pos = [f([[a],[a,a],[a,a,a],[a,a,a,a]],[3,5,7,9])],
     Neg = [],
-    Prog = [sub(2,f_1,2,[f_1,my_length,my_double],[prim,prim]),sub(1,f,2,[f,map,f_1],[inv])],
+    Prog = [sub(2,f_2,2,[f_2,my_double,my_succ]),sub(2,f_1,2,[f_1,my_length,f_2]),sub(1,f,2,[f,map,f_1])],
     test(Name,Pos,Neg,Prog).
 
 test_ho3:-
     Name='higher-order3',
     Pos = [f([1,2,3,4,5,6,7,8,9,10],[2,4,5,6,8,10])],
     Neg = [],
-    Prog = [sub(1,f_1,1,[f_1,divisible5],[prim]),sub(1,f_1,1,[f_1,divisible2],[prim]),sub(2,f,2,[f,filter,f_1],[inv])],
+    Prog = [sub(2,f_1,1,[f_1,mydiv,5]),sub(2,f_1,1,[f_1,mydiv,2]),sub(3,f,2,[f,filter,f_1])],
+    test(Name,Pos,Neg,Prog).
+
+test_ibk1:-
+    Name='ibk1',
+    Pos = [f([1,2,3],[5,6,7])],
+    Neg = [],
+    Prog = [
+    sub(chain,f_2,2,[f_2,my_succ,my_succ]),
+    sub(chain,f_1,2,[f_1,f_2,f_2]),
+    sub(curry,f,2,[f,map,f_1])],
     test(Name,Pos,Neg,Prog).
 
 test_kinship1a:-
     Name='kinship1',
     Pos = [grandparent(ann,amelia),grandparent(steve,amelia),grandparent(ann,spongebob),grandparent(steve,spongebob),grandparent(linda,amelia)],
     Neg = [grandparent(amy,amelia)],
-    Prog = [sub(1,grandparent_1,2,[grandparent_1,father],[prim]),sub(1,grandparent_1,2,[grandparent_1,mother],[prim]),sub(2,grandparent,2,[grandparent,grandparent_1,grandparent_1],[inv,inv])],
+    Prog = [
+    sub(1,grandparent_1,2,[grandparent_1,father]),
+    sub(1,grandparent_1,2,[grandparent_1,mother]),
+    sub(2,grandparent,2,[grandparent,grandparent_1,grandparent_1])],
     test(Name,Pos,Neg,Prog).
 
 test_kinship1b:-
     Name='kinship1',
-    consult(Name),
+    load_example(Name),
     Pos = [grandparent(ann,amelia)],
     Neg = [grandparent(ann,amelia)],
     not(learn(Pos,Neg)),
@@ -184,7 +233,12 @@ test_lessthan:-
     target(5,5),
     target(6,5)
     ],
-    Prog=[sub(chain,target_2,2,[target_2,succ,succ],[prim,prim]),sub(chain,target_1,2,[target_1,succ,target_2],[prim,inv]),sub(ident,target,2,[target,target_1],[inv]),sub(ident,target_1,2,[target_1,succ],[prim]),sub(chain,target,2,[target,target_1,target_1],[inv,inv])],
+    Prog=[
+    sub(chain,target_2,2,[target_2,succ,succ]),
+    sub(chain,target_1,2,[target_1,succ,target_2]),
+    sub(ident,target,2,[target,target_1]),
+    sub(ident,target_1,2,[target_1,succ]),
+    sub(chain,target,2,[target,target_1,target_1])],
     test(Name,Pos,Neg,Prog).
 
 test_member:-
@@ -213,31 +267,74 @@ test_member:-
     target(4,[2,1]),
     target(2,[1])
   ],
-  Prog = [sub(2,target,2,[target,cons],[prim,inv]),sub(1,target,2,[target,value],[prim])],
+  Prog = [sub(2,target,2,[target,cons]),sub(1,target,2,[target,value])],
   test(Name,Pos,Neg,Prog).
 
 test_mutual_recursion:-
     Name = 'mutual-recursion',
     Pos = [even(10),even(8),even(6),even(4),even(2)],
     Neg = [even(3)],
-    Prog=[sub(base,even,1,[even,0],[]),sub(mutual,even_1,1,[even_1,s,even],[prim,inv]),sub(mutual,even,1,[even,s,even_1],[prim,inv])],
+    Prog=[
+    sub(base,even,1,[even,0]),
+    sub(mutual,even_1,1,[even_1,s,even]),
+    sub(mutual,even,1,[even,s,even_1])],
     test(Name,Pos,Neg,Prog).
+
+test_prec:-
+    Name='predecessor',
+Pos = [
+    target(1,0),
+    target(2,1),
+    target(3,2),
+    target(4,3),
+    target(5,4),
+    target(6,5),
+    target(7,6),
+    target(8,7),
+    target(9,8),
+    target(10,9)
+  ],
+  Neg = [
+    target(1,3),
+    target(1,7),
+    target(2,2),
+    target(2,8),
+    target(3,1),
+    target(3,9),
+    target(4,0),
+    target(4,10),
+    target(5,5),
+    target(5,6)
+  ],
+    Prog = [sub(inverse,target,2,[target,succ])],
+    test(Name,Pos,Neg,Prog).
+
+
 
 test_robotsa:-
     Name='robots',
     Pos = [f(world((1/1),(1/1),false),world((3/3),(3/3),false))],
-    Prog = [sub(chain,f_3,2,[f_3,move_right,move_forwards],[prim,prim]),sub(chain,f_2,2,[f_2,f_3,f_3],[inv,inv]),sub(chain,f_1,2,[f_1,f_2,drop_ball],[inv,prim]),sub(chain,f,2,[f,grab_ball,f_1],[prim,inv])],
+    Prog = [
+    sub(chain,f_3,2,[f_3,move_right,move_forwards]),
+    sub(chain,f_2,2,[f_2,f_3,f_3]),
+    sub(chain,f_1,2,[f_1,f_2,drop_ball]),
+    sub(chain,f,2,[f,grab_ball,f_1])],
     test(Name,Pos,[],Prog).
 
 test_robotsb:-
     Name='robots',
     Pos = [f(world((1/1),(1/1),false),world((5/5),(5/5),false))],
-    Prog = [sub(chain,f_4,2,[f_4,move_right,move_forwards],[prim,prim]),sub(chain,f_3,2,[f_3,f_4,f_4],[inv,inv]),sub(chain,f_2,2,[f_2,f_3,f_3],[inv,inv]),sub(chain,f_1,2,[f_1,f_2,drop_ball],[inv,prim]),sub(chain,f,2,[f,grab_ball,f_1],[prim,inv])],
+    Prog = [
+    sub(chain,f_4,2,[f_4,move_right,move_forwards]),
+    sub(chain,f_3,2,[f_3,f_4,f_4]),
+    sub(chain,f_2,2,[f_2,f_3,f_3]),
+    sub(chain,f_1,2,[f_1,f_2,drop_ball]),
+    sub(chain,f,2,[f,grab_ball,f_1])],
     test(Name,Pos,[],Prog).
 
 test_sequential1:-
     Name = 'sequential',
-    consult(Name),
+    load_example(Name),
 
     T1 = [
     parent(ann,andy),
@@ -259,7 +356,11 @@ test_sequential1:-
   ]/[],
 
       learn_seq([T1,T2,T3],Prog),
-      Prog=[sub(ident,parent,2,[parent,father],[prim]),sub(ident,parent,2,[parent,mother],[prim]),sub(chain,grandparent,2,[grandparent,parent,parent],[prim,prim]),sub(chain,great_grandparent,2,[great_grandparent,parent,grandparent],[prim,prim])],
+      Prog=[
+      sub(ident,parent,2,[parent,father]),
+      sub(ident,parent,2,[parent,mother]),
+      sub(chain,grandparent,2,[grandparent,parent,parent]),
+      sub(chain,great_grandparent,2,[great_grandparent,parent,grandparent])],
       unload_file(Name).
 
 
@@ -271,7 +372,7 @@ test_strings1:-
     f(['a','a','c']/['a','a','a','a','c','c'],_/[]),
     f(['a','c']/['a','a','c','c'],_/[])
     ],
-    Prog = [sub(2,f,2,[f,copy1,skip1],[prim,prim]),sub(1,f,2,[f,skip1],[prim,inv]),sub(1,f,2,[f,copy1],[prim,inv])],
+    Prog = [sub(1,f,2,[f,skip1]),sub(6,f,2,[f,skip1]),sub(6,f,2,[f,copy1])],
     test(Name,Pos,[],Prog).
 
 test_strings2:-
@@ -281,7 +382,7 @@ test_strings2:-
     f(['a','a','c']/['a','a','c','d'],_/[]),
     f(['a','c']/['a','c','d'],_/[])
     ],
-    Prog = [sub(3,f_2,2,[f_2,write1,d],[prim]),sub(2,f_1,2,[f_1,next_empty,f_2],[prim,inv]),sub(1,f_2,2,[f_2,copy1,skip1],[prim,prim]),sub(4,f_1,2,[f_1,f_2],[inv,inv]),sub(1,f,2,[f,f_1,f_2],[inv,inv])],
+    Prog = [sub(6,f_2,2,[f_2,write1,d]),sub(2,f,2,[f,empty,f_2]),sub(5,f_1,2,[f_1,copy1,skip1]),sub(7,f,2,[f,f_1])],
     test(Name,Pos,[],Prog).
 
 test_strings3:-
@@ -291,17 +392,17 @@ test_strings3:-
     f(['a','a','c']/['a','a','c','d'],_/[]),
     f(['a','c']/['a','c','d'],_/[])
     ],
-    Prog = [sub(3,f_3,2,[f_3,write1,d],[prim]),sub(2,f_1,2,[f_1,next_empty,f_3],[prim,inv]),sub(1,f_2,2,[f_2,skip1,copy1],[prim,prim]),sub(4,f_1,2,[f_1,f_2],[inv,inv]),sub(1,f,2,[f,copy1,f_1],[prim,inv])],
+    Prog = [sub(6,f_1,2,[f_1,write1,d]),sub(2,f,2,[f,empty,f_1]),sub(5,f_1,2,[f_1,copy1,skip1]),sub(7,f,2,[f,f_1])],
     test(Name,Pos,[],Prog).
 
 test_trains :-
     Name='trains',
     Pos = [e(east1),e(east2),e(east3),e(east4),e(east5)],
     Neg = [e(west6),e(west7),e(west8),e(west9),e(west10)],
-    Prog = [sub(2,e_1,1,[e_1,short,closed],[prim,prim]),sub(3,e,1,[e,has_car,e_1],[prim,inv])],
+    Prog = [
+    sub(2,e_1,1,[e_1,short,closed]),
+    sub(3,e,1,[e,has_car,e_1])],
     test(Name,Pos,Neg,Prog).
-
-
 
 %%
 t :-
@@ -317,11 +418,13 @@ t :-
     test_ho1,
     test_ho2,
     test_ho3,
+    test_ibk1,
     test_kinship1a,
     test_kinship1b,
     test_lessthan,
     test_member,
     test_mutual_recursion,
+    test_prec,
     test_robotsa,
     test_robotsb,
     test_strings1,
@@ -333,4 +436,4 @@ t :-
     writeln('TESTS PASSED').
 
 :-
-    time(t).
+    time(t),halt.
