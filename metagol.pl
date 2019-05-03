@@ -7,12 +7,12 @@
 :- use_module(library(pairs)).
 
 :- dynamic
+    ibk/3,
+    functional/0,
     user:head_pred/1,
     user:body_pred/1,
-    functional/0,
     body_pred_call/2,
-    ibk/3,
-    ibk_body_pred_call/2.
+    compiled_pred_call/2.
 
 :- discontiguous
     metarule/7,
@@ -73,8 +73,8 @@ prove_aux('@'(Atom),_FullSig,_Sig,_MaxN,N,N,Prog,Prog):- !,
 
 prove_aux(p(P,A,Args,_Path),_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-
     nonvar(P),
-    type(P,A,ibk_body_pred),!,
-    ibk_body_pred_call(P,Args).
+    type(P,A,compiled_pred),!,
+    compiled_pred_call(P,Args).
 
 prove_aux(p(P,A,Args,_Path),_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-
     (nonvar(P) -> type(P,A,body_pred); true),
@@ -96,15 +96,16 @@ prove_aux(p(P,A,Args,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
 prove_aux(p(P,A,Args,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     N1 < MaxN,
     Atom = [P|Args],
-    metarule(Name,Subs,Atom,Body1,FullSig,Recursive,[Atom|Path]), % ??
     bind_lower(P,A,FullSig,Sig1,Sig2),
+    metarule(Name,Subs,Atom,Body1,FullSig,Recursive,[Atom|Path]), % ??
     check_recursion(Recursive,MaxN,Atom,Path),
     check_new_metasub(Name,P,A,Subs,Prog1),
     succ(N1,N3),
     prove(Body1,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,Subs)|Prog1],Prog2).
 
 nproveall(Atoms,Sig,Prog):-
-    forall(member(Atom,Atoms), \+ deduce_atom(Atom,Sig,Prog)).
+    forall(member(Atom,Atoms),
+        \+ deduce_atom(Atom,Sig,Prog)).
 
 make_atoms(Atoms1,Atoms2):-
     maplist(atom_to_list,Atoms1,Atoms3),
@@ -150,36 +151,37 @@ check_new_metasub(Name,P,A,Subs,Prog):-
 check_new_metasub(_Name,_P,_A,_Subs,_Prog).
 
 assert_sig_types(Sig):-
-    forall((member(sym(P,A,_),Sig),\+type(P,A,head_pred)),assert(type(P,A,head_pred))).
+    forall((member(sym(P,A,_),Sig),\+type(P,A,head_pred)),
+        assert(type(P,A,head_pred))).
+
+head_preds:-
+    %% remove old invented predicates (not that it really matters)
+    retractall(type(_,_,head_pred)),
+    forall((user:head_pred(P/A),\+type(P,A,head_pred)),
+        assert(type(P,A,head_pred))).
 
 body_preds:-
+    retractall(type(_,_,body_pred)),
+    retractall(body_pred_call(P,_)),
     findall(P/A,user:body_pred(P/A),S0),
     assert_body_preds(S0).
 
-assert_body_preds(S0):-
-    list_to_set(S0,S1),
+assert_body_preds(S1):-
     forall(member(P/A,S1),(
-        retractall(user:body_pred(P/A)),
         retractall(type(P,A,body_pred)),
         retractall(body_pred_call(P,_)),
-        functor(Atom,P,A),
-        Atom =.. [P|Args],
+        retractall(user:body_pred(P/A)),
         (current_predicate(P/A) -> (
-            assert(user:body_pred(P/A)),
             assert(type(P,A,body_pred)),
+            assert(user:body_pred(P/A)),
+            functor(Atom,P,A),
+            Atom =.. [P|Args],
             assert((body_pred_call(P,Args):-user:Atom))
         );
-            format('% WARNING: body pred ~w does not exist\n',[P/A])
+            format('% WARNING: ~w does not exist\n',[P/A])
         )
     )).
 
-head_preds:-
-    retractall(type(_,_,head_pred)),
-    forall((user:head_pred(P/A),\+type(P,A,head_pred)), assert(type(P,A,head_pred))).
-
-ibk:-
-    ibk_head_preds,
-    ibk_body_preds.
 
 ibk_head_preds:-
     findall(P/A,type(P,A,ibk_head_pred),S0),
@@ -189,15 +191,20 @@ ibk_head_preds:-
         assert(type(P,A,ibk_head_pred))
     ).
 
-ibk_body_preds:-
-    findall(P/A,(type(P,A,ibk_body_pred),  not(type(P,A,head_pred)), not(type(P,A,ibk_head_pred))),S0),
+compiled_preds:-
+    findall(P/A,(type(P,A,compiled_pred), not(type(P,A,body_pred)), not(type(P,A,head_pred)), not(type(P,A,ibk_head_pred))),S0),
     list_to_set(S0,S1),
-    retractall(type(_,_,ibk_body_pred)),
+    retractall(type(_,_,compiled_pred)),
+    retractall(compiled_pred_call(_,_)),
     forall(member(P/A,S1),(
-        assert(type(P,A,ibk_body_pred)),
-        functor(Atom,P,A),
-        Atom =..[P|Args],
-        assert((ibk_body_pred_call(P,Args):-user:Atom))
+        (current_predicate(P/A) -> (
+            assert(type(P,A,compiled_pred)),
+            functor(Atom,P,A),
+            Atom =..[P|Args],
+            assert((compiled_pred_call(P,Args):-user:Atom))
+        );
+            format('% WARNING: ~w does not exist\n',[P/A])
+        )
     )).
 
 options:-
@@ -214,9 +221,10 @@ set_option(Option):-
 
 setup:-
     options,
-    body_preds,
     head_preds,
-    ibk.
+    body_preds,
+    ibk_head_preds,
+    compiled_preds.
 
 iterator(N):-
     min_clauses(MinN),
@@ -281,6 +289,9 @@ metarule_asserts(Name,Subs,Head,Body1,MetaBody,PS,Asserts):-
     is_recursive(Body1,P,Recursive),
     add_path_to_body(Body1,Path,Body2),
     gen_metarule_id(Name,AssertName),
+    %% very hacky - I assert that all ground body predicates are compiled
+    %% I filter these in the setup call
+    forall((member(p(P1,A1,_,_),Body2), ground(P1)), assert(type(P1,A1,compiled_pred))),
     (var(MetaBody) ->
         MRule = metarule(AssertName,Subs,Head,Body2,PS,Recursive,Path);
         MRule = (metarule(AssertName,Subs,Head,Body2,PS,Recursive,Path):-MetaBody)),
@@ -298,7 +309,9 @@ ibk_asserts(Head,Body1,IbkBody,[]):-
     assert(type(P0,A0,ibk_head_pred)),
     add_path_to_body(Body1,Path,Body2),
     (IbkBody == false -> assert(ibk(Head,Body2,Path)); assert((ibk(Head,Body2,Path):-IbkBody))),
-    forall((member(p(P1,A1,_,_),Body2), ground(P1)), assert(type(P1,A1,ibk_body_pred))).
+    %% very hacky - I assert that all ground body predicates are compiled
+    %% I filter these in the setup call
+    forall((member(p(P1,A1,_,_),Body2), ground(P1)), assert(type(P1,A1,compiled_pred))).
 
 is_recursive([],_,false).
 is_recursive([[Q|_]|_],P,true):-

@@ -11,13 +11,12 @@ load_example(Name):-
     writeln(Name),
 
     %% (current_predicate(metagol:max_clauses/1) -> retractall(metagol:max_clauses(_)); true),
-
     retractall(user:body_pred(_)),
     retractall(user:head_pred(_)),
     retractall(metagol:ibk(_,_,_)),
     retractall(metagol:type(_,_)),
     retractall(metagol:body_pred_call(_,_)),
-    retractall(metagol:ibk_body_pred_call(_,_)),
+    %% retractall(metagol:ibk_body_pred_call(_,_)),
     consult(Name),
     metagol:set_option(metarule_next_id(0)).
 

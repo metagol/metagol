@@ -15,7 +15,7 @@ metarule([P,Q,R], [P,A,B], [[Q,A,C],[R,C,B]]).
 mydiv(A,B):-
     (nonvar(A) -> number(A); true),
     (nonvar(B) -> (number(B), B>0); true),
-    (var(B) -> member(B,[2,3,4,5]); true),
+    (var(B) -> member(B,[2,3,4,5,6,7,8,9]); true),
     0 is A mod B.
 
 ibk([map,[],[],_],[]).
@@ -24,23 +24,6 @@ ibk([map,[H1|T1],[H2|T2],F],[[F,H1,H2],[map,T1,T2,F]]).
 ibk([filter,[],[],_],[]).
 ibk([filter,[A|T1],[A|T2],F],[[F,A],[filter,T1,T2,F]]).
 ibk([filter,[_|T1],T2,F],[[filter,T1,T2,F]]).
-
-
-divisible2(X):-
-    number(X),
-    0 is X mod 2.
-divisible3(X):-
-    number(X),
-    0 is X mod 3.
-divisible5(X):-
-    number(X),
-    0 is X mod 5.
-even(X):-
-    number(X),
-    0 is X mod 2.
-odd(X):-
-    number(X),
-    1 is X mod 2.
 
 %% background knowledge
 my_double(A,B):-
@@ -105,7 +88,7 @@ a:-
         f([10,20,30],[10,20,30]),
         f([7],[])
     ],
-    learn(Pos,[],Prog),
-    writeln(Prog).
+    learn(Pos,[]).
+    %% writeln(Prog).
 :-
     time(a).

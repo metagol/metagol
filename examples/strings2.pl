@@ -46,7 +46,9 @@ a :-
     f(['a','a','c']/['a','a','c','d'],_/[]),
     f(['a','c']/['a','c','d'],_/[])
   ],
-  learn(Pos,[]).
+  learn(Pos,[],Prog),
+  writeln(Prog),
+  pprint(Prog).
 
 :-
   time(a).
