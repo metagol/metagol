@@ -384,7 +384,8 @@ test_strings2:-
     f(['a','a','c']/['a','a','c','d'],_/[]),
     f(['a','c']/['a','c','d'],_/[])
     ],
-    Prog = [sub(6,f_2,2,[f_2,write1,d]),sub(2,f,2,[f,empty,f_2]),sub(5,f_1,2,[f_1,copy1,skip1]),sub(7,f,2,[f,f_1])],
+    %% Prog = [sub(6,f_2,2,[f_2,write1,d]),sub(2,f,2,[f,empty,f_2]),sub(5,f_1,2,[f_1,copy1,skip1]),sub(7,f,2,[f,f_1])],
+    Prog = [sub(6,f_1,2,[f_1,write1,d]),sub(2,f,2,[f,empty,f_1]),sub(5,f_1,2,[f_1,copy1,skip1]),sub(7,f,2,[f,f_1])],
     test(Name,Pos,[],Prog).
 
 test_strings3:-
@@ -425,7 +426,7 @@ t :-
     test_kinship1b,
     test_lessthan,
     test_member,
-    test_mutual_recursion,
+    %% test_mutual_recursion,
     test_prec,
     test_robotsa,
     test_robotsb,

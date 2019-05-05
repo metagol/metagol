@@ -7,8 +7,8 @@ body_pred(mother/2).
 body_pred(father/2).
 body_pred(shoe/1).
 
-head_pred(boo/1).
-head_pred(boo/1).
+%% head_pred(boo/1).
+%% head_pred(boo/1).
 
 %% metarules
 metarule([P,Q], [P,A,B], [[Q,A,B]]).
@@ -34,7 +34,9 @@ a:-
     grandparent(steve,spongebob),
     grandparent(linda,amelia)
   ],
-  Neg = [grandparent(amy,amelia)],
+  %% Neg = [grandparent(amy,amelia)],
+  Neg = [],
+
   learn(Pos,Neg).
 
 %% example of a failure

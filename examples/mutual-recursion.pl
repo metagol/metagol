@@ -5,8 +5,9 @@ body_pred(s/2).
 
 %% metarules
 metarule(base, [P,A], [P,A], []).
-metarule(mutual, [P,Q,R], [P,A], [[Q,A,B],[R,B]], PS):-
-  member(sym(R,1,_),PS). %% explicitly bind R to a symbol on the predicate signature
+metarule(mutual, [P,Q,R], [P,A], [[Q,A,B],[R,B]], _):-
+    type(R,A,head_pred).
+    %% writeln(rrrrr-R).
 
 %% background knowledge
 s(10,9).

@@ -2,10 +2,6 @@
 
 :- module(metagol,[learn/2,learn/3,learn_seq/2,pprint/1,op(950,fx,'@')]).
 
-:- use_module(library(lists)).
-:- use_module(library(apply)).
-:- use_module(library(pairs)).
-
 :- dynamic
     ibk/3,
     functional/0,
@@ -19,24 +15,21 @@
     metarule_init/6.
 
 default(max_clauses(10)).
-default(timeout(600)). % 10 minutes
 
 learn(Pos,Neg):-
     learn(Pos,Neg,Prog),
     pprint(Prog).
-learn(Pos,Neg,Prog):-
-    setup,
-    timeout(Time),
-    call_with_time_limit(Time,learn_(Pos,Neg,Prog)).
 
-learn_(Pos1,Neg1,Prog):-
+learn(Pos1,Neg1,Prog):-
+    setup,
     make_atoms(Pos1,Pos2),
     make_atoms(Neg1,Neg2),
     proveall(Pos2,Sig,Prog),
     nproveall(Neg2,Sig,Prog),
     ground(Prog),
     check_functional(Pos2,Sig,Prog).
-learn_(_,_,_):-!,
+
+learn(_,_,_):-!,
     writeln('% unable to learn a solution'),
     false.
 
@@ -81,27 +74,28 @@ prove_aux(p(P,A,Args,_Path),_FullSig,_Sig,_MaxN,N,N,Prog,Prog):-
     body_pred_call(P,Args).
 
 prove_aux(p(P,A,Args,Path),FullSig,Sig,MaxN,N1,N2,Prog1,Prog2):-
-    (nonvar(P) -> (\+ type(P,A,head_pred), !, type(P,A,ibk_head_pred)); true),
+    (var(P) -> true; (\+ type(P,A,head_pred), !, type(P,A,ibk_head_pred))),
     ibk([P|Args],Body,Path),
     prove(Body,FullSig,Sig,MaxN,N1,N2,Prog1,Prog2).
 
 prove_aux(p(P,A,Args,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
-    Atom=[P|Args],
+    N1 \== 0,
+    Atom = [P|Args],
     select_lower(P,A,FullSig,Sig1,Sig2),
     member(sub(Name,P,A,Subs),Prog1),
-    metarule_init(Name,Subs,Atom,Body1,Recursive,[Atom|Path]),
+    metarule_init(Name,Subs,Atom,Body,Recursive,[Atom|Path]),
     check_recursion(Recursive,MaxN,Atom,Path),
-    prove(Body1,FullSig,Sig2,MaxN,N1,N2,Prog1,Prog2).
+    prove(Body,FullSig,Sig2,MaxN,N1,N2,Prog1,Prog2).
 
 prove_aux(p(P,A,Args,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
-    N1 < MaxN,
+    N1 \== MaxN,
     Atom = [P|Args],
+    metarule(Name,Subs,Atom,Body,FullSig,Recursive,[Atom|Path]), % ??
     bind_lower(P,A,FullSig,Sig1,Sig2),
-    metarule(Name,Subs,Atom,Body1,FullSig,Recursive,[Atom|Path]), % ??
     check_recursion(Recursive,MaxN,Atom,Path),
     check_new_metasub(Name,P,A,Subs,Prog1),
     succ(N1,N3),
-    prove(Body1,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,Subs)|Prog1],Prog2).
+    prove(Body,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,Subs)|Prog1],Prog2).
 
 nproveall(Atoms,Sig,Prog):-
     forall(member(Atom,Atoms),
@@ -208,7 +202,6 @@ compiled_preds:-
     )).
 
 options:-
-    (current_predicate(timeout/1) -> true; (default(timeout(Time)),set_option(timeout(Time)))),
     (current_predicate(min_clauses/1) -> true; (set_option(min_clauses(1)))),
     (current_predicate(max_clauses/1) -> true; (default(max_clauses(MaxN)),set_option(max_clauses(MaxN)))),
     (current_predicate(max_inv_preds/1) -> true; (max_clauses(MaxN),succ(MaxInv,MaxN),set_option(max_inv_preds(MaxInv)))).
