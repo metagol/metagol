@@ -5,9 +5,8 @@ body_pred(s/2).
 
 %% metarules
 metarule(base, [P,A], [P,A], []).
-metarule(mutual, [P,Q,R], [P,A], [[Q,A,B],[R,B]], _):-
-    type(R,A,head_pred).
-    %% writeln(rrrrr-R).
+metarule(mutual, [P,Q,R], [P,A], [[Q,A,B],[R,B]]):-
+    metagol:type(R,1,head_pred).
 
 %% background knowledge
 s(10,9).

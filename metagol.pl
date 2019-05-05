@@ -11,7 +11,7 @@
     compiled_pred_call/2.
 
 :- discontiguous
-    metarule/7,
+    metarule/6,
     metarule_init/6.
 
 default(max_clauses(10)).
@@ -90,8 +90,8 @@ prove_aux(p(P,A,Args,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
 prove_aux(p(P,A,Args,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     N1 \== MaxN,
     Atom = [P|Args],
-    metarule(Name,Subs,Atom,Body,FullSig,Recursive,[Atom|Path]), % ??
     bind_lower(P,A,FullSig,Sig1,Sig2),
+    metarule(Name,Subs,Atom,Body,Recursive,[Atom|Path]), % ??
     check_recursion(Recursive,MaxN,Atom,Path),
     check_new_metasub(Name,P,A,Subs,Prog1),
     succ(N1,N3),
@@ -267,17 +267,15 @@ atom_to_list(Atom,AtomList):-
 
 %% build the internal metarule clauses
 user:term_expansion(metarule(Subs,Head,Body),Asserts):-
-    metarule_asserts(_Name,Subs,Head,Body,_,_PS,Asserts).
+    metarule_asserts(_Name,Subs,Head,Body,_MetaBody,Asserts).
 user:term_expansion(metarule(Name,Subs,Head,Body),Asserts):-
-    metarule_asserts(Name,Subs,Head,Body,_,_PS,Asserts).
+    metarule_asserts(Name,Subs,Head,Body,_MetaBody,Asserts).
 user:term_expansion((metarule(Subs,Head,Body):-MetaBody),Asserts):-
-    metarule_asserts(_Name,Subs,Head,Body,MetaBody,_PS,Asserts).
+    metarule_asserts(_Name,Subs,Head,Body,MetaBody,Asserts).
 user:term_expansion((metarule(Name,Subs,Head,Body):-MetaBody),Asserts):-
-    metarule_asserts(Name,Subs,Head,Body,MetaBody,_PS,Asserts).
-user:term_expansion((metarule(Name,Subs,Head,Body,PS):-MetaBody),Asserts):-
-    metarule_asserts(Name,Subs,Head,Body,MetaBody,PS,Asserts).
+    metarule_asserts(Name,Subs,Head,Body,MetaBody,Asserts).
 
-metarule_asserts(Name,Subs,Head,Body1,MetaBody,PS,Asserts):-
+metarule_asserts(Name,Subs,Head,Body1,MetaBody,Asserts):-
     Head = [P|_],
     is_recursive(Body1,P,Recursive),
     add_path_to_body(Body1,Path,Body2),
@@ -286,8 +284,8 @@ metarule_asserts(Name,Subs,Head,Body1,MetaBody,PS,Asserts):-
     %% I filter these in the setup call
     forall((member(p(P1,A1,_,_),Body2), ground(P1)), assert(type(P1,A1,compiled_pred))),
     (var(MetaBody) ->
-        MRule = metarule(AssertName,Subs,Head,Body2,PS,Recursive,Path);
-        MRule = (metarule(AssertName,Subs,Head,Body2,PS,Recursive,Path):-MetaBody)),
+        MRule = metarule(AssertName,Subs,Head,Body2,Recursive,Path);
+        MRule = (metarule(AssertName,Subs,Head,Body2,Recursive,Path):-MetaBody)),
     Asserts = [metagol:MRule,metagol:metarule_init(AssertName,Subs,Head,Body2,Recursive,Path)].
 
 user:term_expansion((ibk(Head,Body):-IbkBody),(ibk(Head,Body):-IbkBody)):-
