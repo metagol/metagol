@@ -47,7 +47,7 @@ a :-
     f(['a','c']/['a','c','d'],_/[])
   ],
   learn(Pos,[],Prog),
-  writeln(Prog),
+  %% writeln(Prog),
   pprint(Prog).
 
 :-

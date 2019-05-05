@@ -98,8 +98,7 @@ prove_aux(p(P,A,Args,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     prove(Body,FullSig,Sig2,MaxN,N3,N2,[sub(Name,P,A,Subs)|Prog1],Prog2).
 
 nproveall(Atoms,Sig,Prog):-
-    forall(member(Atom,Atoms),
-        \+ deduce_atom(Atom,Sig,Prog)).
+    forall(member(Atom,Atoms), \+ deduce_atom(Atom,Sig,Prog)).
 
 make_atoms(Atoms1,Atoms2):-
     maplist(atom_to_list,Atoms1,Atoms3),
@@ -119,9 +118,9 @@ check_functional(Atoms,Sig,Prog):-
             \+ call(Condition)));
         true).
 
-check_recursion(false,_,_,_).  %% if not recursive continue
-check_recursion(true,1,_,_):- !,false. %% if recursive then check that maxn != 1
-check_recursion(true,_,Atom,Path):- %% otherwise check path - this step could be very expensive
+check_recursion(false,_,_,_).
+check_recursion(true,MaxN,Atom,Path):-
+    MaxN \== 1, % need at least two clauses if we are using recursion
     \+memberchk(Atom,Path).
 
 select_lower(P,A,FullSig,_Sig1,Sig2):-
@@ -234,9 +233,7 @@ invented_symbols(MaxClauses,P/A,[sym(P,A,_U)|Sig]):-
     NumSymbols is MaxClauses-1,
     max_inv_preds(MaxInvPreds),
     M is min(NumSymbols,MaxInvPreds),
-    findall(sym(Sym1,_Artiy,_Used1),(between(1,M,I),atomic_list_concat([P,'_',I],Sym1)),Sig1),
-    findall(sym(Sym2,Arity2,_Used2),head_pred(Sym2/Arity2),Sig2),
-    append(Sig1,Sig2,Sig).
+    findall(sym(Sym1,_Artiy,_Used1),(between(1,M,I),atomic_list_concat([P,'_',I],Sym1)),Sig).
 
 pprint(Prog1):-
     reverse(Prog1,Prog3),
