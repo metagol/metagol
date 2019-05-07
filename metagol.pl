@@ -10,10 +10,6 @@
     body_pred_call/2,
     compiled_pred_call/2.
 
-:- discontiguous
-    metarule/6,
-    metarule_init/6.
-
 default(max_clauses(10)).
 
 learn(Pos,Neg):-
@@ -83,7 +79,7 @@ prove_aux(p(P,A,Args,Path),FullSig,Sig1,MaxN,N1,N2,Prog1,Prog2):-
     Atom = [P|Args],
     select_lower(P,A,FullSig,Sig1,Sig2),
     member(sub(Name,P,A,Subs),Prog1),
-    metarule_init(Name,Subs,Atom,Body,Recursive,[Atom|Path]),
+    metarule(Name,Subs,Atom,Body,Recursive,[Atom|Path]),
     check_recursion(Recursive,MaxN,Atom,Path),
     prove(Body,FullSig,Sig2,MaxN,N1,N2,Prog1,Prog2).
 
@@ -245,7 +241,7 @@ pprint_clause(C):-
     format('~q.~n',[C]).
 
 metasub_to_clause(sub(Name,_,_,Subs),Clause2):-
-    metarule_init(Name,Subs,HeadList,BodyAsList1,_,_),
+    metarule(Name,Subs,HeadList,BodyAsList1,_,_),
     add_path_to_body(BodyAsList3,_,BodyAsList1),
     include(no_ordering,BodyAsList3,BodyAsList2),
     maplist(atom_to_list,ClauseAsList,[HeadList|BodyAsList2]),
@@ -272,7 +268,7 @@ user:term_expansion((metarule(Subs,Head,Body):-MetaBody),Asserts):-
 user:term_expansion((metarule(Name,Subs,Head,Body):-MetaBody),Asserts):-
     metarule_asserts(Name,Subs,Head,Body,MetaBody,Asserts).
 
-metarule_asserts(Name,Subs,Head,Body1,MetaBody,Asserts):-
+metarule_asserts(Name,Subs,Head,Body1,MetaBody,[metagol:MRule]):-
     Head = [P|_],
     is_recursive(Body1,P,Recursive),
     add_path_to_body(Body1,Path,Body2),
@@ -282,8 +278,7 @@ metarule_asserts(Name,Subs,Head,Body1,MetaBody,Asserts):-
     forall((member(p(P1,A1,_,_),Body2), ground(P1)), assert(type(P1,A1,compiled_pred))),
     (var(MetaBody) ->
         MRule = metarule(AssertName,Subs,Head,Body2,Recursive,Path);
-        MRule = (metarule(AssertName,Subs,Head,Body2,Recursive,Path):-MetaBody)),
-    Asserts = [metagol:MRule,metagol:metarule_init(AssertName,Subs,Head,Body2,Recursive,Path)].
+        MRule = (metarule(AssertName,Subs,Head,Body2,Recursive,Path):-MetaBody)).
 
 user:term_expansion((ibk(Head,Body):-IbkBody),(ibk(Head,Body):-IbkBody)):-
     ibk_asserts(Head,Body,IbkBody,[]).
