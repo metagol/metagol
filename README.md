@@ -163,9 +163,9 @@ Here are some publications on MIL and Metagol.
 
 #### Key papers
 
-* A. Cropper and S.H. Muggleton: [Learning efficient logic programs](http://A.cropper.com/pubs/mlj18-metaopt.pdf). Machine learning 2018.
+* A. Cropper and S.H. Muggleton: [Learning efficient logic programs](http://andrewcropper.com/pubs/mlj18-metaopt.pdf). Machine learning 2018.
 
-* A. Cropper and S.H. Muggleton: [Learning Higher-Order Logic Programs through Abstraction and Invention](http://A.cropper.com/pubs/ijcai16-metafunc.pdf). IJCAI 2016.
+* A. Cropper and S.H. Muggleton: [Learning Higher-Order Logic Programs through Abstraction and Invention](http://andrewcropper.com/pubs/ijcai16-metafunc.pdf). IJCAI 2016.
 
 * S.H. Muggleton, D. Lin, and A. Tamaddoni-Nezhad: [Meta-interpretive learning of higher-order dyadic datalog: predicate invention revisited](https://link.springer.com/article/10.1007/s10994-014-5471-y). Machine Learning 2015.
 
@@ -175,11 +175,11 @@ Here are some publications on MIL and Metagol.
 
 * R. Morel, A. Cropper, and L. Ong. [Typed meta-interpretive learning of logic programs](http://andrewcropper.com/pubs/jelia19-typed.pdf). JELIA 2019.
 
-* A. Cropper and S. Tourret: [Derivation Reduction of Metarules in Meta-interpretive Learning](http://A.cropper.com/pubs/ilp18-dreduce.pdf). ILP 2018.
+* A. Cropper and S. Tourret: [Derivation Reduction of Metarules in Meta-interpretive Learning](http://andrewcropper.com/pubs/ilp18-dreduce.pdf). ILP 2018.
 
-* A. Cropper and S.H. Muggleton: [Learning Efficient Logical Robot Strategies Involving Composable Objects](http://A.cropper.com/pubs/ijcai15-metagolo.pdf). IJCAI 2015.
+* A. Cropper and S.H. Muggleton: [Learning Efficient Logical Robot Strategies Involving Composable Objects](http://andrewcropper.com/pubs/ijcai15-metagolo.pdf). IJCAI 2015.
 
-* A. Cropper and S.H. Muggleton: [Logical Minimisation of Meta-Rules Within Meta-Interpretive Learning](http://A.cropper.com/pubs/ilp14-minmeta.pdf). ILP 2014.
+* A. Cropper and S.H. Muggleton: [Logical Minimisation of Meta-Rules Within Meta-Interpretive Learning](http://andrewcropper.com/pubs/ilp14-minmeta.pdf). ILP 2014.
 
 * S.H. Muggleton, D. Lin, Jianzhong Chen, abd A. Tamaddoni-Nezhad: MetaBayes: Bayesian Meta-Interpretative Learning Using Higher-Order Stochastic Refinement. ILP 2013.
 
@@ -190,14 +190,14 @@ Here are some publications on MIL and Metagol.
 * S. Muggleton, Wang-Zhou Dai, Claude Sammut, A. Tamaddoni-Nezhad, Jing Wen, Zhi-Hua Zhou:
 Meta-Interpretive Learning from noisy images. Machine Learning 2018.
 
-* A. Cropper, A. Tamaddoni-Nezhad, S.H. Muggleton: [Meta-Interpretive Learning of Data Transformation Programs](http://A.cropper.com/pubs/ilp15-datacurate.pdf). ILP 2015.
+* A. Cropper, A. Tamaddoni-Nezhad, S.H. Muggleton: [Meta-Interpretive Learning of Data Transformation Programs](http://andrewcropper.com/pubs/ilp15-datacurate.pdf). ILP 2015.
 
-* A. Cropper, S.H. Muggleton: [Can predicate invention compensate for incomplete background knowledge?](http://A.cropper.com/pubs/scai15-incomplete.pdf) SCAI 2015.
+* A. Cropper, S.H. Muggleton: [Can predicate invention compensate for incomplete background knowledge?](http://andrewcropper.com/pubs/scai15-incomplete.pdf) SCAI 2015.
 
 * D. Lin, E. Dechter, K. Ellis, J.B. Tenenbaum, and S.H. Muggleton: Bias reformulation for one-shot function induction. ECAI 2014.
 
 #### Theses
 
-* A. Cropper: [Efficiently learning efficient programs](http://A.cropper.com/pubs/phd-thesis.pdf). Imperial College London, UK 2017
+* A. Cropper: [Efficiently learning efficient programs](http://andrewcropper.com/pubs/phd-thesis.pdf). Imperial College London, UK 2017
 
 * D. Lin: Logic programs as declarative and procedural bias in inductive logic programming. Imperial College London, UK 2013
