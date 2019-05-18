@@ -1,6 +1,6 @@
 Metagol is an inductive logic programming (ILP) system based on meta-interpretive learning.
 Please contact Andrew Cropper (andrew.cropper@cs.ox.ac.uk) with any questions / bugs.
-If you use Metagol for research, please use [this citation](https://raw.githubusercontent.com/metagol/metagol/master/metagol.bib).
+If you use Metagol for research, please use [this citation](https://raw.githubusercontent.com/metagol/metagol/master/metagol.bib) and cite the relevant paper.
 
 #### Using Metagol
 
@@ -80,9 +80,9 @@ Users must supply metarules.
 Deciding which metarules to use is still an open (and hard!) problem.
 Preliminary work in this area is detailed in papers:
 
-* Cropper, A., and Tourret, S. [Derivation reduction of metarules in meta-interpretive learning](http://andrewcropper.com/pubs/ilp18-dreduce.pdf). ILP 2018.
+* A. Cropper and S. Tourret: [Derivation reduction of metarules in meta-interpretive learning](http://andrewcropper.com/pubs/ilp18-dreduce.pdf). ILP 2018.
 
-* Cropper, A. and Muggleton S.H. [Logical minimisation of meta-rules within meta-interpretive learning](http://andrewcropper.com/pubs/ilp14-minmeta.pdf). ILP 2014.
+* A. Cropper and S.H. Muggleton: [Logical minimisation of meta-rules within meta-interpretive learning](http://andrewcropper.com/pubs/ilp14-minmeta.pdf). ILP 2014.
 
 For learning dyadic programs without constant symbols, we recommend using these metarules:
 
@@ -110,7 +110,10 @@ See the find-duplicate, sorter, member, and string examples.
 
 #### Interpreted background knowledge
 
-Metagol supports interpreted background knowledge (IBK).
+Metagol supports interpreted background knowledge (IBK), which was initially introduced in this paper:
+
+* A. Cropper and S.H. Muggleton: [Learning Higher-Order Logic Programs through Abstraction and Invention](http://andrewcropper.com/pubs/ijcai16-metafunc.pdf). IJCAI 2016.
+
 IBK is usually used to learn higher-order programs.
 For instance, one can define the `map/3` construct as follows:
 
@@ -181,18 +184,22 @@ Here are some publications on MIL and Metagol.
 
 * A. Cropper and S.H. Muggleton: [Logical Minimisation of Meta-Rules Within Meta-Interpretive Learning](http://andrewcropper.com/pubs/ilp14-minmeta.pdf). ILP 2014.
 
-* S.H. Muggleton, D. Lin, Jianzhong Chen, abd A. Tamaddoni-Nezhad: MetaBayes: Bayesian Meta-Interpretative Learning Using Higher-Order Stochastic Refinement. ILP 2013.
+* S.H. Muggleton, D. Lin, Jianzhong Chen, and A. Tamaddoni-Nezhad: MetaBayes: Bayesian Meta-Interpretative Learning Using Higher-Order Stochastic Refinement. ILP 2013.
 
 #### Applications / other
 
+* A.Cropper: [Playgol: learning programs through play](http://andrewcropper.com/pubs/ijcai19-playgol.pdf). IJCAI 2019.
+
 * S.H. Muggleton, U. Schmid, C. Zeller, A. Tamaddoni-Nezhad, and T.R. Besold: Ultra-Strong Machine Learning: comprehensibility of programs learned with ILP. Machine Learning 2018.
 
-* S. Muggleton, Wang-Zhou Dai, Claude Sammut, A. Tamaddoni-Nezhad, Jing Wen, Zhi-Hua Zhou:
+* S. Muggleton, W-Z. Dai, C. Sammut, A. Tamaddoni-Nezhad, J. Wen, and Z-H. Zhou:
 Meta-Interpretive Learning from noisy images. Machine Learning 2018.
 
-* A. Cropper, A. Tamaddoni-Nezhad, S.H. Muggleton: [Meta-Interpretive Learning of Data Transformation Programs](http://andrewcropper.com/pubs/ilp15-datacurate.pdf). ILP 2015.
+* M. Siebers and U. Schmid: [Was the Year 2000 a Leap Year? Step-Wise Narrowing Theories with Metagol] (https://link.springer.com/chapter/10.1007/978-3-319-99960-9_9). ILP 2018.
 
-* A. Cropper, S.H. Muggleton: [Can predicate invention compensate for incomplete background knowledge?](http://andrewcropper.com/pubs/scai15-incomplete.pdf) SCAI 2015.
+* A. Cropper, A. Tamaddoni-Nezhad, and S.H. Muggleton: [Meta-Interpretive Learning of Data Transformation Programs](http://andrewcropper.com/pubs/ilp15-datacurate.pdf). ILP 2015.
+
+* A. Cropper and S.H. Muggleton: [Can predicate invention compensate for incomplete background knowledge?](http://andrewcropper.com/pubs/scai15-incomplete.pdf) SCAI 2015.
 
 * D. Lin, E. Dechter, K. Ellis, J.B. Tenenbaum, and S.H. Muggleton: Bias reformulation for one-shot function induction. ECAI 2014.
 
