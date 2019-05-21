@@ -195,7 +195,7 @@ Here are some publications on MIL and Metagol.
 * S. Muggleton, W-Z. Dai, C. Sammut, A. Tamaddoni-Nezhad, J. Wen, and Z-H. Zhou:
 Meta-Interpretive Learning from noisy images. Machine Learning 2018.
 
-* M. Siebers and U. Schmid: [Was the Year 2000 a Leap Year? Step-Wise Narrowing Theories with Metagol] (https://link.springer.com/chapter/10.1007/978-3-319-99960-9_9). ILP 2018.
+* M. Siebers and U. Schmid: [Was the Year 2000 a Leap Year? Step-Wise Narrowing Theories with Metagol](https://link.springer.com/chapter/10.1007/978-3-319-99960-9_9). ILP 2018.
 
 * A. Cropper, A. Tamaddoni-Nezhad, and S.H. Muggleton: [Meta-Interpretive Learning of Data Transformation Programs](http://andrewcropper.com/pubs/ilp15-datacurate.pdf). ILP 2015.
 
