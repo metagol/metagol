@@ -179,9 +179,9 @@ Here are some publications on MIL and Metagol.
 
 #### Theory and Implementation
 
-A. Cropper and S. Tourret. [Logical minimisation of metarules](http://andrewcropper.com/pubs/mlj19-reduce.pdf). Machine Learning 2019.
+* A. Cropper and S. Tourret. [Logical minimisation of metarules](http://andrewcropper.com/pubs/mlj19-reduce.pdf). Machine Learning 2019.
 
-A. Cropper, R. Morel, and S.H. Muggleton. [Learning higher-order logic programs](http://andrewcropper.com/pubs/mlj19-metaho.pdf). Machine Learning 2019.
+* A. Cropper, R. Morel, and S.H. Muggleton. [Learning higher-order logic programs](http://andrewcropper.com/pubs/mlj19-metaho.pdf). Machine Learning 2019.
 
 * A. Cropper and S.H. Muggleton: [Learning efficient logic programs](http://andrewcropper.com/pubs/mlj18-metaopt.pdf). Machine learning 2018.
 
