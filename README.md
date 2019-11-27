@@ -77,8 +77,9 @@ The symbols `A`, `B`, and `C` denote first-order variables (i.e. can unify with 
 Metagol will search for appropriate substitutions for the variables in the second argument of a metarule (*Subs*).
 
 Users must supply metarules.
-Deciding which metarules to use is still an open (and hard!) problem.
-Preliminary work in this area is detailed in papers:
+Deciding which metarules to use is still an open (and hard!) problem. Some work in this area is detailed in the papers:
+
+* A. Cropper and S. Tourret. [Logical minimisation of metarules](http://andrewcropper.com/pubs/mlj19-reduce.pdf). Machine Learning 2019.
 
 * A. Cropper and S. Tourret: [Derivation reduction of metarules in meta-interpretive learning](http://andrewcropper.com/pubs/ilp18-dreduce.pdf). ILP 2018.
 
@@ -110,7 +111,9 @@ See the find-duplicate, sorter, member, and string examples.
 
 #### Interpreted background knowledge
 
-Metagol supports interpreted background knowledge (IBK), which was initially introduced in this paper:
+Metagol supports interpreted background knowledge (IBK), which was initially introduced in these papers:
+
+* A. Cropper, R. Morel, and S.H. Muggleton. [Learning higher-order logic programs](http://andrewcropper.com/pubs/mlj19-metaho.pdf). Machine Learning 2019.
 
 * A. Cropper and S.H. Muggleton: [Learning Higher-Order Logic Programs through Abstraction and Invention](http://andrewcropper.com/pubs/ijcai16-metafunc.pdf). IJCAI 2016.
 
@@ -166,9 +169,9 @@ Here are some publications on MIL and Metagol.
 
 #### Key papers
 
-* A. Cropper and S.H. Muggleton: [Learning efficient logic programs](http://andrewcropper.com/pubs/mlj18-metaopt.pdf). Machine learning 2018.
+* A. Cropper and S. Tourret. [Logical minimisation of metarules](http://andrewcropper.com/pubs/mlj19-reduce.pdf). Machine Learning 2019.
 
-* A. Cropper and S.H. Muggleton: [Learning Higher-Order Logic Programs through Abstraction and Invention](http://andrewcropper.com/pubs/ijcai16-metafunc.pdf). IJCAI 2016.
+* A. Cropper, R. Morel, and S.H. Muggleton. [Learning higher-order logic programs](http://andrewcropper.com/pubs/mlj19-metaho.pdf). Machine Learning 2019.
 
 * S.H. Muggleton, D. Lin, and A. Tamaddoni-Nezhad: [Meta-interpretive learning of higher-order dyadic datalog: predicate invention revisited](https://link.springer.com/article/10.1007/s10994-014-5471-y). Machine Learning 2015.
 
@@ -176,17 +179,31 @@ Here are some publications on MIL and Metagol.
 
 #### Theory and Implementation
 
+A. Cropper and S. Tourret. [Logical minimisation of metarules](http://andrewcropper.com/pubs/mlj19-reduce.pdf). Machine Learning 2019.
+
+A. Cropper, R. Morel, and S.H. Muggleton. [Learning higher-order logic programs](http://andrewcropper.com/pubs/mlj19-metaho.pdf). Machine Learning 2019.
+
+* A. Cropper and S.H. Muggleton: [Learning efficient logic programs](http://andrewcropper.com/pubs/mlj18-metaopt.pdf). Machine learning 2018.
+
 * R. Morel, A. Cropper, and L. Ong. [Typed meta-interpretive learning of logic programs](http://andrewcropper.com/pubs/jelia19-typed.pdf). JELIA 2019.
 
 * A. Cropper and S. Tourret: [Derivation Reduction of Metarules in Meta-interpretive Learning](http://andrewcropper.com/pubs/ilp18-dreduce.pdf). ILP 2018.
 
+* A. Cropper and S.H. Muggleton: [Learning Higher-Order Logic Programs through Abstraction and Invention](http://andrewcropper.com/pubs/ijcai16-metafunc.pdf). IJCAI 2016.
+
 * A. Cropper and S.H. Muggleton: [Learning Efficient Logical Robot Strategies Involving Composable Objects](http://andrewcropper.com/pubs/ijcai15-metagolo.pdf). IJCAI 2015.
+
+* S.H. Muggleton, D. Lin, and A. Tamaddoni-Nezhad: [Meta-interpretive learning of higher-order dyadic datalog: predicate invention revisited](https://link.springer.com/article/10.1007/s10994-014-5471-y). Machine Learning 2015.
+
+* S.H. Muggleton, D. Lin, N. Pahlavi, and A. Tamaddoni-Nezhad: [Meta-interpretive learning: application to grammatical inference](https://link.springer.com/article/10.1007/s10994-013-5358-3). Machine Learning 2014.
 
 * A. Cropper and S.H. Muggleton: [Logical Minimisation of Meta-Rules Within Meta-Interpretive Learning](http://andrewcropper.com/pubs/ilp14-minmeta.pdf). ILP 2014.
 
 * S.H. Muggleton, D. Lin, Jianzhong Chen, and A. Tamaddoni-Nezhad: MetaBayes: Bayesian Meta-Interpretative Learning Using Higher-Order Stochastic Refinement. ILP 2013.
 
 #### Applications / other
+
+* A.Cropper: [Forgetting to learn logic programs](http://andrewcropper.com/pubs/aaai20-forgetgol.pdf). AAAI 2020.
 
 * A.Cropper: [Playgol: learning programs through play](http://andrewcropper.com/pubs/ijcai19-playgol.pdf). IJCAI 2019.
 
@@ -195,13 +212,13 @@ Here are some publications on MIL and Metagol.
 * S. Muggleton, W-Z. Dai, C. Sammut, A. Tamaddoni-Nezhad, J. Wen, and Z-H. Zhou:
 Meta-Interpretive Learning from noisy images. Machine Learning 2018.
 
-* M. Siebers and U. Schmid: [Was the Year 2000 a Leap Year? Step-Wise Narrowing Theories with Metagol] (https://link.springer.com/chapter/10.1007/978-3-319-99960-9_9). ILP 2018.
+* M. Siebers and U. Schmid: [Was the Year 2000 a Leap Year? Step-Wise Narrowing Theories with Metagol](https://link.springer.com/chapter/10.1007/978-3-319-99960-9_9). ILP 2018.
 
 * A. Cropper, A. Tamaddoni-Nezhad, and S.H. Muggleton: [Meta-Interpretive Learning of Data Transformation Programs](http://andrewcropper.com/pubs/ilp15-datacurate.pdf). ILP 2015.
 
 * A. Cropper and S.H. Muggleton: [Can predicate invention compensate for incomplete background knowledge?](http://andrewcropper.com/pubs/scai15-incomplete.pdf) SCAI 2015.
 
-* D. Lin, E. Dechter, K. Ellis, J.B. Tenenbaum, and S.H. Muggleton: Bias reformulation for one-shot function induction. ECAI 2014.
+* D. Lin, E. Dechter, K. Ellis, J.B. Tenenbaum, and S.H. Muggleton: [Bias reformulation for one-shot function induction](https://www.doc.ic.ac.uk/~shm/Papers/ECAI-546.pdf). ECAI 2014.
 
 #### Theses
 
