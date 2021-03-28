@@ -1,5 +1,7 @@
+# THIS VERSION OF METAGOL IS NO LONGER UNDER DEVELOPMENT. IT HAS BEEN SUPERSEDED BY [POPPER](https://arxiv.org/pdf/2005.02259.pdf).
+
+
 Metagol is an inductive logic programming (ILP) system based on meta-interpretive learning.
-Please contact Andrew Cropper (andrew.cropper@cs.ox.ac.uk) with any questions / bugs.
 If you use Metagol for research, please use [this citation](https://raw.githubusercontent.com/metagol/metagol/master/metagol.bib) and cite the relevant paper.
 
 #### Using Metagol
